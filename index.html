@@ -3,42 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي</title>
+    <title>المخبر الافتراضي - القائمة الرئيسية</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #eef2f3; padding: 20px; }
-        .lab-container { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; }
-        .experiment-box { border: 2px dashed #3498db; padding: 20px; margin: 20px 0; border-radius: 10px; }
-        .btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .btn:hover { background-color: #2980b9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; font-size: 24px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { background-color: #0088cc; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn:hover { background-color: #006699; }
+        .back-btn { background-color: #e74c3c; margin-top: 20px; width: 100%; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="lab-container">
-        <h1>🧪 المخبر الافتراضي</h1>
-        <p>مرحباً بك في أول اختبار عملي.</p>
-
-        <div class="experiment-box">
-            <p id="question">ما هو اللون الذي يظهر عند إضافة اليود إلى النشاء؟</p>
-            <button class="btn" onclick="checkAnswer('أزرق داكن')">أزرق داكن</button>
-            <button class="btn" onclick="checkAnswer('أحمر')">أحمر</button>
-        </div>
-
-        <p id="result"></p>
+<div class="container">
+    <div id="view-title"><h1>اختر السنة الدراسية</h1></div>
+    
+    <div id="years-view" class="btn-grid">
+        <button class="btn" onclick="showSemesters(2)">السنة الثانية</button>
+        <button class="btn" onclick="showSemesters(3)">السنة الثالثة</button>
+        <button class="btn" onclick="showSemesters(4)">السنة الرابعة</button>
+        <button class="btn" onclick="showSemesters(5)">السنة الخامسة</button>
     </div>
 
-    <script>
-        function checkAnswer(answer) {
-            const resultDisplay = document.getElementById('result');
-            if (answer === 'أزرق داكن') {
-                resultDisplay.innerHTML = "✅ إجابة صحيحة! تفاعل النشاء مع اليود يعطي لوناً أزرق.";
-                resultDisplay.style.color = "green";
-            } else {
-                resultDisplay.innerHTML = "❌ حاول مرة أخرى.";
-                resultDisplay.style.color = "red";
-            }
+    <div id="semesters-view" class="hidden">
+        <div class="btn-grid">
+            <button class="btn" onclick="showSubjects(1)">الفصل الأول</button>
+            <button class="btn" onclick="showSubjects(2)">الفصل الثاني</button>
+        </div>
+        <button class="btn back-btn" onclick="goBack('years-view')">عودة للسنوات</button>
+    </div>
+
+    <div id="subjects-view" class="hidden">
+        <div id="subjects-list" class="btn-grid"></div>
+        <button class="btn back-btn" onclick="goBack('semesters-view')">عودة للفصول</button>
+    </div>
+</div>
+
+<script>
+    let selectedYear = 0;
+    let selectedSemester = 0;
+
+    const data = {
+        2: { // السنة الثانية
+            1: ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات1", "الكيمياء العضوية1"],
+            2: ["الكيمياء العضوية2", "الكيمياء الحيوية1", "العقاقير1", "التحليلية1", "الصيدلانيات1"]
+        },
+        3: { // السنة الثالثة
+            1: ["التحليلية2", "الأحياء1", "العقاقير2", "فارماكولوجي1", "التكنولوجيا الصيدلية"],
+            2: ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي2", "الكيمياء صيدلية1", "الأحياء2"]
         }
-    </script>
+    };
+
+    function showSemesters(year) {
+        selectedYear = year;
+        document.getElementById('years-view').classList.add('hidden');
+        document.getElementById('semesters-view').classList.remove('hidden');
+        document.getElementById('view-title').innerHTML = "<h1>اختر الفصل الدراسي</h1>";
+    }
+
+    function showSubjects(semester) {
+        selectedSemester = semester;
+        const subjects = data[selectedYear][semester] || [];
+        const listDiv = document.getElementById('subjects-list');
+        listDiv.innerHTML = "";
+
+        subjects.forEach(subject => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.innerText = subject;
+            btn.onclick = () => alert("سيتم فتح محاضرات مادة: " + subject);
+            listDiv.appendChild(btn);
+        });
+
+        document.getElementById('semesters-view').classList.add('hidden');
+        document.getElementById('subjects-view').classList.remove('hidden');
+        document.getElementById('view-title').innerHTML = "<h1>اختر المادة</h1>";
+    }
+
+    function goBack(viewId) {
+        document.getElementById('semesters-view').classList.add('hidden');
+        document.getElementById('subjects-view').classList.add('hidden');
+        document.getElementById(viewId).classList.remove('hidden');
+        document.getElementById('view-title').innerHTML = viewId === 'years-view' ? "<h1>اختر السنة الدراسية</h1>" : "<h1>اختر الفصل الدراسي</h1>";
+    }
+</script>
+
 </body>
 </html>
