@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المخبر الافتراضي</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #eef2f3; padding: 20px; }
+        .lab-container { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        .experiment-box { border: 2px dashed #3498db; padding: 20px; margin: 20px 0; border-radius: 10px; }
+        .btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+
+    <div class="lab-container">
+        <h1>🧪 المخبر الافتراضي</h1>
+        <p>مرحباً بك في أول اختبار عملي.</p>
+
+        <div class="experiment-box">
+            <p id="question">ما هو اللون الذي يظهر عند إضافة اليود إلى النشاء؟</p>
+            <button class="btn" onclick="checkAnswer('أزرق داكن')">أزرق داكن</button>
+            <button class="btn" onclick="checkAnswer('أحمر')">أحمر</button>
+        </div>
+
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function checkAnswer(answer) {
+            const resultDisplay = document.getElementById('result');
+            if (answer === 'أزرق داكن') {
+                resultDisplay.innerHTML = "✅ إجابة صحيحة! تفاعل النشاء مع اليود يعطي لوناً أزرق.";
+                resultDisplay.style.color = "green";
+            } else {
+                resultDisplay.innerHTML = "❌ حاول مرة أخرى.";
+                resultDisplay.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
