@@ -3,37 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي - كيمياء صيدلية</title>
+    <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --error: #e74c3c; }
-        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-card { background: white; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; animation: fadeIn 0.5s; }
-        .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; min-height: 300px; }
-        .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 12px; background: white; color: var(--primary); 
-               box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; 
-               display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); border-color: var(--accent); color: var(--accent); }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; text-align: center; padding: 15px; direction: rtl; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; background: #0088cc; color: white; font-size: 18px; cursor: pointer; }
         .hidden { display: none; }
-        .test-box { background: #f8f9fa; border: 2px solid var(--accent); padding: 15px; border-radius: 15px; margin-top: 10px; }
-        .result-msg { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 8px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .test-area { background: #eef9ff; border: 2px solid #0088cc; padding: 15px; border-radius: 10px; margin-top: 20px; }
+        .res { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <div class="header">
-        <h2 id="nav-title">المخبر الافتراضي</h2>
-        <p id="sub-title">اختر السنة الدراسية</p>
+<div class="card">
+    <h2 id="title">المخبر الافتراضي</h2>
+
+    <div id="step1">
+        <p>اختر السنة الدراسية:</p>
+        <button class="btn" onclick="showStep(2)">السنة الثالثة</button>
     </div>
 
-    <div class="content">
-        <div id="years-step">
-            <button class="btn" onclick="goTo('semesters-step', 'السنة الثالثة', 'اختر الفصل')">السنة الثالثة <span>⬅️</span></button>
-            <button class="btn" style="opacity:0.5">السنة الثانية (قريباً)</button>
+    <div id="step2" class="hidden">
+        <p>السنة الثالثة - اختر الفصل:</p>
+        <button class="btn" onclick="showStep(3)">الفصل الثاني</button>
+        <button onclick="showStep(1)">🔙 عودة</button>
+    </div>
+
+    <div id="step3" class="hidden">
+        <p>اختر المادة:</p>
+        <button class="btn" onclick="showStep(4)">الكيمياء الصيدلية 1</button>
+        <button onclick="showStep(2)">🔙 عودة</button>
+    </div>
+
+    <div id="step4" class="hidden">
+        <p>المادة: كيمياء صيدلية 1</p>
+        <button class="btn" onclick="showStep(5)">الجلسة 1: الكشف عن الشوارد</button>
+        <button onclick="showStep(3)">🔙 عودة</button>
+    </div>
+
+    <div id="step5" class="hidden">
+        <div class="test-area">
+            [span_0](start_span)<h3>اختبار الكشف عن الكالسيوم $Ca^{+2}$[span_0](end_span)</h3>
+            [span_1](start_span)<p>عند إضافة 1 مل من <b>حماضات النشادر</b> إلى 2 مل من شوارد الكالسيوم، ما هو لون الراسب؟[span_1](end_span)</p>
+            <button class="btn" style="background:#27ae60" onclick="check('صح')">راسب أبيض ⚪</button>
+            <button class="btn" style="background:#e67e22" onclick="check('غلط')">راسب أحمر 🔴</button>
         </div>
+        <div id="resultBox" class="res hidden"></div>
+        <br>
+        <button onclick="showStep(4)">🔙 إنهاء</button>
+    </div>
+</div>
+
+<script>
+    // التأكد من أن التطبيق يعمل بكامل الشاشة في تليجرام
+    window.Telegram.WebApp.expand();
+
+    function showStep(n) {
+        // إخفاء كل المراحل
+        for(let i=1; i<=5; i++) {
+            document.getElementById('step' + i).classList.add('hidden');
+        }
+        // إظهار المرحلة المطلوبة
+        document.getElementById('step' + n).classList.remove('hidden');
+    }
+
+    function check(status) {
+        const box = document.getElementById('resultBox');
+        box.classList.remove('hidden');
+        if(status === 'صح') {
+            [span_2](start_span)box.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم.[span_2](end_span)";
+            box.style.background = "#d4edda";
+        } else {
+            box.innerHTML = "❌ خطأ! [span_3](start_span)راجع صفات الراسب في الصفحة 4.[span_3](end_span)";
+            box.style.background = "#f8d7da";
+        }
+    }
+</script>
+
+</body>
+</html>
 
         <div id="semesters-step" class="hidden">
             <button class="btn" onclick="goTo('subjects-step', 'الفصل الثاني', 'اختر المادة')">الفصل الثاني <span>⬅️</span></button>
