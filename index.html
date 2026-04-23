@@ -6,34 +6,79 @@
     <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; direction: rtl; text-align: center; padding: 20px; }
-        .page { display: none; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .active { display: block; animation: fadeIn 0.3s; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #0088cc; color: white; border: none; border-radius: 10px; font-size: 18px; text-decoration: none; cursor: pointer; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        :root { --main-blue: #0088cc; --bg-color: #f4f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-color); direction: rtl; text-align: center; margin: 0; padding: 20px; }
+        
+        /* الحاوية الرئيسية */
+        .app-container { max-width: 400px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        /* إخفاء الأقسام غير النشطة بشكل كامل */
+        .page { display: none; }
+        .page.active { display: block; animation: slideIn 0.3s ease-out; }
+
+        h2 { color: #2c3e50; font-size: 20px; margin-bottom: 20px; }
+        
+        /* تنسيق الأزرار */
+        .btn { display: block; width: 100%; padding: 16px; margin: 12px 0; background: var(--main-blue); color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .btn:active { transform: scale(0.98); background: #006699; }
+        
+        .btn-secondary { background: #6c757d; margin-top: 20px; font-size: 14px; padding: 10px; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+<div class="app-container">
     <div id="p1" class="page active">
-        <h2>المخبر الافتراضي</h2>
+        <h2>🔬 المخبر الافتراضي</h2>
         <p>اختر السنة الدراسية:</p>
-        <button class="btn" onclick="show(2)">السنة الثالثة</button>
+        <button class="btn" onclick="showPage(2)">السنة الثالثة</button>
+        <button class="btn" style="background:#ccc; cursor:not-allowed">السنة الثانية (قريباً)</button>
     </div>
 
     <div id="p2" class="page">
         <h2>السنة الثالثة</h2>
-        <p>اختر الفصل:</p>
-        <button class="btn" onclick="show(3)">الفصل الثاني</button>
-        <button style="background:#888" class="btn" onclick="show(1)">🔙 عودة</button>
+        <p>اختر الفصل الدراسي:</p>
+        <button class="btn" onclick="showPage(3)">الفصل الثاني</button>
+        <button class="btn btn-secondary" onclick="showPage(1)">🔙 العودة للسنوات</button>
     </div>
 
     <div id="p3" class="page">
         <h2>الفصل الثاني - الثالثة</h2>
-        <button class="btn" onclick="show(4)">الكيمياء الصيدلية 1</button>
-        <button style="background:#888" class="btn" onclick="show(2)">🔙 عودة</button>
+        <p>اختر المادة:</p>
+        <button class="btn" onclick="showPage(4)">الكيمياء الصيدلية 1</button>
+        <button class="btn btn-secondary" onclick="showPage(2)">🔙 العودة للفصول</button>
     </div>
 
+    <div id="p4" class="page">
+        <h2>الكيمياء الصيدلية 1</h2>
+        <p>الجلسات المتاحة:</p>
+        <button class="btn" onclick="alert('سيبدأ الآن اختبار الكشف عن الكالسيوم والمغنزيوم')">الجلسة 1: الكشف عن الشوارد</button>
+        <button class="btn btn-secondary" onclick="showPage(3)">🔙 العودة للمواد</button>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    function showPage(pageNum) {
+        // 1. إخفاء جميع الصفحات تماماً
+        const allPages = document.querySelectorAll('.page');
+        allPages.forEach(p => p.classList.remove('active'));
+
+        // 2. إظهار الصفحة المطلوبة فقط
+        const targetPage = document.getElementById('p' + pageNum);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>
     <div id="p4" class="page">
         <h2>الكيمياء الصيدلية 1</h2>
         <p>الجلسات العملية المتاحة:</p>
