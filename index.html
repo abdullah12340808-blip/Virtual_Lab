@@ -3,37 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي - القائمة الرئيسية</title>
+    <title>المخبر الافتراضي - كيمياء صيدلية</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; font-size: 24px; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn { background-color: #0088cc; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn:hover { background-color: #006699; }
-        .back-btn { background-color: #e74c3c; margin-top: 20px; width: 100%; }
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --error: #e74c3c; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-card { background: white; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; animation: fadeIn 0.5s; }
+        .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; min-height: 300px; }
+        .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 12px; background: white; color: var(--primary); 
+               box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; 
+               display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); border-color: var(--accent); color: var(--accent); }
         .hidden { display: none; }
+        .test-box { background: #f8f9fa; border: 2px solid var(--accent); padding: 15px; border-radius: 15px; margin-top: 10px; }
+        .result-msg { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 8px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="view-title"><h1>اختر السنة الدراسية</h1></div>
-    
-    <div id="years-view" class="btn-grid">
-        <button class="btn" onclick="showSemesters(2)">السنة الثانية</button>
-        <button class="btn" onclick="showSemesters(3)">السنة الثالثة</button>
-        <button class="btn" onclick="showSemesters(4)">السنة الرابعة</button>
-        <button class="btn" onclick="showSemesters(5)">السنة الخامسة</button>
+<div class="app-card">
+    <div class="header">
+        <h2 id="nav-title">المخبر الافتراضي</h2>
+        <p id="sub-title">اختر السنة الدراسية</p>
     </div>
 
-    <div id="semesters-view" class="hidden">
-        <div class="btn-grid">
-            <button class="btn" onclick="showSubjects(1)">الفصل الأول</button>
-            <button class="btn" onclick="showSubjects(2)">الفصل الثاني</button>
+    <div class="content">
+        <div id="years-step">
+            <button class="btn" onclick="goTo('semesters-step', 'السنة الثالثة', 'اختر الفصل')">السنة الثالثة <span>⬅️</span></button>
+            <button class="btn" style="opacity:0.5">السنة الثانية (قريباً)</button>
         </div>
-        <button class="btn back-btn" onclick="goBack('years-view')">عودة للسنوات</button>
+
+        <div id="semesters-step" class="hidden">
+            <button class="btn" onclick="goTo('subjects-step', 'الفصل الثاني', 'اختر المادة')">الفصل الثاني <span>⬅️</span></button>
+            <button class="btn" onclick="goBack('years-step', 'المخبر الافتراضي', 'اختر السنة')">🔙 عودة</button>
+        </div>
+
+        <div id="subjects-step" class="hidden">
+            <button class="btn" onclick="goTo('sessions-step', 'الكيمياء الصيدلية 1', 'اختر الجلسة')">الكيمياء الصيدلية 1 <span>🧪</span></button>
+            <button class="btn" onclick="goBack('semesters-step', 'السنة الثالثة', 'اختر الفصل')">🔙 عودة</button>
+        </div>
+
+        <div id="sessions-step" class="hidden">
+            <button class="btn" onclick="goTo('lab-test-step', 'الجلسة 1: شوارد موجبة', 'اختبار الكالسيوم')">الجلسة الأولى: الكشف عن الشوارد <span>🔬</span></button>
+            <button class="btn" onclick="goBack('subjects-step', 'الفصل الثاني', 'اختر المادة')">🔙 عودة</button>
+        </div>
+
+        <div id="lab-test-step" class="hidden">
+            <div class="test-box">
+                <p><b>تجربة:</b> الكشف عن شوارد <b>الكالسيوم Ca²⁺</b></p>
+                <p>أضف 1 مل من "حماضات النشادر" إلى 2 مل من محلول الكالسيوم. ماذا تلاحظ؟</p>
+                <button class="btn" onclick="verify('white', 'Ca')">ظهور راسب أبيض ⚪</button>
+                <button class="btn" onclick="verify('blue', 'Ca')">ظهور لون أزرق 🔵</button>
+                <button class="btn" onclick="verify('orange', 'Ca')">تلوّن اللهب باللون البرتقالي 🔥</button>
+            </div>
+            <div id="result" class="result-msg hidden"></div>
+            <button class="btn back-btn" onclick="goBack('sessions-step', 'الكيمياء الصيدلية 1', 'اختر الجلسة')">🔙 إنهاء التجربة</button>
+        </div>
     </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // تمديد التطبيق ليأخذ الشاشة كاملة
+
+    function goTo(stepId, title, sub) {
+        document.querySelectorAll('.content > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById(stepId).classList.remove('hidden');
+        document.getElementById('nav-title').innerText = title;
+        document.getElementById('sub-title').innerText = sub;
+    }
+
+    function goBack(stepId, title, sub) {
+        goTo(stepId, title, sub);
+    }
+
+    function verify(choice, type) {
+        const res = document.getElementById('result');
+        res.classList.remove('hidden');
+        
+        if (type === 'Ca' && choice === 'white') {
+            [span_0](start_span)res.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم[span_0](end_span).";
+            res.style.background = "#d4edda"; res.style.color = "#155724";
+        } else if (type === 'Ca' && choice === 'orange') {
+            res.innerHTML = "💡 معلومة صحيحة! [span_1](start_span)الكالسيوم يعطي لهب برتقالي، لكنه ليس ناتج تفاعل الحماضات[span_1](end_span).";
+            res.style.background = "#fff3cd"; res.style.color = "#856404";
+        } else {
+            res.innerHTML = "❌ خطأ! [span_2](start_span)الراسب الناتج مع الحماضات أبيض اللون دائماً[span_2](end_span).";
+            res.style.background = "#f8d7da"; res.style.color = "#721c24";
+        }
+    }
+</script>
+
+</body>
+</html>
+
 
     <div id="subjects-view" class="hidden">
         <div id="subjects-list" class="btn-grid"></div>
