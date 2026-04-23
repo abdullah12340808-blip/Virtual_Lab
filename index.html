@@ -6,34 +6,66 @@
     <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; text-align: center; padding: 15px; direction: rtl; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; background: #0088cc; color: white; font-size: 18px; cursor: pointer; }
-        .hidden { display: none; }
-        .test-area { background: #eef9ff; border: 2px solid #0088cc; padding: 15px; border-radius: 10px; margin-top: 20px; }
-        .res { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; }
+        body { font-family: sans-serif; background: #f4f4f4; direction: rtl; text-align: center; padding: 20px; }
+        .page { display: none; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .active { display: block; animation: fadeIn 0.3s; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #0088cc; color: white; border: none; border-radius: 10px; font-size: 18px; text-decoration: none; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 id="title">المخبر الافتراضي</h2>
-
-    <div id="step1">
+    <div id="p1" class="page active">
+        <h2>المخبر الافتراضي</h2>
         <p>اختر السنة الدراسية:</p>
-        <button class="btn" onclick="showStep(2)">السنة الثالثة</button>
+        <button class="btn" onclick="show(2)">السنة الثالثة</button>
     </div>
 
-    <div id="step2" class="hidden">
-        <p>السنة الثالثة - اختر الفصل:</p>
-        <button class="btn" onclick="showStep(3)">الفصل الثاني</button>
-        <button onclick="showStep(1)">🔙 عودة</button>
+    <div id="p2" class="page">
+        <h2>السنة الثالثة</h2>
+        <p>اختر الفصل:</p>
+        <button class="btn" onclick="show(3)">الفصل الثاني</button>
+        <button style="background:#888" class="btn" onclick="show(1)">🔙 عودة</button>
     </div>
 
-    <div id="step3" class="hidden">
-        <p>اختر المادة:</p>
-        <button class="btn" onclick="showStep(4)">الكيمياء الصيدلية 1</button>
-        <button onclick="showStep(2)">🔙 عودة</button>
+    <div id="p3" class="page">
+        <h2>الفصل الثاني - الثالثة</h2>
+        <button class="btn" onclick="show(4)">الكيمياء الصيدلية 1</button>
+        <button style="background:#888" class="btn" onclick="show(2)">🔙 عودة</button>
+    </div>
+
+    <div id="p4" class="page">
+        <h2>الكيمياء الصيدلية 1</h2>
+        <p>الجلسات العملية المتاحة:</p>
+        <button class="btn" onclick="alert('سيبدأ اختبار الكشف عن الشوارد الموجبة قريباً!')">الجلسة 1: الكشف عن الشوارد</button>
+        <button style="background:#888" class="btn" onclick="show(3)">🔙 عودة</button>
+    </div>
+
+    <script>
+        // إخبار تليجرام أن التطبيق جاهز
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        function show(pageNum) {
+            console.log("الانتقال إلى الصفحة: " + pageNum); // للتأكد من عمل الدالة
+            
+            // إخفاء جميع الصفحات
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+
+            // إظهار الصفحة المطلوبة
+            const target = document.getElementById('p' + pageNum);
+            if (target) {
+                target.classList.add('active');
+            } else {
+                console.error("الصفحة غير موجودة!");
+            }
+        }
+    </script>
+</body>
+</html>
     </div>
 
     <div id="step4" class="hidden">
