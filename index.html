@@ -1,54 +1,274 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المخبر الافتراضي</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: #101c33;
+      --panel-2: #162544;
+      --text: #eef4ff;
+      --muted: #9fb2d1;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #112040 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .app { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(16, 28, 51, .86);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      margin-bottom: 16px;
+    }
+    .brand h1 { margin: 0; font-size: 22px; color: #7dd3fc; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; max-width: 840px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(56, 189, 248, .12); color: #bfe9ff; border: 1px solid rgba(56, 189, 248, .22); font-size: 13px; white-space: nowrap; flex: 0 0 auto; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .panel { background: rgba(16, 28, 51, .92); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); padding: 18px; }
+    .title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .title-row h2 { margin: 0; font-size: 22px; }
+    .title-row p { margin: 6px 0 0; color: var(--muted); line-height: 1.8; }
+    .grid { display: grid; gap: 14px; }
+    .sessions-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card {
+      background: linear-gradient(180deg, rgba(22,37,68,.95), rgba(12,21,39,.95));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .click-card {
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .click-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125, 211, 252, .35);
+    }
+    .click-card h3 {
+      margin: 0 0 8px;
+      color: #e8f7ff;
+    }
+    .click-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      color: #d8e6ff;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #07101d;
+      background: #cfefff;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .hidden { display: none !important; }
+    .h-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 2px 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .h-scroll::-webkit-scrollbar { height: 10px; }
+    .h-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+    }
+    .h-card {
+      flex: 0 0 260px;
+      scroll-snap-align: start;
+    }
+    .h-card.compact { flex-basis: 280px; }
+    .lab-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .lab-layout { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+    .lab-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-height: 430px;
+      justify-content: flex-start;
+    }
+    .lab-board {
+      width: 100%;
+    }
+    .lab-status {
+      margin-top: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      line-height: 1.8;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>اختبار الكيمياء الصيدلية</h1>
-        <p>اختر السنة والفصل والمادة ثم الجلسة لإجراء الاختبار المخبرى التفاعلي.</p>
-    </header>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <h1>المخبر الافتراضي</h1>
+        <p>واجهة امتحانية تفاعلية مبنية على المواد الدراسية المختلفة للجلسات المخبرية.</p>
+      </div>
+      <div class="chip" id="breadcrumbChip">الصفحة الرئيسية</div>
+    </div><!-- Home -->
 
-    <div id="yearSelection" class="selection-section">
-        <h2>اختر السنة</h2>
-        <select id="yearSelect" onchange="loadFasalOptions()">
-            <option value="">-- اختر السنة --</option>
-            <option value="2">السنة الثانية</option>
-            <option value="3">السنة الثالثة</option>
-        </select>
-    </div>
+    <section id="homeScreen" class="screen active">
+      <div class="panel">
+        <div class="screen-head">
+          <div>
+            <h2>الاختبارات</h2>
+            <p>اختر السنة، الفصل، المادة، ثم الجلسة لإجراء الاختبار.</p>
+          </div>
+        </div>
 
-    <div id="faselSelection" class="selection-section" style="display:none;">
-        <h2>اختر الفصل</h2>
-        <select id="faselSelect" onchange="loadMaterias()">
-            <option value="">-- اختر الفصل --</option>
-        </select>
-    </div>
+        <div id="unitCards" class="grid sessions-grid"></div>
+      </div>
+    </section>
 
-    <div id="materiaSelection" class="selection-section" style="display:none;">
-        <h2>اختر المادة</h2>
-        <select id="materiaSelect" onchange="loadSessions()">
-            <option value="">-- اختر المادة --</option>
-        </select>
-    </div>
+    <!-- Tests inside a session -->
+    <section id="testsScreen" class="screen">
+      <div class="panel">
+        <div class="screen-head">
+          <div>
+            <h2 id="unitTitle">الاختبار الأول</h2>
+            <p id="unitDesc"></p>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="goHome()">العودة</button>
+          </div>
+        </div>
 
-    <div id="sessionSelection" class="selection-section" style="display:none;">
-        <h2>اختر الجلسة</h2>
-        <select id="sessionSelect" onchange="startTest()">
-            <option value="">-- اختر الجلسة --</option>
-        </select>
-    </div>
+        <div class="card" style="margin-bottom:12px;">
+          <h3 style="margin:0 0 8px;">التجارب المتاحة</h3>
+          <p style="margin:0; color:var(--muted); line-height:1.8;">اختر التجربة التي تريد حلها.</p>
+        </div>
 
-    <div id="testArea" style="display:none;">
-        <h2>الاختبار المخبرى</h2>
-        <p id="testDescription"></p>
-        <div id="testContent"></div>
-    </div>
+        <div id="testCards" class="h-scroll"></div>
+      </div>
+    </section>
 
-    <script src="script.js"></script>
+    <!-- Lab -->
+    <section id="labScreen" class="screen">
+      <div class="panel">
+        <div class="title-row">
+          <div>
+            <h2 id="labTitle">المخبر الافتراضي</h2>
+            <p id="labSubtitle"></p>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="backToTests()">العودة للتجارب</button>
+            <button class="btn secondary" onclick="restartTest()">إعادة المحاولة</button>
+          </div>
+        </div>
+
+        <div class="lab-layout">
+          <div class="lab-visual card">
+            <div class="tube-wrap">
+              <div class="tube-glow"></div>
+              <div class="tube-opening"></div>
+              <div class="tube-body">
+                <div id="innerLiquid" class="inner-liquid"></div>
+                <div id="meniscus" class="meniscus"></div>
+                <div id="precipitate" class="precipitate"></div>
+              </div>
+              <div class="tube-bottom"></div>
+            </div>
+            <div id="flame" class="flame"></div>
+            <div class="small" id="visualLabel">الأنبوب فارغ وجاهز للتجربة.</div>
+          </div>
+
+          <div class="lab-board">
+            <div class="card">
+              <h3 style="margin-top:0">الوصف الامتحاني</h3>
+              <p id="examPrompt" style="margin:0; color:var(--muted); line-height:1.9;">—</p>
+              <div class="progress"><div id="progressBar"></div></div>
+            </div>
+
+            <div class="step-list-wrap">
+              <h3 style="margin:0 0 8px;">الخطوات المتاحة</h3>
+              <div id="stepList" class="step-list"></div>
+            </div>
+
+            <div class="lab-status">
+              <h3 style="margin:0 0 8px;">حالة التجربة</h3>
+              <p id="statusText" style="margin:0; color:var(--muted); line-height:1.85;">ابدأ باختيار الخطوة الصحيحة من الذاكرة.</p>
+              <div id="resultBox" class="result-box hidden"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          كل ما في هذه الواجهة مأخوذ من الجلسة العملية المرفقة فقط، مع تحويله إلى نمط امتحاني تسلسلي.
+        </div>
+      </div>
+    </section>
+  </div>  
+
+  <script>
+    // يمكنك إدخال الكود الخاص بالتفاعل مع الخطوات هنا...
+  </script>
 </body>
 </html>
