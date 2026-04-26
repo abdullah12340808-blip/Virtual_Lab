@@ -3,129 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي</title>
+    <title>المخبر الافتراضي - جامعة حماه</title>
     <style>
-        :root { --liquid-color: rgba(255, 255, 255, 0.3); --precipitate-height: 0%; --precipitate-color: white; }
-        body { font-family: 'Arial', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .lab-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        
-        .test-tube-container { height: 250px; display: flex; justify-content: center; align-items: flex-end; margin: 20px 0; position: relative; }
-        .test-tube { width: 70px; height: 200px; border: 3px solid #ddd; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; position: relative; background: #fff; overflow: hidden; }
-        .liquid { position: absolute; bottom: 0; width: 100%; height: 50%; background: var(--liquid-color); transition: 0.5s; }
-        .precipitate { position: absolute; bottom: 0; width: 100%; height: var(--precipitate-height); background: var(--precipitate-color); filter: blur(1px); transition: 1s; border-radius: 0 0 35px 35px; }
-        
-        .flame { position: absolute; bottom: -30px; width: 40px; height: 40px; border-radius: 50% 0 50% 50%; transform: rotate(-45deg); display: none; filter: blur(2px); }
+        :root {
+            --glass-color: rgba(255, 255, 255, 0.2);
+            --liquid-color: rgba(200, 230, 255, 0.3);
+            --precipitate-h: 0%;
+            --precipitate-c: #ffffff;
+            --flame-c: transparent;
+        }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; background: #34495e; color: white; font-size: 0.9em; }
-        button:hover { opacity: 0.9; }
-        .reset-btn { background: #e74c3c !important; grid-column: span 2; }
-        .status { min-height: 50px; margin-top: 15px; color: #2c3e50; font-size: 0.95em; line-height: 1.4; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .lab-wrapper {
+            background: #ffffff;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h2 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px; }
+
+        /* منطقة الأنبوب */
+        .stage {
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            position: relative;
+            background: linear-gradient(to bottom, #eef2f3, #ffffff);
+            border-radius: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .test-tube {
+            width: 70px;
+            height: 220px;
+            border: 3px solid #bdc3c7;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            position: relative;
+            background: var(--glass-color);
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .liquid-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60%;
+            background: var(--liquid-color);
+            transition: all 0.6s ease;
+        }
+
+        .precipitate-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: var(--precipitate-h);
+            background: var(--precipitate-c);
+            filter: blur(1px);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.9;
+        }
+
+        .flame-effect {
+            position: absolute;
+            bottom: -10px;
+            width: 50px;
+            height: 80px;
+            background: var(--flame-c);
+            border-radius: 50% 50% 20% 20%;
+            filter: blur(10px);
+            z-index: 1;
+            animation: flicker 0.2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* الأزرار */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95em;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:hover { background: #2c3e50; }
+
+        .btn-ca { background: #2980b9; }
+        .btn-mg { background: #27ae60; }
+        .btn-reset { background: #e74c3c; grid-column: span 2; margin-top: 10px; }
+
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fdf2e9;
+            border-radius: 10px;
+            border-right: 5px solid #e67e22;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d35400;
+            font-weight: 500;
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="lab-card">
-    <h3 id="lab-title">مخبر الكيمياء الصيدلية 1</h3>
-    <div id="selection-area">
-        <p>اختر الشاردة التي تود الكشف عنها:</p>
-        <button onclick="startExp('Ca')" style="width:100%; margin-bottom:10px;">الكالسيوم (Ca++)</button>
-        <button onclick="startExp('Mg')" style="width:100%;">المغنيزيوم (Mg++)</button>
+<div class="lab-wrapper">
+    <h2>المخبر الافتراضي</h2>
+    <div class="subtitle">السنة الثالثة - الكيمياء الصيدلية 1</div>
+
+    <div id="selector-screen">
+        <p>اختر الشاردة لبدء التجربة العملية:</p>
+        <button class="btn-ca" onclick="initExperiment('Ca')" style="width:100%; margin-bottom:10px;">كشف شوارد الكالسيوم</button>
+        <button class="btn-mg" onclick="initExperiment('Mg')" style="width:100%;">كشف شوارد المغنيزيوم</button>
     </div>
 
-    <div id="experiment-area" style="display:none;">
-        <p id="ion-name"></p>
-        <div class="test-tube-container">
+    <div id="lab-screen" class="hidden">
+        <div class="stage">
+            <div class="flame-effect" id="flame"></div>
             <div class="test-tube">
-                <div class="liquid" id="liquid"></div>
-                <div class="precipitate" id="precipitate"></div>
+                <div class="liquid-layer" id="liquid"></div>
+                <div class="precipitate-layer" id="precipitate"></div>
             </div>
-            <div id="flame-effect" class="flame"></div>
         </div>
-        
-        <div class="status" id="status-msg">أضف الكواشف بالترتيب...</div>
 
-        <div class="btn-grid" id="controls"></div>
-        <button class="reset-btn" onclick="resetExp()">العودة للقائمة الرئيسية</button>
+        <div class="info-panel" id="status-text">
+            جاهز لبدء التجربة...
+        </div>
+
+        <div class="controls-grid" id="controls">
+            </div>
+
+        <button class="btn-reset" onclick="goHome()">العودة للقائمة الرئيسية</button>
     </div>
 </div>
 
 <script>
-    let currentIon = '';
+    // الحالة الكيميائية الحالية
+    let state = {
+        ion: '',
+        hasPrecipitate: false,
+        reagentCount: 0
+    };
 
-    function startExp(ion) {
-        currentIon = ion;
-        document.getElementById('selection-area').style.display = 'none';
-        document.getElementById('experiment-area').style.display = 'block';
-        document.getElementById('ion-name').innerText = ion === 'Ca' ? "الشاردة المجهولة: الكالسيوم" : "الشاردة المجهولة: المغنيزيوم";
-        loadControls();
+    function initExperiment(type) {
+        state.ion = type;
+        document.getElementById('selector-screen').classList.add('hidden');
+        document.getElementById('lab-screen').classList.remove('hidden');
+        renderButtons();
     }
 
-    function loadControls() {
-        const controls = document.getElementById('controls');
-        controls.innerHTML = '';
-        if (currentIon === 'Ca') {
-            controls.innerHTML = `
-                <button onclick="applyEffect('oxalate')">حماضات النشادر</button>
-                <button onclick="applyEffect('hcl')">حمض HCl</button>
-                <button onclick="applyEffect('flame')">اختبار اللهب</button>
-                <button onclick="applyEffect('sulfate')">كبريتات الصوديوم</button>`;
+    function renderButtons() {
+        const container = document.getElementById('controls');
+        container.innerHTML = '';
+        
+        if (state.ion === 'Ca') {
+            createBtn(container, "حماضات النشادر", () => reaction('ca_oxalate'));
+            createBtn(container, "حمض كلور الماء", () => reaction('hcl'));
+            createBtn(container, "كبريتات الصوديوم", () => reaction('ca_sulfate'));
+            createBtn(container, "اختبار اللهب", () => reaction('ca_flame'));
         } else {
-            controls.innerHTML = `
-                <button onclick="applyEffect('phosphate')">فوسفات الصوديوم</button>
-                <button onclick="applyEffect('naoh')">هيدروكسيد الصوديوم</button>
-                <button onclick="applyEffect('carbonate')">كربونات الصوديوم</button>`;
+            createBtn(container, "فوسفات ثنائية الصوديوم", () => reaction('mg_phosphate'));
+            createBtn(container, "هيدروكسيد الصوديوم", () => reaction('mg_naoh'));
+            createBtn(container, "كربونات الصوديوم", () => reaction('mg_carbonate'));
+            createBtn(container, "حمض الخل", () => reaction('acetic_acid'));
         }
     }
 
-    function applyEffect(reagent) {
+    function createBtn(parent, text, action) {
+        const btn = document.createElement('button');
+        btn.innerText = text;
+        btn.onclick = action; // ربط مباشر للحدث لضمان العمل
+        parent.appendChild(btn);
+    }
+
+    function reaction(type) {
         const p = document.getElementById('precipitate');
         const l = document.getElementById('liquid');
-        const s = document.getElementById('status-msg');
-        const f = document.getElementById('flame-effect');
-        
-        f.style.display = 'none';
+        const s = document.getElementById('status-text');
+        const f = document.getElementById('flame');
 
-        if (currentIon === 'Ca') {
-            if (reagent === 'oxalate') {
-                p.style.height = '40%';
-                p.style.background = 'white';
-                [span_2](start_span)s.innerText = "تشكل راسب أبيض من حماضات الكالسيوم[span_2](end_span)";
-            } else if (reagent === 'hcl') {
-                p.style.height = '0%';
-                [span_3](start_span)s.innerText = "ينحل الراسب في حمض كلور الماء[span_3](end_span)";
-            } else if (reagent === 'flame') {
-                f.style.display = 'block';
-                f.style.background = '#e67e22'; // برتقالي
-                [span_4](start_span)s.innerText = "يتلون اللهب باللون البرتقالي[span_4](end_span)";
-            } else if (reagent === 'sulfate') {
-                p.style.height = '25%';
-                p.style.background = '#f9f9f9';
-                [span_5](start_span)s.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم[span_5](end_span)";
-            }
-        } else if (currentIon === 'Mg') {
-            if (reagent === 'phosphate') {
-                p.style.height = '45%';
-                p.style.background = 'rgba(255,255,255,0.9)';
-                [span_6](start_span)s.innerText = "راسب أبيض بلوري من فوسفات الأمونيوم والمغنيزيوم[span_6](end_span)";
-            } else if (reagent === 'naoh') {
-                p.style.height = '30%';
-                p.style.background = '#eee';
-                [span_7](start_span)s.innerText = "راسب أبيض من هيدروكسيد المغنيزيوم لا ينحل بزيادة الكاشف[span_7](end_span)";
-            } else if (reagent === 'carbonate') {
-                p.style.height = '35%';
-                [span_8](start_span)s.innerText = "راسب أبيض من كربونات المغنيزيوم[span_8](end_span)";
-            }
+        // إخفاء اللهب تلقائياً عند إضافة أي مادة
+        f.style.setProperty('--flame-c', 'transparent');
+
+        switch(type) {
+            case 'ca_oxalate':
+                p.style.setProperty('--precipitate-h', '45%');
+                p.style.setProperty('--precipitate-c', '#ffffff');
+                [span_0](start_span)s.innerText = "تشكل راسب أبيض من حماضات الكالسيوم[span_0](end_span)";
+                state.hasPrecipitate = true;
+                break;
+            case 'hcl':
+                p.style.setProperty('--precipitate-h', '0%');
+                [span_1](start_span)s.innerText = "ينحل الراسب تماماً في حمض كلور الماء[span_1](end_span)";
+                state.hasPrecipitate = false;
+                break;
+            case 'ca_sulfate':
+                p.style.setProperty('--precipitate-h', '30%');
+                p.style.setProperty('--precipitate-c', '#fcfcfc');
+                [span_2](start_span)s.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم[span_2](end_span)";
+                break;
+            case 'ca_flame':
+                f.style.setProperty('--flame-c', '#e67e22');
+                [span_3](start_span)s.innerText = "يتلون اللهب باللون البرتقالي المميز[span_3](end_span)";
+                break;
+            case 'mg_phosphate':
+                p.style.setProperty('--precipitate-h', '50%');
+                p.style.setProperty('--precipitate-c', '#f0f0f0');
+                [span_4](start_span)s.innerText = "ظهور راسب أبيض بلوري من فوسفات الأمونيوم والمغنيزيوم[span_4](end_span)";
+                break;
+            case 'mg_naoh':
+                p.style.setProperty('--precipitate-h', '40%');
+                p.style.setProperty('--precipitate-c', '#ffffff');
+                [span_5](start_span)s.innerText = "تشكل راسب أبيض من هيدروكسيد المغنيزيوم لا ينحل بزيادة الكاشف[span_5](end_span)";
+                break;
+            case 'mg_carbonate':
+                p.style.setProperty('--precipitate-h', '35%');
+                [span_6](start_span)s.innerText = "تشكل راسب أبيض من كربونات المغنيزيوم[span_6](end_span)";
+                break;
+            case 'acetic_acid':
+                if(state.ion === 'Mg') {
+                    p.style.setProperty('--precipitate-h', '0%');
+                    [span_7](start_span)s.innerText = "يذوب راسب الفوسفات في حمض الخل[span_7](end_span)";
+                } else {
+                    [span_8](start_span)s.innerText = "راسب الكالسيوم لا ينحل بحمض الخل[span_8](end_span)";
+                }
+                break;
         }
     }
 
-    function resetExp() {
-        currentIon = '';
-        document.getElementById('selection-area').style.display = 'block';
-        document.getElementById('experiment-area').style.display = 'none';
-        document.getElementById('precipitate').style.height = '0%';
-        document.getElementById('status-msg').innerText = "أضف الكواشف بالترتيب...";
-        document.getElementById('flame-effect').style.display = 'none';
+    function goHome() {
+        document.getElementById('selector-screen').classList.remove('hidden');
+        document.getElementById('lab-screen').classList.add('hidden');
+        // تصغير الأنبوب
+        document.getElementById('precipitate').style.setProperty('--precipitate-h', '0%');
+        document.getElementById('flame').style.setProperty('--flame-c', 'transparent');
     }
 </script>
 
