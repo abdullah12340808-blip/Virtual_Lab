@@ -2,514 +2,90 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المخبر الافتراضي الذكي</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المخبر الافتراضي - الكيمياء الصيدلية</title>
     <style>
-        :root { --main: #0088cc; --bg: #eef2f5; --glass: rgba(255, 255, 255, 0.9); }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 10px; direction: rtl; display: flex; justify-content: center; min-height: 100vh; }
-        .app-card { background: var(--glass); border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; border: 1px solid #ddd; position: relative; }
+        :root { --liquid-color: #f0f0f0; --precipitate-height: 0%; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; text-align: center; }
+        .lab-container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        h2 { color: #2c3e50; text-align: center; font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid var(--main); padding-bottom: 10px; }
-        .instruction { color: #555; text-align: center; margin-bottom: 20px; font-weight: 500; }
+        /* تصميم أنبوب الاختبار */
+        .test-tube {
+            width: 60px; height: 200px; border: 3px solid #ccc;
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            position: relative; background: rgba(255, 255, 255, 0.3);
+            overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        .liquid {
+            position: absolute; bottom: 0; width: 100%; height: 60%;
+            background-color: var(--liquid-color); transition: all 0.8s ease;
+        }
+        .precipitate {
+            position: absolute; bottom: 0; width: 100%;
+            height: var(--precipitate-height);
+            background: rgba(255, 255, 255, 0.8); /* راسب أبيض افتراضي */
+            filter: blur(2px); transition: all 1s ease;
+        }
 
-        /* تصميم الأزرار */
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; background: var(--main); color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn:active { transform: translateY(2px); box-shadow: none; }
-        .btn-back { background: #7f8c8d; font-size: 14px; margin-top: 20px; }
-
-        /* أنبوب الاختبار التفاعلي */
-        .test-tube-container { display: flex; justify-content: center; margin: 20px 0; }
-        .tube { width: 50px; height: 150px; border: 3px solid #ccc; border-radius: 0 0 25px 25px; position: relative; background: rgba(255,255,255,0.5); overflow: hidden; }
-        .liquid { position: absolute; bottom: 0; width: 100%; height: 40%; transition: all 1s ease; background: #e0e0e0; }
-        .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: all 1s ease; background: white; border-top: 2px solid #ddd; }
-
-        /* منطقة النتائج */
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; display: none; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .controls { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #2c3e50; color: white; }
+        button:hover { background: #34495e; }
+        .status-box { margin-top: 20px; font-weight: bold; color: #d35400; }
     </style>
 </head>
 <body>
 
-<div id="main-container" class="app-card">
+<div class="lab-container">
+    <h2>مخبر الكيمياء الصيدلية - الجلسة الأولى</h2>
+    <p>الشاردة المجهولة: <strong>شوارد الكالسيوم $Ca^{++}$</strong></p>
+
+    <div class="test-tube">
+        <div class="liquid" id="liquid"></div>
+        <div class="precipitate" id="precipitate"></div>
     </div>
 
+    <div class="status-box" id="status">أضف كاشفاً لبدء التجربة...</div>
+
+    <div class="controls">
+        <button onclick="testCalcium('oxalate')">إضافة حماضات النشادر</button>
+        <button onclick="testCalcium('sulfate')">إضافة كبريتات الصوديوم</button>
+        <button onclick="testFlame()">اختبار اللهب</button>
+        <button onclick="resetLab()" style="background: #c0392b;">تفريغ الأنبوب</button>
+    </div>
+</div>
+
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    function testCalcium(reagent) {
+        const liquid = document.getElementById('liquid');
+        const precipitate = document.getElementById('precipitate');
+        const status = document.getElementById('status');
 
-    const container = document.getElementById('main-container');
-
-    function render(view) {
-        container.innerHTML = ""; // مسح كامل للمحتوى لمنع التداخل
-        let content = "";
-
-        if (view === 'years') {
-            content = `<h2>🔬 المخبر الافتراضي</h2>
-                       <p class="instruction">مرحباً بك دكتور، اختر السنة الدراسية:</p>
-                       <button class="btn" onclick="render('semesters')">السنة الثالثة</button>
-                       <button class="btn" style="background:#bdc3c7" disabled>السنة الثانية (قريباً)</button>`;
+        if (reagent === 'oxalate') {
+            [span_1](start_span)// تفاعل حماضات النشادر[span_1](end_span)
+            document.documentElement.style.setProperty('--precipitate-height', '40%');
+            precipitate.style.background = "rgba(255, 255, 255, 0.9)";
+            status.innerText = "تشكل راسب أبيض من حماضات الكالسيوم (لا ينحل بحمض الخل)";
         } 
-        else if (view === 'semesters') {
-            content = `<h2>السنة الثالثة</h2>
-                       <button class="btn" onclick="render('subjects')">الفصل الدراسي الثاني</button>
-                       <button class="btn btn-back" onclick="render('years')">🔙 عودة للرئيسية</button>`;
-        }
-        else if (view === 'subjects') {
-            content = `<h2>الفصل الثاني</h2>
-                       <button class="btn" onclick="render('sessions')">الكيمياء الصيدلية 1 🧪</button>
-                       <button class="btn btn-back" onclick="render('semesters')">🔙 عودة للفصول</button>`;
-        }
-        else if (view === 'sessions') {
-            content = `<h2>الجلسات العملية</h2>
-                       <button class="btn" onclick="render('lab')">الجلسة 1: الكشف عن الشوارد</button>
-                       <button class="btn btn-back" onclick="render('subjects')">🔙 عودة للمواد</button>`;
-        }
-        else if (view === 'lab') {
-            content = `<h2>اختبار الكشف عن الكالسيوم $Ca^{+2}$</h2>
-                       <div class="test-tube-container">
-                           <div class="tube">
-                               <div id="liquid" class="liquid" style="height: 40%; background: #d1ecf1;"></div>
-                               <div id="precipitate" class="precipitate"></div>
-                           </div>
-                       </div>
-                       <p class="instruction">أضف 1 مل من "حماضات النشادر" إلى أنبوب الاختبار. ماذا تلاحظ؟</p>
-                       <button class="btn" style="background:#2c3e50" onclick="conductTest('white')">إضافة الكاشف ⚪</button>
-                       <button class="btn" style="background:#e67e22" onclick="conductTest('flame')">اختبار اللهب 🔥</button>
-                       <div id="feedback" class="feedback"></div>
-                       <button class="btn btn-back" onclick="render('sessions')">🔙 إنهاء التجربة</button>`;
-        }
-
-        container.innerHTML = content;
-    }
-
-    function conductTest(action) {
-        const liq = document.getElementById('liquid');
-        const pre = document.getElementById('precipitate');
-        const fb = document.getElementById('feedback');
-        fb.style.display = "block";
-
-        if (action === 'white') {
-            pre.style.height = "30%";
-            pre.style.background = "white";
-            fb.style.background = "#d4edda";
-            fb.style.color = "#155724";
-            fb.innerHTML = "✅ تشكل راسب أبيض من حماضات الكالسيوم. (المحاضرة ص4)";
-        } else if (action === 'flame') {
-            liq.style.background = "#ff5722"; // لون برتقالي
-            fb.style.background = "#fff3cd";
-            fb.style.color = "#856404";
-            fb.innerHTML = "🔥 تلون اللهب باللون البرتقالي المميز للكالسيوم. (المحاضرة ص4)";
+        else if (reagent === 'sulfate') {
+            [span_2](start_span)// تفاعل كبريتات الصوديوم[span_2](end_span)
+            document.documentElement.style.setProperty('--precipitate-height', '25%');
+            precipitate.style.background = "rgba(240, 240, 240, 0.9)";
+            status.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم";
         }
     }
 
-    // البدء
-    render('years');
-</script>
-
-</body>
-</html>
-                        <button class="btn" onclick="render('semesters')">السنة الثالثة</button>
-                        <button class="btn" style="background:#ccc" disabled>السنة الثانية (قريباً)</button>`;
-                break;
-            case 'semesters':
-                html = `<h2>السنة الثالثة</h2>
-                        <button class="btn" onclick="render('subjects')">الفصل الثاني</button>
-                        <button class="btn btn-back" onclick="render('years')">🔙 عودة</button>`;
-                break;
-            case 'subjects':
-                html = `<h2>الفصل الثاني</h2>
-                        <button class="btn" onclick="render('sessions')">الكيمياء الصيدلية 1</button>
-                        <button class="btn btn-back" onclick="render('semesters')">🔙 عودة</button>`;
-                break;
-            case 'sessions':
-                html = `<h2>كيمياء صيدلية 1</h2>
-                        <button class="btn" onclick="render('test')">الجلسة 1: الكشف عن الشوارد</button>
-                        <button class="btn btn-back" onclick="render('subjects')">🔙 عودة</button>`;
-                break;
-            case 'test':
-                html = `<h2>الاختبار العملي 🧪</h2>
-                        <div class="test-box">
-                            [span_0](start_span)<p><b>سؤال الكالسيوم $Ca^{+2}$:</b> عند إضافة حماضات النشادر لمحلول الكالسيوم، ما هو لون الراسب؟[span_0](end_span)</p>
-                            <button class="btn" style="background:#34495e" onclick="check('white')">راسب أبيض ⚪</button>
-                            <button class="btn" style="background:#34495e" onclick="check('blue')">راسب أزرق 🔵</button>
-                        </div>
-                        <div id="res-msg"></div>
-                        <button class="btn btn-back" onclick="render('sessions')">🔙 إنهاء الجلسة</button>`;
-                break;
-        }
-        app.innerHTML = html;
-        window.scrollTo(0,0);
+    function testFlame() {
+        const liquid = document.getElementById('liquid');
+        const status = document.getElementById('status');
+        [span_3](start_span)// تلوين اللهب بالبرتقالي[span_3](end_span)
+        liquid.style.backgroundColor = "#e67e22"; 
+        status.innerText = "تلوين اللهب باللون البرتقالي المميز للكالسيوم";
     }
 
-    function check(ans) {
-        const res = document.getElementById('res-msg');
-        res.style.display = 'block';
-        if(ans === 'white') {
-            res.style.background = '#d4edda'; res.style.color = '#155724';
-            [span_1](start_span)res.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم[span_1](end_span).";
-        } else {
-            res.style.background = '#f8d7da'; res.style.color = '#721c24';
-            res.innerHTML = "❌ خطأ! [span_2](start_span)الراسب الناتج مع الحماضات أبيض دائماً[span_2](end_span).";
-        }
-    }
-
-    // التشغيل المبدئي
-    render('years');
-</script>
-
-</body>
-</html>
-
-    <div class="test-card">
-        [span_1](start_span)<p><b>تجربة المغنيزيوم $Mg^{+2}$:</b> عند إضافة NaOH، ماذا يحدث للراسب الأبيض؟[span_1](end_span)</p>
-        <button class="btn btn-test" onclick="check('صح', 'لا ينحل بزيادة من الكاشف (صفة مميزة).')">لا ينحل بزيادة الكاشف 🧪</button>
-        <button class="btn btn-test" onclick="check('خطأ', 'راسب المغنيزيوم يتميز بأنه غير قابل للانحلال بزيادة الكاشف.')">ينحل بالزيادة 💧</button>
-    </div>
-
-    <div id="result-box"></div>
-    <button class="btn btn-back" onclick="nav(4)">🔙 إنهاء الجلسة</button>
-</div>
-
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    function nav(id) {
-        // إخفاء كل الصفحات
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        // إظهار الصفحة المطلوبة فقط
-        document.getElementById('step' + id).classList.add('active');
-        // إخفاء صندوق النتيجة
-        document.getElementById('result-box').style.display = 'none';
-    }
-
-    function check(status, msg) {
-        const res = document.getElementById('result-box');
-        res.style.display = 'block';
-        if(status === 'صح') {
-            res.style.background = '#d4edda'; res.style.color = '#155724';
-            res.innerHTML = "✅ " + msg;
-        } else {
-            res.style.background = '#f8d7da'; res.style.color = '#721c24';
-            res.innerHTML = "❌ " + msg;
-        }
-    }
-</script>
-
-</body>
-</html>
-        <p>يرجى اختيار السنة الدراسية:</p>
-        <button class="btn" onclick="nav(2)">السنة الثالثة</button>
-        <button class="btn" style="background:#bdc3c7; cursor:not-allowed">السنة الثانية (قريباً)</button>
-    </div>
-
-    <div id="step2" class="card">
-        <h2>السنة الثالثة</h2>
-        <p>اختر الفصل الدراسي:</p>
-        <button class="btn" onclick="nav(3)">الفصل الثاني</button>
-        <button class="btn btn-back" onclick="nav(1)">🔙 العودة للسنوات</button>
-    </div>
-
-    <div id="step3" class="card">
-        <h2>الفصل الثاني</h2>
-        <p>اختر المادة العلمية:</p>
-        <button class="btn" onclick="nav(4)">الكيمياء الصيدلية 1</button>
-        <button class="btn btn-back" onclick="nav(2)">🔙 العودة للفصول</button>
-    </div>
-
-    <div id="step4" class="card">
-        <h2>الكيمياء الصيدلية 1</h2>
-        <p>الجلسات العملية المتاحة:</p>
-        <button class="btn" onclick="nav(5)">الجلسة 1: الكشف عن الشوارد</button>
-        <button class="btn btn-back" onclick="nav(3)">🔙 العودة للمواد</button>
-    </div>
-
-    <div id="step5" class="card">
-        <h2>الاختبار العملي 🧪</h2>
-        <div class="lab-test">
-            <p><b>السؤال:</b> عند إضافة 1 مل من "حماضات النشادر" إلى محلول شوارد <b>الكالسيوم $Ca^{+2}$</b>، ماذا نلاحظ؟</p>
-            <button class="btn" style="background:#34495e" onclick="check('white')">تشكل راسب أبيض ⚪</button>
-            <button class="btn" style="background:#34495e" onclick="check('blue')">تشكل لون أزرق 🔵</button>
-        </div>
-        <div id="resBox" class="result"></div>
-        <button class="btn btn-back" onclick="nav(4)">🔙 إنهاء الاختبار</button>
-    </div>
-</div>
-
-<script>
-    // تفعيل مكتبة تليجرام
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    function nav(step) {
-        // إخفاء كل البطاقات
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        // إظهار البطاقة المطلوبة
-        document.getElementById('step' + step).classList.add('active');
-        // إخفاء صندوق النتيجة عند التنقل
-        document.getElementById('resBox').style.display = 'none';
-    }
-
-    function check(answer) {
-        const res = document.getElementById('resBox');
-        res.style.display = 'block';
-        if(answer === 'white') {
-            res.innerHTML = "✅ إجابة صحيحة! يتشكل راسب أبيض من حماضات الكالسيوم (ص4 من المحاضرة).";
-            res.style.background = "#d4edda"; res.style.color = "#155724";
-        } else {
-            res.innerHTML = "❌ إجابة خاطئة! راجع تفاعلات الكالسيوم في ملف العملي.";
-            res.style.background = "#f8d7da"; res.style.color = "#721c24";
-        }
-    }
-</script>
-
-</body>
-</html>
-        <button class="btn" style="background:#ccc; cursor:not-allowed">السنة الثانية (قريباً)</button>
-    </div>
-
-    <div id="p2" class="page">
-        <h2>السنة الثالثة</h2>
-        <p>اختر الفصل الدراسي:</p>
-        <button class="btn" onclick="showPage(3)">الفصل الثاني</button>
-        <button class="btn btn-secondary" onclick="showPage(1)">🔙 العودة للسنوات</button>
-    </div>
-
-    <div id="p3" class="page">
-        <h2>الفصل الثاني - الثالثة</h2>
-        <p>اختر المادة:</p>
-        <button class="btn" onclick="showPage(4)">الكيمياء الصيدلية 1</button>
-        <button class="btn btn-secondary" onclick="showPage(2)">🔙 العودة للفصول</button>
-    </div>
-
-    <div id="p4" class="page">
-        <h2>الكيمياء الصيدلية 1</h2>
-        <p>الجلسات المتاحة:</p>
-        <button class="btn" onclick="alert('سيبدأ الآن اختبار الكشف عن الكالسيوم والمغنزيوم')">الجلسة 1: الكشف عن الشوارد</button>
-        <button class="btn btn-secondary" onclick="showPage(3)">🔙 العودة للمواد</button>
-    </div>
-</div>
-
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-
-    function showPage(pageNum) {
-        // 1. إخفاء جميع الصفحات تماماً
-        const allPages = document.querySelectorAll('.page');
-        allPages.forEach(p => p.classList.remove('active'));
-
-        // 2. إظهار الصفحة المطلوبة فقط
-        const targetPage = document.getElementById('p' + pageNum);
-        if (targetPage) {
-            targetPage.classList.add('active');
-        }
-    }
-</script>
-
-</body>
-</html>
-    <div id="p4" class="page">
-        <h2>الكيمياء الصيدلية 1</h2>
-        <p>الجلسات العملية المتاحة:</p>
-        <button class="btn" onclick="alert('سيبدأ اختبار الكشف عن الشوارد الموجبة قريباً!')">الجلسة 1: الكشف عن الشوارد</button>
-        <button style="background:#888" class="btn" onclick="show(3)">🔙 عودة</button>
-    </div>
-
-    <script>
-        // إخبار تليجرام أن التطبيق جاهز
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        function show(pageNum) {
-            console.log("الانتقال إلى الصفحة: " + pageNum); // للتأكد من عمل الدالة
-            
-            // إخفاء جميع الصفحات
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.remove('active');
-            });
-
-            // إظهار الصفحة المطلوبة
-            const target = document.getElementById('p' + pageNum);
-            if (target) {
-                target.classList.add('active');
-            } else {
-                console.error("الصفحة غير موجودة!");
-            }
-        }
-    </script>
-</body>
-</html>
-    </div>
-
-    <div id="step4" class="hidden">
-        <p>المادة: كيمياء صيدلية 1</p>
-        <button class="btn" onclick="showStep(5)">الجلسة 1: الكشف عن الشوارد</button>
-        <button onclick="showStep(3)">🔙 عودة</button>
-    </div>
-
-    <div id="step5" class="hidden">
-        <div class="test-area">
-            [span_0](start_span)<h3>اختبار الكشف عن الكالسيوم $Ca^{+2}$[span_0](end_span)</h3>
-            [span_1](start_span)<p>عند إضافة 1 مل من <b>حماضات النشادر</b> إلى 2 مل من شوارد الكالسيوم، ما هو لون الراسب؟[span_1](end_span)</p>
-            <button class="btn" style="background:#27ae60" onclick="check('صح')">راسب أبيض ⚪</button>
-            <button class="btn" style="background:#e67e22" onclick="check('غلط')">راسب أحمر 🔴</button>
-        </div>
-        <div id="resultBox" class="res hidden"></div>
-        <br>
-        <button onclick="showStep(4)">🔙 إنهاء</button>
-    </div>
-</div>
-
-<script>
-    // التأكد من أن التطبيق يعمل بكامل الشاشة في تليجرام
-    window.Telegram.WebApp.expand();
-
-    function showStep(n) {
-        // إخفاء كل المراحل
-        for(let i=1; i<=5; i++) {
-            document.getElementById('step' + i).classList.add('hidden');
-        }
-        // إظهار المرحلة المطلوبة
-        document.getElementById('step' + n).classList.remove('hidden');
-    }
-
-    function check(status) {
-        const box = document.getElementById('resultBox');
-        box.classList.remove('hidden');
-        if(status === 'صح') {
-            [span_2](start_span)box.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم.[span_2](end_span)";
-            box.style.background = "#d4edda";
-        } else {
-            box.innerHTML = "❌ خطأ! [span_3](start_span)راجع صفات الراسب في الصفحة 4.[span_3](end_span)";
-            box.style.background = "#f8d7da";
-        }
-    }
-</script>
-
-</body>
-</html>
-
-        <div id="semesters-step" class="hidden">
-            <button class="btn" onclick="goTo('subjects-step', 'الفصل الثاني', 'اختر المادة')">الفصل الثاني <span>⬅️</span></button>
-            <button class="btn" onclick="goBack('years-step', 'المخبر الافتراضي', 'اختر السنة')">🔙 عودة</button>
-        </div>
-
-        <div id="subjects-step" class="hidden">
-            <button class="btn" onclick="goTo('sessions-step', 'الكيمياء الصيدلية 1', 'اختر الجلسة')">الكيمياء الصيدلية 1 <span>🧪</span></button>
-            <button class="btn" onclick="goBack('semesters-step', 'السنة الثالثة', 'اختر الفصل')">🔙 عودة</button>
-        </div>
-
-        <div id="sessions-step" class="hidden">
-            <button class="btn" onclick="goTo('lab-test-step', 'الجلسة 1: شوارد موجبة', 'اختبار الكالسيوم')">الجلسة الأولى: الكشف عن الشوارد <span>🔬</span></button>
-            <button class="btn" onclick="goBack('subjects-step', 'الفصل الثاني', 'اختر المادة')">🔙 عودة</button>
-        </div>
-
-        <div id="lab-test-step" class="hidden">
-            <div class="test-box">
-                <p><b>تجربة:</b> الكشف عن شوارد <b>الكالسيوم Ca²⁺</b></p>
-                <p>أضف 1 مل من "حماضات النشادر" إلى 2 مل من محلول الكالسيوم. ماذا تلاحظ؟</p>
-                <button class="btn" onclick="verify('white', 'Ca')">ظهور راسب أبيض ⚪</button>
-                <button class="btn" onclick="verify('blue', 'Ca')">ظهور لون أزرق 🔵</button>
-                <button class="btn" onclick="verify('orange', 'Ca')">تلوّن اللهب باللون البرتقالي 🔥</button>
-            </div>
-            <div id="result" class="result-msg hidden"></div>
-            <button class="btn back-btn" onclick="goBack('sessions-step', 'الكيمياء الصيدلية 1', 'اختر الجلسة')">🔙 إنهاء التجربة</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand(); // تمديد التطبيق ليأخذ الشاشة كاملة
-
-    function goTo(stepId, title, sub) {
-        document.querySelectorAll('.content > div').forEach(div => div.classList.add('hidden'));
-        document.getElementById(stepId).classList.remove('hidden');
-        document.getElementById('nav-title').innerText = title;
-        document.getElementById('sub-title').innerText = sub;
-    }
-
-    function goBack(stepId, title, sub) {
-        goTo(stepId, title, sub);
-    }
-
-    function verify(choice, type) {
-        const res = document.getElementById('result');
-        res.classList.remove('hidden');
-        
-        if (type === 'Ca' && choice === 'white') {
-            [span_0](start_span)res.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم[span_0](end_span).";
-            res.style.background = "#d4edda"; res.style.color = "#155724";
-        } else if (type === 'Ca' && choice === 'orange') {
-            res.innerHTML = "💡 معلومة صحيحة! [span_1](start_span)الكالسيوم يعطي لهب برتقالي، لكنه ليس ناتج تفاعل الحماضات[span_1](end_span).";
-            res.style.background = "#fff3cd"; res.style.color = "#856404";
-        } else {
-            res.innerHTML = "❌ خطأ! [span_2](start_span)الراسب الناتج مع الحماضات أبيض اللون دائماً[span_2](end_span).";
-            res.style.background = "#f8d7da"; res.style.color = "#721c24";
-        }
-    }
-</script>
-
-</body>
-</html>
-
-
-    <div id="subjects-view" class="hidden">
-        <div id="subjects-list" class="btn-grid"></div>
-        <button class="btn back-btn" onclick="goBack('semesters-view')">عودة للفصول</button>
-    </div>
-</div>
-
-<script>
-    let selectedYear = 0;
-    let selectedSemester = 0;
-
-    const data = {
-        2: { // السنة الثانية
-            1: ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات1", "الكيمياء العضوية1"],
-            2: ["الكيمياء العضوية2", "الكيمياء الحيوية1", "العقاقير1", "التحليلية1", "الصيدلانيات1"]
-        },
-        3: { // السنة الثالثة
-            1: ["التحليلية2", "الأحياء1", "العقاقير2", "فارماكولوجي1", "التكنولوجيا الصيدلية"],
-            2: ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي2", "الكيمياء صيدلية1", "الأحياء2"]
-        }
-    };
-
-    function showSemesters(year) {
-        selectedYear = year;
-        document.getElementById('years-view').classList.add('hidden');
-        document.getElementById('semesters-view').classList.remove('hidden');
-        document.getElementById('view-title').innerHTML = "<h1>اختر الفصل الدراسي</h1>";
-    }
-
-    function showSubjects(semester) {
-        selectedSemester = semester;
-        const subjects = data[selectedYear][semester] || [];
-        const listDiv = document.getElementById('subjects-list');
-        listDiv.innerHTML = "";
-
-        subjects.forEach(subject => {
-            const btn = document.createElement('button');
-            btn.className = 'btn';
-            btn.innerText = subject;
-            btn.onclick = () => alert("سيتم فتح محاضرات مادة: " + subject);
-            listDiv.appendChild(btn);
-        });
-
-        document.getElementById('semesters-view').classList.add('hidden');
-        document.getElementById('subjects-view').classList.remove('hidden');
-        document.getElementById('view-title').innerHTML = "<h1>اختر المادة</h1>";
-    }
-
-    function goBack(viewId) {
-        document.getElementById('semesters-view').classList.add('hidden');
-        document.getElementById('subjects-view').classList.add('hidden');
-        document.getElementById(viewId).classList.remove('hidden');
-        document.getElementById('view-title').innerHTML = viewId === 'years-view' ? "<h1>اختر السنة الدراسية</h1>" : "<h1>اختر الفصل الدراسي</h1>";
+    function resetLab() {
+        document.documentElement.style.setProperty('--precipitate-height', '0%');
+        document.getElementById('liquid').style.backgroundColor = "#f0f0f0";
+        document.getElementById('status').innerText = "تم تنظيف الأنبوب. ابدأ مجدداً.";
     }
 </script>
 
