@@ -2,38 +2,105 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --primary: #0088cc; --success: #27ae60; --danger: #e74c3c; --bg: #f5f6f7; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); direction: rtl; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-wrapper { width: 100%; max-width: 400px; }
+        :root { --primary: #0088cc; --success: #27ae60; --error: #e74c3c; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; direction: rtl; }
         
-        /* تصميم البطاقة */
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; display: none; }
-        .card.active { display: block; animation: fadeIn 0.4s ease; }
+        /* إخفاء الصفحات غير النشطة */
+        .page { display: none; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
 
-        h2 { color: #2c3e50; font-size: 22px; margin-top: 0; }
-        p { color: #7f8c8d; font-size: 16px; }
+        h2 { color: #2c3e50; font-size: 20px; margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        p { color: #444; line-height: 1.6; }
 
-        /* الأزرار */
-        .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; border: none; border-radius: 10px; background: var(--primary); color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
-        .btn:active { transform: scale(0.98); opacity: 0.9; }
-        .btn-back { background: #95a5a6; margin-top: 20px; }
+        .btn { display: block; width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 10px; background: var(--primary); color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-back { background: #8e9eab; margin-top: 20px; }
+        .btn-test { background: #34495e; }
 
-        /* منطقة الاختبار */
-        .lab-test { background: #f9f9f9; border: 2px dashed var(--primary); border-radius: 10px; padding: 15px; margin-top: 15px; }
-        .result { margin-top: 15px; padding: 10px; border-radius: 8px; font-weight: bold; display: none; }
+        .test-card { background: #f8f9fa; border-right: 5px solid var(--primary); padding: 15px; border-radius: 8px; margin: 15px 0; }
+        #result-box { display: none; padding: 12px; border-radius: 8px; margin-top: 15px; font-weight: bold; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="app-wrapper">
-    <div id="step1" class="card active">
-        <h2>🔬 المخبر الافتراضي</h2>
+<div id="step1" class="page active">
+    <h2>🔬 المخبر الافتراضي</h2>
+    <p>مرحباً بك دكتور، اختر السنة الدراسية:</p>
+    <button class="btn" onclick="nav(2)">السنة الثالثة</button>
+    <button class="btn" style="background:#ccc" disabled>السنة الثانية (قريباً)</button>
+</div>
+
+<div id="step2" class="page">
+    <h2>السنة الثالثة</h2>
+    <p>اختر الفصل الدراسي:</p>
+    <button class="btn" onclick="nav(3)">الفصل الثاني</button>
+    <button class="btn btn-back" onclick="nav(1)">🔙 عودة</button>
+</div>
+
+<div id="step3" class="page">
+    <h2>الفصل الثاني</h2>
+    <button class="btn" onclick="nav(4)">الكيمياء الصيدلية 1</button>
+    <button class="btn btn-back" onclick="nav(2)">🔙 عودة</button>
+</div>
+
+<div id="step4" class="page">
+    <h2>كيمياء صيدلية 1</h2>
+    <button class="btn" onclick="nav(5)">الجلسة 1: الكشف عن الشوارد</button>
+    <button class="btn btn-back" onclick="nav(3)">🔙 عودة</button>
+</div>
+
+<div id="step5" class="page">
+    <h2>الجلسة 1: الكشف عن الشوارد</h2>
+    
+    <div class="test-card">
+        [span_0](start_span)<p><b>تجربة الكالسيوم $Ca^{+2}$:</b> عند إضافة حماضات النشادر، ما صفة الراسب؟[span_0](end_span)</p>
+        <button class="btn btn-test" onclick="check('صح', 'يتشكل راسب أبيض ينحل بزيادة من الكاشف.')">راسب أبيض ⚪</button>
+        <button class="btn btn-test" onclick="check('خطأ', 'الراسب الناتج أبيض اللون دائماً.')">راسب أزرق 🔵</button>
+    </div>
+
+    <div class="test-card">
+        [span_1](start_span)<p><b>تجربة المغنيزيوم $Mg^{+2}$:</b> عند إضافة NaOH، ماذا يحدث للراسب الأبيض؟[span_1](end_span)</p>
+        <button class="btn btn-test" onclick="check('صح', 'لا ينحل بزيادة من الكاشف (صفة مميزة).')">لا ينحل بزيادة الكاشف 🧪</button>
+        <button class="btn btn-test" onclick="check('خطأ', 'راسب المغنيزيوم يتميز بأنه غير قابل للانحلال بزيادة الكاشف.')">ينحل بالزيادة 💧</button>
+    </div>
+
+    <div id="result-box"></div>
+    <button class="btn btn-back" onclick="nav(4)">🔙 إنهاء الجلسة</button>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function nav(id) {
+        // إخفاء كل الصفحات
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // إظهار الصفحة المطلوبة فقط
+        document.getElementById('step' + id).classList.add('active');
+        // إخفاء صندوق النتيجة
+        document.getElementById('result-box').style.display = 'none';
+    }
+
+    function check(status, msg) {
+        const res = document.getElementById('result-box');
+        res.style.display = 'block';
+        if(status === 'صح') {
+            res.style.background = '#d4edda'; res.style.color = '#155724';
+            res.innerHTML = "✅ " + msg;
+        } else {
+            res.style.background = '#f8d7da'; res.style.color = '#721c24';
+            res.innerHTML = "❌ " + msg;
+        }
+    }
+</script>
+
+</body>
+</html>
         <p>يرجى اختيار السنة الدراسية:</p>
         <button class="btn" onclick="nav(2)">السنة الثالثة</button>
         <button class="btn" style="background:#bdc3c7; cursor:not-allowed">السنة الثانية (قريباً)</button>
