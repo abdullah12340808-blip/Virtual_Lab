@@ -6,62 +6,85 @@
     <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --primary: #0088cc; --success: #27ae60; --error: #e74c3c; --bg: #f0f2f5; }
+        :root { --main: #0088cc; --success: #27ae60; --bg: #f4f7f9; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; direction: rtl; }
-        
-        /* إخفاء الصفحات غير النشطة */
-        .page { display: none; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        .page.active { display: block; animation: fadeIn 0.3s ease; }
-
-        h2 { color: #2c3e50; font-size: 20px; margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
-        p { color: #444; line-height: 1.6; }
-
-        .btn { display: block; width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 10px; background: var(--primary); color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-back { background: #8e9eab; margin-top: 20px; }
-        .btn-test { background: #34495e; }
-
-        .test-card { background: #f8f9fa; border-right: 5px solid var(--primary); padding: 15px; border-radius: 8px; margin: 15px 0; }
-        #result-box { display: none; padding: 12px; border-radius: 8px; margin-top: 15px; font-weight: bold; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .app-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: 20px auto; min-height: 300px; display: flex; flex-direction: column; justify-content: center; }
+        h2 { color: #2c3e50; font-size: 20px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--main); padding-bottom: 10px; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; background: var(--main); color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-back { background: #8e9eab; font-size: 14px; }
+        .test-box { background: #f8f9fa; border: 1px dashed var(--main); padding: 15px; border-radius: 10px; margin-top: 10px; }
+        #res-msg { margin-top: 15px; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; display: none; }
     </style>
 </head>
 <body>
 
-<div id="step1" class="page active">
-    <h2>🔬 المخبر الافتراضي</h2>
-    <p>مرحباً بك دكتور، اختر السنة الدراسية:</p>
-    <button class="btn" onclick="nav(2)">السنة الثالثة</button>
-    <button class="btn" style="background:#ccc" disabled>السنة الثانية (قريباً)</button>
-</div>
-
-<div id="step2" class="page">
-    <h2>السنة الثالثة</h2>
-    <p>اختر الفصل الدراسي:</p>
-    <button class="btn" onclick="nav(3)">الفصل الثاني</button>
-    <button class="btn btn-back" onclick="nav(1)">🔙 عودة</button>
-</div>
-
-<div id="step3" class="page">
-    <h2>الفصل الثاني</h2>
-    <button class="btn" onclick="nav(4)">الكيمياء الصيدلية 1</button>
-    <button class="btn btn-back" onclick="nav(2)">🔙 عودة</button>
-</div>
-
-<div id="step4" class="page">
-    <h2>كيمياء صيدلية 1</h2>
-    <button class="btn" onclick="nav(5)">الجلسة 1: الكشف عن الشوارد</button>
-    <button class="btn btn-back" onclick="nav(3)">🔙 عودة</button>
-</div>
-
-<div id="step5" class="page">
-    <h2>الجلسة 1: الكشف عن الشوارد</h2>
-    
-    <div class="test-card">
-        [span_0](start_span)<p><b>تجربة الكالسيوم $Ca^{+2}$:</b> عند إضافة حماضات النشادر، ما صفة الراسب؟[span_0](end_span)</p>
-        <button class="btn btn-test" onclick="check('صح', 'يتشكل راسب أبيض ينحل بزيادة من الكاشف.')">راسب أبيض ⚪</button>
-        <button class="btn btn-test" onclick="check('خطأ', 'الراسب الناتج أبيض اللون دائماً.')">راسب أزرق 🔵</button>
+<div id="app" class="app-card">
     </div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const app = document.getElementById('app');
+
+    // دالة بناء الواجهات
+    function render(view) {
+        let html = "";
+        switch(view) {
+            case 'years':
+                html = `<h2>🔬 المخبر الافتراضي</h2>
+                        <button class="btn" onclick="render('semesters')">السنة الثالثة</button>
+                        <button class="btn" style="background:#ccc" disabled>السنة الثانية (قريباً)</button>`;
+                break;
+            case 'semesters':
+                html = `<h2>السنة الثالثة</h2>
+                        <button class="btn" onclick="render('subjects')">الفصل الثاني</button>
+                        <button class="btn btn-back" onclick="render('years')">🔙 عودة</button>`;
+                break;
+            case 'subjects':
+                html = `<h2>الفصل الثاني</h2>
+                        <button class="btn" onclick="render('sessions')">الكيمياء الصيدلية 1</button>
+                        <button class="btn btn-back" onclick="render('semesters')">🔙 عودة</button>`;
+                break;
+            case 'sessions':
+                html = `<h2>كيمياء صيدلية 1</h2>
+                        <button class="btn" onclick="render('test')">الجلسة 1: الكشف عن الشوارد</button>
+                        <button class="btn btn-back" onclick="render('subjects')">🔙 عودة</button>`;
+                break;
+            case 'test':
+                html = `<h2>الاختبار العملي 🧪</h2>
+                        <div class="test-box">
+                            [span_0](start_span)<p><b>سؤال الكالسيوم $Ca^{+2}$:</b> عند إضافة حماضات النشادر لمحلول الكالسيوم، ما هو لون الراسب؟[span_0](end_span)</p>
+                            <button class="btn" style="background:#34495e" onclick="check('white')">راسب أبيض ⚪</button>
+                            <button class="btn" style="background:#34495e" onclick="check('blue')">راسب أزرق 🔵</button>
+                        </div>
+                        <div id="res-msg"></div>
+                        <button class="btn btn-back" onclick="render('sessions')">🔙 إنهاء الجلسة</button>`;
+                break;
+        }
+        app.innerHTML = html;
+        window.scrollTo(0,0);
+    }
+
+    function check(ans) {
+        const res = document.getElementById('res-msg');
+        res.style.display = 'block';
+        if(ans === 'white') {
+            res.style.background = '#d4edda'; res.style.color = '#155724';
+            [span_1](start_span)res.innerHTML = "✅ صحيح! يتشكل راسب أبيض من حماضات الكالسيوم[span_1](end_span).";
+        } else {
+            res.style.background = '#f8d7da'; res.style.color = '#721c24';
+            res.innerHTML = "❌ خطأ! [span_2](start_span)الراسب الناتج مع الحماضات أبيض دائماً[span_2](end_span).";
+        }
+    }
+
+    // التشغيل المبدئي
+    render('years');
+</script>
+
+</body>
+</html>
 
     <div class="test-card">
         [span_1](start_span)<p><b>تجربة المغنيزيوم $Mg^{+2}$:</b> عند إضافة NaOH، ماذا يحدث للراسب الأبيض؟[span_1](end_span)</p>
