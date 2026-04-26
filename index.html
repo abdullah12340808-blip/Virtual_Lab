@@ -3,89 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المخبر الافتراضي - الكيمياء الصيدلية</title>
+    <title>المخبر الافتراضي</title>
     <style>
-        :root { --liquid-color: #f0f0f0; --precipitate-height: 0%; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; text-align: center; }
-        .lab-container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        :root { --liquid-color: rgba(255, 255, 255, 0.3); --precipitate-height: 0%; --precipitate-color: white; }
+        body { font-family: 'Arial', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .lab-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
         
-        /* تصميم أنبوب الاختبار */
-        .test-tube {
-            width: 60px; height: 200px; border: 3px solid #ccc;
-            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
-            position: relative; background: rgba(255, 255, 255, 0.3);
-            overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-        }
-        .liquid {
-            position: absolute; bottom: 0; width: 100%; height: 60%;
-            background-color: var(--liquid-color); transition: all 0.8s ease;
-        }
-        .precipitate {
-            position: absolute; bottom: 0; width: 100%;
-            height: var(--precipitate-height);
-            background: rgba(255, 255, 255, 0.8); /* راسب أبيض افتراضي */
-            filter: blur(2px); transition: all 1s ease;
-        }
+        .test-tube-container { height: 250px; display: flex; justify-content: center; align-items: flex-end; margin: 20px 0; position: relative; }
+        .test-tube { width: 70px; height: 200px; border: 3px solid #ddd; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; position: relative; background: #fff; overflow: hidden; }
+        .liquid { position: absolute; bottom: 0; width: 100%; height: 50%; background: var(--liquid-color); transition: 0.5s; }
+        .precipitate { position: absolute; bottom: 0; width: 100%; height: var(--precipitate-height); background: var(--precipitate-color); filter: blur(1px); transition: 1s; border-radius: 0 0 35px 35px; }
+        
+        .flame { position: absolute; bottom: -30px; width: 40px; height: 40px; border-radius: 50% 0 50% 50%; transform: rotate(-45deg); display: none; filter: blur(2px); }
 
-        .controls { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #2c3e50; color: white; }
-        button:hover { background: #34495e; }
-        .status-box { margin-top: 20px; font-weight: bold; color: #d35400; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; background: #34495e; color: white; font-size: 0.9em; }
+        button:hover { opacity: 0.9; }
+        .reset-btn { background: #e74c3c !important; grid-column: span 2; }
+        .status { min-height: 50px; margin-top: 15px; color: #2c3e50; font-size: 0.95em; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-<div class="lab-container">
-    <h2>مخبر الكيمياء الصيدلية - الجلسة الأولى</h2>
-    <p>الشاردة المجهولة: <strong>شوارد الكالسيوم $Ca^{++}$</strong></p>
-
-    <div class="test-tube">
-        <div class="liquid" id="liquid"></div>
-        <div class="precipitate" id="precipitate"></div>
+<div class="lab-card">
+    <h3 id="lab-title">مخبر الكيمياء الصيدلية 1</h3>
+    <div id="selection-area">
+        <p>اختر الشاردة التي تود الكشف عنها:</p>
+        <button onclick="startExp('Ca')" style="width:100%; margin-bottom:10px;">الكالسيوم (Ca++)</button>
+        <button onclick="startExp('Mg')" style="width:100%;">المغنيزيوم (Mg++)</button>
     </div>
 
-    <div class="status-box" id="status">أضف كاشفاً لبدء التجربة...</div>
+    <div id="experiment-area" style="display:none;">
+        <p id="ion-name"></p>
+        <div class="test-tube-container">
+            <div class="test-tube">
+                <div class="liquid" id="liquid"></div>
+                <div class="precipitate" id="precipitate"></div>
+            </div>
+            <div id="flame-effect" class="flame"></div>
+        </div>
+        
+        <div class="status" id="status-msg">أضف الكواشف بالترتيب...</div>
 
-    <div class="controls">
-        <button onclick="testCalcium('oxalate')">إضافة حماضات النشادر</button>
-        <button onclick="testCalcium('sulfate')">إضافة كبريتات الصوديوم</button>
-        <button onclick="testFlame()">اختبار اللهب</button>
-        <button onclick="resetLab()" style="background: #c0392b;">تفريغ الأنبوب</button>
+        <div class="btn-grid" id="controls"></div>
+        <button class="reset-btn" onclick="resetExp()">العودة للقائمة الرئيسية</button>
     </div>
 </div>
 
 <script>
-    function testCalcium(reagent) {
-        const liquid = document.getElementById('liquid');
-        const precipitate = document.getElementById('precipitate');
-        const status = document.getElementById('status');
+    let currentIon = '';
 
-        if (reagent === 'oxalate') {
-            [span_1](start_span)// تفاعل حماضات النشادر[span_1](end_span)
-            document.documentElement.style.setProperty('--precipitate-height', '40%');
-            precipitate.style.background = "rgba(255, 255, 255, 0.9)";
-            status.innerText = "تشكل راسب أبيض من حماضات الكالسيوم (لا ينحل بحمض الخل)";
-        } 
-        else if (reagent === 'sulfate') {
-            [span_2](start_span)// تفاعل كبريتات الصوديوم[span_2](end_span)
-            document.documentElement.style.setProperty('--precipitate-height', '25%');
-            precipitate.style.background = "rgba(240, 240, 240, 0.9)";
-            status.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم";
+    function startExp(ion) {
+        currentIon = ion;
+        document.getElementById('selection-area').style.display = 'none';
+        document.getElementById('experiment-area').style.display = 'block';
+        document.getElementById('ion-name').innerText = ion === 'Ca' ? "الشاردة المجهولة: الكالسيوم" : "الشاردة المجهولة: المغنيزيوم";
+        loadControls();
+    }
+
+    function loadControls() {
+        const controls = document.getElementById('controls');
+        controls.innerHTML = '';
+        if (currentIon === 'Ca') {
+            controls.innerHTML = `
+                <button onclick="applyEffect('oxalate')">حماضات النشادر</button>
+                <button onclick="applyEffect('hcl')">حمض HCl</button>
+                <button onclick="applyEffect('flame')">اختبار اللهب</button>
+                <button onclick="applyEffect('sulfate')">كبريتات الصوديوم</button>`;
+        } else {
+            controls.innerHTML = `
+                <button onclick="applyEffect('phosphate')">فوسفات الصوديوم</button>
+                <button onclick="applyEffect('naoh')">هيدروكسيد الصوديوم</button>
+                <button onclick="applyEffect('carbonate')">كربونات الصوديوم</button>`;
         }
     }
 
-    function testFlame() {
-        const liquid = document.getElementById('liquid');
-        const status = document.getElementById('status');
-        [span_3](start_span)// تلوين اللهب بالبرتقالي[span_3](end_span)
-        liquid.style.backgroundColor = "#e67e22"; 
-        status.innerText = "تلوين اللهب باللون البرتقالي المميز للكالسيوم";
+    function applyEffect(reagent) {
+        const p = document.getElementById('precipitate');
+        const l = document.getElementById('liquid');
+        const s = document.getElementById('status-msg');
+        const f = document.getElementById('flame-effect');
+        
+        f.style.display = 'none';
+
+        if (currentIon === 'Ca') {
+            if (reagent === 'oxalate') {
+                p.style.height = '40%';
+                p.style.background = 'white';
+                [span_2](start_span)s.innerText = "تشكل راسب أبيض من حماضات الكالسيوم[span_2](end_span)";
+            } else if (reagent === 'hcl') {
+                p.style.height = '0%';
+                [span_3](start_span)s.innerText = "ينحل الراسب في حمض كلور الماء[span_3](end_span)";
+            } else if (reagent === 'flame') {
+                f.style.display = 'block';
+                f.style.background = '#e67e22'; // برتقالي
+                [span_4](start_span)s.innerText = "يتلون اللهب باللون البرتقالي[span_4](end_span)";
+            } else if (reagent === 'sulfate') {
+                p.style.height = '25%';
+                p.style.background = '#f9f9f9';
+                [span_5](start_span)s.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم[span_5](end_span)";
+            }
+        } else if (currentIon === 'Mg') {
+            if (reagent === 'phosphate') {
+                p.style.height = '45%';
+                p.style.background = 'rgba(255,255,255,0.9)';
+                [span_6](start_span)s.innerText = "راسب أبيض بلوري من فوسفات الأمونيوم والمغنيزيوم[span_6](end_span)";
+            } else if (reagent === 'naoh') {
+                p.style.height = '30%';
+                p.style.background = '#eee';
+                [span_7](start_span)s.innerText = "راسب أبيض من هيدروكسيد المغنيزيوم لا ينحل بزيادة الكاشف[span_7](end_span)";
+            } else if (reagent === 'carbonate') {
+                p.style.height = '35%';
+                [span_8](start_span)s.innerText = "راسب أبيض من كربونات المغنيزيوم[span_8](end_span)";
+            }
+        }
     }
 
-    function resetLab() {
-        document.documentElement.style.setProperty('--precipitate-height', '0%');
-        document.getElementById('liquid').style.backgroundColor = "#f0f0f0";
-        document.getElementById('status').innerText = "تم تنظيف الأنبوب. ابدأ مجدداً.";
+    function resetExp() {
+        currentIon = '';
+        document.getElementById('selection-area').style.display = 'block';
+        document.getElementById('experiment-area').style.display = 'none';
+        document.getElementById('precipitate').style.height = '0%';
+        document.getElementById('status-msg').innerText = "أضف الكواشف بالترتيب...";
+        document.getElementById('flame-effect').style.display = 'none';
     }
 </script>
 
