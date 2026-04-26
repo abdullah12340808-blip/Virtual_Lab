@@ -1,0 +1,63 @@
+/* الأساسيات */
+body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: center;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* العنوان الرئيسي */
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+}
+
+h1 {
+    margin: 0;
+}
+
+/* الأنابيب الاختبارية */
+.test-tube {
+    position: relative;
+    width: 100px;
+    height: 300px;
+    margin: 20px auto;
+    border: 5px solid #000;
+    border-radius: 10px;
+    background: linear-gradient(to top, #ddd 50%, #f0f0f0);
+}
+
+.liquid {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+    background-color: transparent;
+    transition: height 1s;
+}
+
+/* الأزرار */
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* النتيجة */
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
