@@ -5,136 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المخبر الافتراضي - جامعة حماه</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: white; width: 90%; max-width: 450px; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); text-align: center; }
-        .tube-area { height: 250px; display: flex; justify-content: center; align-items: flex-end; position: relative; margin: 20px 0; background: #eef2f3; border-radius: 10px; }
-        .tube { width: 60px; height: 180px; border: 3px solid #999; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; position: relative; overflow: hidden; background: rgba(255,255,255,0.5); z-index: 2; }
-        .liquid { position: absolute; bottom: 0; width: 100%; height: 50%; background: rgba(173, 216, 230, 0.4); transition: 0.5s; }
-        .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; background: white; transition: 0.8s; filter: blur(1px); }
-        .flame { position: absolute; bottom: -10px; width: 40px; height: 60px; border-radius: 50% 50% 20% 20%; display: none; filter: blur(5px); z-index: 1; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 12px; border: none; border-radius: 8px; background: #2c3e50; color: white; cursor: pointer; font-weight: bold; font-size: 14px; }
-        button:active { background: #1a252f; transform: scale(0.98); }
-        .msg { margin: 15px 0; min-height: 40px; color: #d35400; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: #fff; width: 92%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .tube-box { height: 260px; display: flex; justify-content: center; align-items: flex-end; position: relative; margin: 20px 0; background: #f8fafb; border-radius: 15px; border: 1px solid #e1e8ed; }
+        .test-tube { width: 65px; height: 190px; border: 3px solid #b2bec3; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; position: relative; overflow: hidden; background: rgba(255,255,255,0.6); z-index: 2; }
+        .liquid { position: absolute; bottom: 0; width: 100%; height: 50%; background: rgba(178, 190, 195, 0.2); transition: 0.6s; }
+        .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 0.8s; filter: blur(1px); }
+        .fire { position: absolute; bottom: -5px; width: 45px; height: 75px; border-radius: 50% 50% 20% 20%; display: none; filter: blur(8px); z-index: 1; animation: blink 0.3s infinite; }
+        @keyframes blink { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 14px; border: none; border-radius: 12px; background: #2d3436; color: #fff; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+        button:active { transform: scale(0.96); opacity: 0.8; }
+        .status-panel { margin: 15px 0; min-height: 55px; color: #e67e22; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
         .hidden { display: none; }
-        .nav-btn { background: #e74c3c; grid-column: span 2; margin-top: 10px; }
+        .back-btn { background: #d63031; grid-column: span 2; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>المخبر الافتراضي</h2>
+    <h2 id="main-title">المخبر الافتراضي</h2>
     
-    <div id="start-screen">
-        <p>الجلسة الأولى: الكيمياء الصيدلية 1</p>
-        <button id="choose-ca" style="width:100%; margin-bottom:10px; background:#2980b9;">بدء تجربة الكالسيوم</button>
-        <button id="choose-mg" style="width:100%; background:#27ae60;">بدء تجربة المغنيزيوم</button>
+    <div id="home-screen">
+        <p style="color: #636e72;">اختر الشاردة المجهولة لبدء العمل:</p>
+        <button id="btn-start-ca" style="width:100%; margin-bottom:12px; background:#0984e3;">كشف شوارد الكالسيوم</button>
+        <button id="btn-start-mg" style="width:100%; background:#00b894;">كشف شوارد المغنيزيوم</button>
     </div>
 
     <div id="lab-screen" class="hidden">
-        <p id="ion-title"></p>
-        <div class="tube-area">
-            <div id="flame-img" class="flame"></div>
-            <div class="tube">
+        <div id="ion-header" style="font-weight: bold; color: #2d3436;"></div>
+        <div class="tube-box">
+            <div id="visual-fire" class="fire"></div>
+            <div class="test-tube">
                 <div class="liquid"></div>
-                <div id="precipitate-layer" class="precipitate"></div>
+                <div id="visual-precipitate" class="precipitate"></div>
             </div>
         </div>
-        <div id="info-msg" class="msg">جاهز للإضافة...</div>
-        <div class="btn-grid" id="action-buttons"></div>
-        <button class="nav-btn" id="back-home">تغيير الشاردة</button>
+        <div id="status-msg" class="status-panel">بانتظار إضافة الكاشف...</div>
+        <div class="grid" id="tools-grid"></div>
+        <button class="back-btn" id="btn-home">رجوع</button>
     </div>
 </div>
 
 <script>
-    const startScreen = document.getElementById('start-screen');
-    const labScreen = document.getElementById('lab-screen');
-    const ionTitle = document.getElementById('ion-title');
-    const infoMsg = document.getElementById('info-msg');
-    const precipitate = document.getElementById('precipitate-layer');
-    const flame = document.getElementById('flame-img');
-    const actionButtons = document.getElementById('action-buttons');
+    const home = document.getElementById('home-screen');
+    const lab = document.getElementById('lab-screen');
+    const prec = document.getElementById('visual-precipitate');
+    const fire = document.getElementById('visual-fire');
+    const msg = document.getElementById('status-msg');
+    const grid = document.getElementById('tools-grid');
+    const header = document.getElementById('ion-header');
 
-    let currentIon = "";
+    let activeIon = "";
 
-    // بدء تجربة الكالسيوم
-    document.getElementById('choose-ca').addEventListener('click', () => {
-        setupLab("الكالسيوم", "Ca");
-    });
+    // تفعيل أزرار القائمة الرئيسية
+    document.getElementById('btn-start-ca').onclick = () => openLab("الكالسيوم", "Ca");
+    document.getElementById('btn-start-mg').onclick = () => openLab("المغنيزيوم", "Mg");
+    document.getElementById('btn-home').onclick = () => { home.classList.remove('hidden'); lab.classList.add('hidden'); };
 
-    // بدء تجربة المغنيزيوم
-    document.getElementById('choose-mg').addEventListener('click', () => {
-        setupLab("المغنيزيوم", "Mg");
-    });
-
-    function setupLab(name, code) {
-        currentIon = code;
-        startScreen.classList.add('hidden');
-        labScreen.classList.remove('hidden');
-        ionTitle.innerText = "كشف شاردة " + name;
-        resetTube();
-        renderControls();
+    function openLab(name, code) {
+        activeIon = code;
+        home.classList.add('hidden');
+        lab.classList.remove('hidden');
+        header.innerText = "تجربة الكشف عن " + name;
+        resetUI();
+        loadButtons();
     }
 
-    function renderControls() {
-        actionButtons.innerHTML = "";
-        if (currentIon === "Ca") {
-            addButton("حماضات النشادر", () => {
-                precipitate.style.height = "40%";
-                precipitate.style.background = "white";
-                infoMsg.innerText = "تشكل راسب أبيض من حماضات الكالسيوم";
+    function loadButtons() {
+        grid.innerHTML = "";
+        if (activeIon === "Ca") {
+            createActionButton("حماضات النشادر", () => {
+                prec.style.height = "45%"; prec.style.background = "#ffffff";
+                msg.innerText = "ظهور راسب أبيض من حماضات الكالسيوم [تفاعل مرجعي]";
             });
-            addButton("حمض HCl", () => {
-                precipitate.style.height = "0%";
-                infoMsg.innerText = "ينحل الراسب في حمض كلور الماء";
+            createActionButton("حمض HCl", () => {
+                prec.style.height = "0%";
+                msg.innerText = "انحلال الراسب تماماً في حمض كلور الماء";
             });
-            addButton("اختبار اللهب", () => {
-                flame.style.display = "block";
-                flame.style.background = "orange";
-                infoMsg.innerText = "تلوين اللهب باللون البرتقالي";
+            createActionButton("كبريتات الصوديوم", () => {
+                prec.style.height = "30%"; prec.style.background = "#f1f2f6";
+                msg.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم";
             });
-            addButton("كبريتات الصوديوم", () => {
-                precipitate.style.height = "30%";
-                precipitate.style.background = "#f9f9f9";
-                infoMsg.innerText = "تشكل راسب أبيض من كبريتات الكالسيوم";
+            createActionButton("اختبار اللهب", () => {
+                fire.style.display = "block"; fire.style.background = "radial-gradient(circle, #ff9f43, #ee5253)";
+                msg.innerText = "تلوين اللهب باللون البرتقالي المميز للكالسيوم";
             });
         } else {
-            addButton("فوسفات الصوديوم", () => {
-                precipitate.style.height = "45%";
-                precipitate.style.background = "white";
-                infoMsg.innerText = "راسب أبيض بلوري من فوسفات الأمونيوم والمغنيزيوم";
+            createActionButton("فوسفات الصوديوم", () => {
+                prec.style.height = "50%"; prec.style.background = "rgba(255,255,255,0.9)";
+                msg.innerText = "ظهور راسب أبيض بلوري (فوسفات الأمونيوم والمغنيزيوم)";
             });
-            addButton("هيدروكسيد الصوديوم", () => {
-                precipitate.style.height = "35%";
-                infoMsg.innerText = "راسب أبيض من هيدروكسيد المغنيزيوم";
+            createActionButton("هيدروكسيد الصوديوم", () => {
+                prec.style.height = "40%"; prec.style.background = "#ffffff";
+                msg.innerText = "تشكل راسب هيدروكسيد المغنيزيوم (لا ينحل بزيادة الكاشف)";
             });
-            addButton("كربونات الصوديوم", () => {
-                precipitate.style.height = "30%";
-                infoMsg.innerText = "راسب أبيض من كربونات المغنيزيوم";
+            createActionButton("كربونات الصوديوم", () => {
+                prec.style.height = "35%"; prec.style.background = "#f5f6fa";
+                msg.innerText = "ترسب كربونات المغنيزيوم باللون الأبيض";
             });
-            addButton("حمض الخل", () => {
-                precipitate.style.height = "0%";
-                infoMsg.innerText = "يذوب راسب المغنيزيوم في حمض الخل";
+            createActionButton("حمض الخل", () => {
+                prec.style.height = "0%";
+                msg.innerText = "انحلال الراسب البلوري في حمض الخل [خاص بالمغنيزيوم]";
             });
         }
     }
 
-    function addButton(text, action) {
-        const btn = document.createElement('button');
-        btn.innerText = text;
-        btn.onclick = action;
-        actionButtons.appendChild(btn);
+    function createActionButton(txt, fn) {
+        const b = document.createElement('button');
+        b.innerText = txt;
+        b.onclick = fn;
+        grid.appendChild(b);
     }
 
-    document.getElementById('back-home').addEventListener('click', () => {
-        startScreen.classList.remove('hidden');
-        labScreen.classList.add('hidden');
-    });
-
-    function resetTube() {
-        precipitate.style.height = "0%";
-        flame.style.display = "none";
-        infoMsg.innerText = "جاهز للإضافة...";
+    function resetUI() {
+        prec.style.height = "0%";
+        fire.style.display = "none";
+        msg.innerText = "أضف الكاشف لملاحظة التفاعل...";
     }
 </script>
 
