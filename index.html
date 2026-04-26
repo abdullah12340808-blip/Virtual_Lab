@@ -7,23 +7,47 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <header>
         <h1>اختبار الكيمياء الصيدلية</h1>
-        <p>اختبر معرفتك بالمواد الكيميائية من خلال التفاعلات المختبرية التفاعلية.</p>
+        <p>اختر السنة والفصل والمادة ثم الجلسة لإجراء الاختبار المخبرى التفاعلي.</p>
     </header>
 
-    <div class="experiment">
-        <div id="testTube" class="test-tube">
-            <div class="liquid" id="liquid"></div>
-        </div>
-        <div class="buttons">
-            <button onclick="addChemical('calcium')">إضافة شوارد الكالسيوم</button>
-            <button onclick="addChemical('magnesium')">إضافة شوارد المغنيزيوم</button>
-            <button onclick="addChemical('phosphate')">إضافة فوسفات ثنائية الصوديوم</button>
-        </div>
+    <div id="yearSelection" class="selection-section">
+        <h2>اختر السنة</h2>
+        <select id="yearSelect" onchange="loadFasalOptions()">
+            <option value="">-- اختر السنة --</option>
+            <option value="2">السنة الثانية</option>
+            <option value="3">السنة الثالثة</option>
+        </select>
     </div>
 
-    <div id="result"></div>
+    <div id="faselSelection" class="selection-section" style="display:none;">
+        <h2>اختر الفصل</h2>
+        <select id="faselSelect" onchange="loadMaterias()">
+            <option value="">-- اختر الفصل --</option>
+        </select>
+    </div>
+
+    <div id="materiaSelection" class="selection-section" style="display:none;">
+        <h2>اختر المادة</h2>
+        <select id="materiaSelect" onchange="loadSessions()">
+            <option value="">-- اختر المادة --</option>
+        </select>
+    </div>
+
+    <div id="sessionSelection" class="selection-section" style="display:none;">
+        <h2>اختر الجلسة</h2>
+        <select id="sessionSelect" onchange="startTest()">
+            <option value="">-- اختر الجلسة --</option>
+        </select>
+    </div>
+
+    <div id="testArea" style="display:none;">
+        <h2>الاختبار المخبرى</h2>
+        <p id="testDescription"></p>
+        <div id="testContent"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
