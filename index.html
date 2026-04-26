@@ -6,34 +6,101 @@
     <title>المخبر الافتراضي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --main-blue: #0088cc; --bg-color: #f4f7f9; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-color); direction: rtl; text-align: center; margin: 0; padding: 20px; }
+        :root { --primary: #0088cc; --success: #27ae60; --danger: #e74c3c; --bg: #f5f6f7; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); direction: rtl; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-wrapper { width: 100%; max-width: 400px; }
         
-        /* الحاوية الرئيسية */
-        .app-container { max-width: 400px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        
-        /* إخفاء الأقسام غير النشطة بشكل كامل */
-        .page { display: none; }
-        .page.active { display: block; animation: slideIn 0.3s ease-out; }
+        /* تصميم البطاقة */
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; display: none; }
+        .card.active { display: block; animation: fadeIn 0.4s ease; }
 
-        h2 { color: #2c3e50; font-size: 20px; margin-bottom: 20px; }
-        
-        /* تنسيق الأزرار */
-        .btn { display: block; width: 100%; padding: 16px; margin: 12px 0; background: var(--main-blue); color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
-        .btn:active { transform: scale(0.98); background: #006699; }
-        
-        .btn-secondary { background: #6c757d; margin-top: 20px; font-size: 14px; padding: 10px; }
+        h2 { color: #2c3e50; font-size: 22px; margin-top: 0; }
+        p { color: #7f8c8d; font-size: 16px; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* الأزرار */
+        .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; border: none; border-radius: 10px; background: var(--primary); color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-back { background: #95a5a6; margin-top: 20px; }
+
+        /* منطقة الاختبار */
+        .lab-test { background: #f9f9f9; border: 2px dashed var(--primary); border-radius: 10px; padding: 15px; margin-top: 15px; }
+        .result { margin-top: 15px; padding: 10px; border-radius: 8px; font-weight: bold; display: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div id="p1" class="page active">
+<div class="app-wrapper">
+    <div id="step1" class="card active">
         <h2>🔬 المخبر الافتراضي</h2>
-        <p>اختر السنة الدراسية:</p>
-        <button class="btn" onclick="showPage(2)">السنة الثالثة</button>
+        <p>يرجى اختيار السنة الدراسية:</p>
+        <button class="btn" onclick="nav(2)">السنة الثالثة</button>
+        <button class="btn" style="background:#bdc3c7; cursor:not-allowed">السنة الثانية (قريباً)</button>
+    </div>
+
+    <div id="step2" class="card">
+        <h2>السنة الثالثة</h2>
+        <p>اختر الفصل الدراسي:</p>
+        <button class="btn" onclick="nav(3)">الفصل الثاني</button>
+        <button class="btn btn-back" onclick="nav(1)">🔙 العودة للسنوات</button>
+    </div>
+
+    <div id="step3" class="card">
+        <h2>الفصل الثاني</h2>
+        <p>اختر المادة العلمية:</p>
+        <button class="btn" onclick="nav(4)">الكيمياء الصيدلية 1</button>
+        <button class="btn btn-back" onclick="nav(2)">🔙 العودة للفصول</button>
+    </div>
+
+    <div id="step4" class="card">
+        <h2>الكيمياء الصيدلية 1</h2>
+        <p>الجلسات العملية المتاحة:</p>
+        <button class="btn" onclick="nav(5)">الجلسة 1: الكشف عن الشوارد</button>
+        <button class="btn btn-back" onclick="nav(3)">🔙 العودة للمواد</button>
+    </div>
+
+    <div id="step5" class="card">
+        <h2>الاختبار العملي 🧪</h2>
+        <div class="lab-test">
+            <p><b>السؤال:</b> عند إضافة 1 مل من "حماضات النشادر" إلى محلول شوارد <b>الكالسيوم $Ca^{+2}$</b>، ماذا نلاحظ؟</p>
+            <button class="btn" style="background:#34495e" onclick="check('white')">تشكل راسب أبيض ⚪</button>
+            <button class="btn" style="background:#34495e" onclick="check('blue')">تشكل لون أزرق 🔵</button>
+        </div>
+        <div id="resBox" class="result"></div>
+        <button class="btn btn-back" onclick="nav(4)">🔙 إنهاء الاختبار</button>
+    </div>
+</div>
+
+<script>
+    // تفعيل مكتبة تليجرام
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function nav(step) {
+        // إخفاء كل البطاقات
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        // إظهار البطاقة المطلوبة
+        document.getElementById('step' + step).classList.add('active');
+        // إخفاء صندوق النتيجة عند التنقل
+        document.getElementById('resBox').style.display = 'none';
+    }
+
+    function check(answer) {
+        const res = document.getElementById('resBox');
+        res.style.display = 'block';
+        if(answer === 'white') {
+            res.innerHTML = "✅ إجابة صحيحة! يتشكل راسب أبيض من حماضات الكالسيوم (ص4 من المحاضرة).";
+            res.style.background = "#d4edda"; res.style.color = "#155724";
+        } else {
+            res.innerHTML = "❌ إجابة خاطئة! راجع تفاعلات الكالسيوم في ملف العملي.";
+            res.style.background = "#f8d7da"; res.style.color = "#721c24";
+        }
+    }
+</script>
+
+</body>
+</html>
         <button class="btn" style="background:#ccc; cursor:not-allowed">السنة الثانية (قريباً)</button>
     </div>
 
