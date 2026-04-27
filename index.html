@@ -2,91 +2,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>المخبر الافتراضي الشامل - جامعة حماة</title>
+  <title>المخبر الافتراضي التعليمي - جامعة حماة</title>
   <style>
-    :root { --bg: #010409; --panel: #0d1117; --accent: #58a6ff; --success: #238636; --danger: #da3633; --text: #c9d1d9; }
+    :root {
+      --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --success: #22c55e;
+      --danger: #f43f5e; --text: #f8fafc; --gold: #fbbf24;
+    }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
     /* نظام الشاشات */
-    .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.4s; }
+    .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
     .screen.active { display: flex; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .header { background: var(--panel); padding: 15px; border-bottom: 1px solid #30363d; display: flex; align-items: center; gap: 15px; }
-    .btn-back { background: #21262d; border: 1px solid #30363d; color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+    .header { background: var(--panel); padding: 18px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
 
-    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 20px; overflow-y: auto; }
-    .btn-main { width: 100%; max-width: 340px; background: #161b22; border: 1px solid #30363d; padding: 22px; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-main:active { background: var(--accent); color: #000; }
+    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 25px; overflow-y: auto; }
+    .btn-main { width: 100%; max-width: 360px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+    .btn-main:active { transform: scale(0.98); background: var(--accent); color: #000; }
 
-    /* مسرح العمليات */
-    .lab-stage { flex: 1; position: relative; background: radial-gradient(circle, #161b22, #010409); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    /* مسرح المختبر */
+    .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
     
-    /* أدوات المختبر */
-    .tool { position: absolute; bottom: 60px; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
-    .burner { left: 40px; }
-    .ice-bath { right: 40px; }
-    .ice-container { width: 80px; height: 50px; background: rgba(173, 216, 230, 0.4); border: 2px solid #add8e6; border-radius: 10px 10px 20px 20px; position: relative; box-shadow: 0 0 15px rgba(173, 216, 230, 0.3); }
-    .ice-cube { position: absolute; background: white; width: 10px; height: 10px; border-radius: 2px; opacity: 0.6; }
+    /* أدوات */
+    .tool { position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
+    .burner { left: 30px; }
+    .ice-bath { right: 30px; }
+    .ice-box { width: 90px; height: 60px; background: #bae6fd; border: 3px solid #7dd3fc; border-radius: 10px 10px 25px 25px; box-shadow: 0 0 20px rgba(125,211,252,0.4); }
 
     /* الأنبوب */
-    #tube { width: 55px; height: 170px; position: relative; z-index: 100; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
-    .glass { position: absolute; inset: 0; border: 2.5px solid rgba(255,255,255,0.2); border-radius: 0 0 25px 25px; background: rgba(255,255,255,0.05); backdrop-filter: blur(5px); overflow: hidden; }
-    .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1s; background: rgba(255,255,255,0.1); }
+    #tube { width: 60px; height: 180px; position: relative; z-index: 100; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
+    .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.4); border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); overflow: hidden; }
+    .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1.5s; background: rgba(255,255,255,0.2); }
     .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 2s; filter: blur(1px); }
 
     /* تأثيرات */
-    .flame { width: 25px; height: 45px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; transition: 0.3s; }
+    .flame { width: 30px; height: 50px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; transition: 0.3s; }
     .flame.active { opacity: 1; animation: flicker 0.1s infinite; }
-    @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.2); } }
-    .mist { position: absolute; inset: 0; background: white; opacity: 0; transition: 1s; pointer-events: none; } /* ندى التبريد */
+    @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.3); } }
+    .mist { position: absolute; inset: 0; background: white; opacity: 0; transition: 1.5s; pointer-events: none; }
 
     /* لوحة التحكم */
-    .controls { background: var(--panel); padding: 15px; border-top: 1px solid #30363d; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .btn-tool { background: #21262d; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 8px; font-size: 13px; }
-    .btn-fire { background: #491111; }
-    .btn-ice { background: #112d49; }
+    .controls { background: var(--panel); padding: 20px; border-top: 2px solid var(--accent); border-radius: 30px 30px 0 0; }
+    .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .btn-opt { background: #334155; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: bold; }
+    .btn-fire.active { background: var(--danger); box-shadow: 0 0 15px var(--danger); }
+    .btn-ice.active { background: #0369a1; box-shadow: 0 0 15px #0369a1; }
+    .btn-clean { background: #64748b; color: white; border: none; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 100%; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div id="app">
-    <div id="scrStart" class="screen active">
-        <div class="menu-container">
-            <h1 style="color:var(--accent)">المخبر الافتراضي</h1>
-            <p>كلية الصيدلة - جامعة حماة</p>
-            <button class="btn-main" onclick="nav('scrYears')" style="background:var(--accent); color:#000">لنبدأ</button>
+    <div id="scrStart" class="screen active" style="justify-content:center; align-items:center;">
+        <div style="text-align:center;">
+            <div style="font-size:70px; margin-bottom:20px;">🔬</div>
+            <h1 style="color:var(--accent); font-size:32px; margin:0;">المخبر الافتراضي</h1>
+            <p style="color:#94a3b8; margin-bottom:40px;">جامعة حماة - كلية الصيدلة</p>
+            <button class="btn-main" onclick="nav('scrYears')" style="background:var(--accent); color:#000; border:none; font-size:20px;">دخول الطالب</button>
         </div>
     </div>
 
     <div id="scrYears" class="screen">
-        <div class="header"><span>اختر السنة</span></div>
+        <div class="header"><span>اختر السنة الدراسية</span></div>
         <div class="menu-container">
-            <button class="btn-main" onclick="openYear('y2')">السنة الثانية</button>
-            <button class="btn-main" onclick="openYear('y3')">السنة الثالثة</button>
+            <button class="btn-main" onclick="showTerms('y2')">السنة الثانية</button>
+            <button class="btn-main" onclick="showTerms('y3')">السنة الثالثة</button>
+            <button class="btn-main" style="opacity:0.6">السنة الرابعة (قريباً)</button>
+            <button class="btn-main" style="opacity:0.6">السنة الخامسة (قريباً)</button>
+        </div>
+    </div>
+
+    <div id="scrTerms" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('scrYears')">←</button><span id="termTitle"></span></div>
+        <div class="menu-container">
+            <button class="btn-main" onclick="showSubs(1)">الفصل الأول</button>
+            <button class="btn-main" onclick="showSubs(2)">الفصل الثاني</button>
         </div>
     </div>
 
     <div id="scrSubs" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrYears')">←</button><span id="txtYear"></span></div>
-        <div class="menu-container" id="listSubs"></div>
+        <div class="header"><button class="btn-back" onclick="nav('scrTerms')">←</button><span>المواد المتاحة</span></div>
+        <div class="menu-container" id="subList"></div>
     </div>
 
-    <div id="scrSess" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrSubs')">←</button><span id="txtSub"></span></div>
-        <div class="menu-container" id="listSess"></div>
+    <div id="scrSessions" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('scrSubs')">←</button><span id="sessTitle"></span></div>
+        <div class="menu-container" id="sessList"></div>
     </div>
 
     <div id="scrLab" class="screen">
-        <div class="header"><button class="btn-back" onclick="location.reload()">← خروج</button><span id="labTitle"></span></div>
+        <div class="header"><button class="btn-back" onclick="location.reload()">← خروج</button><span id="labTestName"></span></div>
         <div class="lab-stage">
-            <div id="labStatus" style="position:absolute; top:10px; font-size:13px; color:var(--accent);">بانتظار الإجراء الأول..</div>
+            <div id="hintTxt" style="position:absolute; top:20px; color:var(--accent); font-weight:bold; text-align:center; width:90%;"></div>
             
             <div class="tool burner">
                 <div id="flame" class="flame"></div>
-                <div style="width:35px; height:10px; background:#30363d; border-radius:4px;"></div>
+                <div style="width:40px; height:12px; background:#475569; border-radius:4px;"></div>
             </div>
 
             <div id="tube">
@@ -98,75 +112,88 @@
             </div>
 
             <div class="tool ice-bath">
-                <div class="ice-container">
-                    <div class="ice-cube" style="top:5px; left:10px;"></div>
-                    <div class="ice-cube" style="top:15px; right:12px;"></div>
-                    <div class="ice-cube" style="bottom:8px; left:25px;"></div>
-                </div>
-                <div style="margin-top:5px; font-size:10px;">حمام ثلجي</div>
+                <div class="ice-box"></div>
+                <div style="margin-top:5px; font-size:11px; font-weight:bold;">حمام ثلجي</div>
             </div>
         </div>
 
         <div class="controls">
-            <div class="grid">
-                <button class="btn-tool" onclick="addReagent('HCl')">حمض HCl</button>
-                <button class="btn-tool" onclick="addReagent('Ammonia')">نشادر NH4OH</button>
-                <button class="btn-tool" onclick="addReagent('Phosphate')">فوسفات الصوديوم</button>
-                <button class="btn-tool" onclick="addReagent('Nessler')">كاشف نيسلر</button>
-                <button class="btn-tool" onclick="addReagent('Cobalt')">كوبالتي نتريت</button>
-                <button class="btn-tool" onclick="addReagent('Acetic')">حمض الخل</button>
+            <button class="btn-clean" onclick="cleanTube()">🧼 غسل الأنبوب (Reset)</button>
+            <div class="grid-btns">
+                <button class="btn-opt" onclick="addReagent('HCl')">HCl</button>
+                <button class="btn-opt" onclick="addReagent('Ammonia')">نشادر</button>
+                <button class="btn-opt" onclick="addReagent('Phosphate')">فوسفات</button>
+                <button class="btn-opt" onclick="addReagent('Nessler')">كاشف نيسلر</button>
+                <button class="btn-opt" onclick="addReagent('Cobalt')">كوبالتي نتريت</button>
+                <button class="btn-opt" onclick="addReagent('Acetic')">حمض الخل</button>
             </div>
-            <div style="display:flex; gap:8px; margin-bottom:10px;">
-                <button class="btn-tool btn-fire" style="flex:1" onclick="action('heat')">تسخين 🔥</button>
-                <button class="btn-tool btn-ice" style="flex:1" onclick="action('cool')">تبريد ❄️</button>
+            <div style="display:flex; gap:10px;">
+                <button id="heatBtn" class="btn-opt btn-fire" style="flex:1" onclick="toggleHeat()">تسخين 🔥</button>
+                <button id="coolBtn" class="btn-opt btn-ice" style="flex:1" onclick="toggleCool()">تبريد ❄️</button>
             </div>
-            <button class="btn-tool" style="width:100%; background:var(--success); font-weight:bold;" onclick="finish()">تقديم النتيجة النهائية 🔍</button>
+            <button class="btn-opt" style="width:100%; margin-top:10px; background:var(--success); color:#000;" onclick="openDiagnosis()">تقديم التشخيص النهائي 🔍</button>
         </div>
     </div>
 </div>
 
 <script>
-    const data = {
-        y2: ["العضوية 2", "التحليلية 1", "العقاقير 1"],
-        y3: ["الكيمياء الصيدلية 1", "الدمويات", "التحليل الآلي"]
+    const curriculum = {
+        y2: {
+            t1: ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات 1", "الكيمياء العضوية 1"],
+            t2: ["الكيمياء العضوية 2", "الكيمياء الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 1"]
+        },
+        y3: {
+            t1: ["التحليلية 2", "الأحياء 1", "العقاقير 2", "فارماكولوجي 1", "التكنولوجيا الصيدلية"],
+            t2: ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي 2", "الكيمياء صيدلية 1", "الأحياء 2"]
+        }
     };
 
-    let secretIon = '';
-    const ions = ['الكالسيوم', 'المغنيزيوم', 'الأمونيوم', 'البوتاسيوم'];
-    let log = [];
+    let curYear = '', curTerm = 1, secretIon = '', log = [], isHeating = false, isCooling = false;
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function openYear(y) {
-        document.getElementById('txtYear').innerText = y === 'y2' ? "السنة الثانية" : "السنة الثالثة";
-        const list = document.getElementById('listSubs'); list.innerHTML = "";
-        data[y].forEach(s => {
+    function showTerms(y) {
+        curYear = y;
+        document.getElementById('termTitle').innerText = y === 'y2' ? "السنة الثانية" : "السنة الثالثة";
+        nav('scrTerms');
+    }
+
+    function showSubs(t) {
+        curTerm = t;
+        const list = document.getElementById('subList'); list.innerHTML = "";
+        curriculum[curYear]['t' + t].forEach(sub => {
             const b = document.createElement('div'); b.className = 'btn-main';
-            b.innerText = s; b.onclick = () => openSub(s); list.appendChild(b);
+            b.innerText = sub; b.onclick = () => showSessions(sub); list.appendChild(b);
         });
         nav('scrSubs');
     }
 
-    function openSub(s) {
-        document.getElementById('txtSub').innerText = s;
-        const list = document.getElementById('listSess'); list.innerHTML = "";
-        if (s === "الكيمياء الصيدلية 1") {
+    function showSessions(sub) {
+        document.getElementById('sessTitle').innerText = sub;
+        const list = document.getElementById('sessList'); list.innerHTML = "";
+        
+        // جلسات تجريبية للمواد المطلوبة
+        let sess = [];
+        if (sub === "الكيمياء صيدلية 1") sess = [{n: "اختبار كشف الشوارد الموجبة المجهولة", type: "lab_unknown"}];
+        else if (sub === "الدمويات") sess = [{n: "الجلسة الأولى: سحب الدم", type: "info"}];
+        else sess = [{n: "الجلسة الأولى: مقدمة", type: "info"}];
+
+        sess.forEach(s => {
             const b = document.createElement('div'); b.className = 'btn-main';
-            b.innerText = "اختبار الكشف عن الشوارد الموجبة";
-            b.onclick = startUnknownLab;
+            b.innerText = s.n; b.onclick = () => s.type === "lab_unknown" ? startUnknown() : alert("الجلسة تحت التطوير");
             list.appendChild(b);
-        } else { list.innerHTML = "قريباً.."; }
-        nav('scrSess');
+        });
+        nav('scrSessions');
     }
 
-    function startUnknownLab() {
-        secretIon = ions[Math.floor(Math.random() * ions.length)];
-        log = [];
-        resetLabUI();
-        document.getElementById('labTitle').innerText = "عينة مجهولة رقم " + Math.floor(Math.random()*900+100);
+    function startUnknown() {
+        secretIon = ['الكالسيوم', 'المغنيزيوم', 'الأمونيوم', 'البوتاسيوم'][Math.floor(Math.random()*4)];
+        log = []; cleanTube();
+        document.getElementById('labTestName').innerText = "تحليل عينة مجهولة";
+        document.getElementById('hintTxt').innerText = "أضف الكواشف واستخدم الحرارة لكشف الشاردة";
         nav('scrLab');
     }
 
@@ -174,72 +201,84 @@
         log.push(r);
         const liq = document.getElementById('liq');
         const prec = document.getElementById('prec');
-        const status = document.getElementById('labStatus');
+        liq.style.height = (parseInt(liq.style.height) || 30) + 7 + "%";
         
-        // تفاعل افتراضي (أي إضافة تسبب عكارة خفيفة أو تغير بسيط)
-        liq.style.height = (parseInt(liq.style.height) || 30) + 5 + "%";
-        
-        // منطق التفاعلات بناءً على المادة السرية
         if (secretIon === 'المغنيزيوم' && log.includes('Phosphate') && log.includes('Ammonia')) {
-            prec.style.height = "25%"; prec.style.background = "white"; prec.style.opacity = "1";
-            status.innerText = "تشكل راسب أبيض بلوري كثيف";
-        } 
-        else if (secretIon === 'الأمونيوم' && r === 'Nessler') {
-            liq.style.background = "#8b4513"; status.innerText = "تغير المحلول للون بني محمر";
-        }
-        else if (secretIon === 'البوتاسيوم' && r === 'Cobalt' && log.includes('Acetic')) {
-            prec.style.height = "20%"; prec.style.background = "#ffd700"; prec.style.opacity = "1";
-            status.innerText = "تشكل راسب أصفر";
-        }
-        else {
-            // تفاعل خاطئ أو غير مميز: عكارة عشوائية
-            status.innerText = "حدث تفاعل.. تعكر المحلول قليلاً";
-            liq.style.background = "rgba(200,200,200,0.2)";
+            prec.style.height = "30%"; prec.style.background = "white"; prec.style.opacity = "1";
+        } else if (secretIon === 'الأمونيوم' && r === 'Nessler') {
+            liq.style.background = "#92400e";
+        } else if (secretIon === 'البوتاسيوم' && r === 'Cobalt' && log.includes('Acetic')) {
+            prec.style.height = "25%"; prec.style.background = "#eab308"; prec.style.opacity = "1";
         }
     }
 
-    function action(type) {
+    function toggleHeat() {
+        if (isCooling) toggleCool(); // إيقاف التبريد إذا كان يعمل
+        isHeating = !isHeating;
         const tube = document.getElementById('tube');
-        const status = document.getElementById('labStatus');
-        
-        if (type === 'heat') {
-            tube.style.transform = "translate(-125px, 20px) rotate(-10deg)";
-            document.getElementById('flame').classList.add('active');
-            status.innerText = "يتم التسخين..";
-            
+        const flame = document.getElementById('flame');
+        const btn = document.getElementById('heatBtn');
+
+        if (isHeating) {
+            tube.style.transform = "translate(-120px, 30px) rotate(-10deg)";
+            flame.classList.add('active');
+            btn.classList.add('active');
             if (secretIon === 'الكالسيوم' && log.includes('HCl')) {
-                setTimeout(() => {
-                    document.getElementById('flame').style.background = "orange";
-                    status.innerText = "لون اللهب أصبح آجري (برتقالي محمر)!";
-                }, 1500);
+                setTimeout(() => { flame.style.background = "#f97316"; }, 1000);
             }
         } else {
-            tube.style.transform = "translate(125px, 20px) rotate(10deg)";
-            document.getElementById('flame').classList.remove('active');
-            document.getElementById('mist').style.opacity = "0.5";
-            status.innerText = "تبريد في الحمام الثلجي..";
-            setTimeout(() => { tube.style.transform = "translate(0,0)"; }, 2000);
+            tube.style.transform = "translate(0,0)";
+            flame.classList.remove('active');
+            btn.classList.remove('active');
+            flame.style.background = "";
         }
     }
 
-    function finish() {
-        const choice = prompt("اكتب اسم الشاردة التي اكتشفتها (كالسيوم، مغنيزيوم، أمونيوم، بوتاسيوم):");
-        if (choice === secretIon) {
-            alert("صحيح! أنت كيميائي بارع. الشاردة هي " + secretIon);
-            location.reload();
+    function toggleCool() {
+        if (isHeating) toggleHeat();
+        isCooling = !isCooling;
+        const tube = document.getElementById('tube');
+        const btn = document.getElementById('coolBtn');
+        const mist = document.getElementById('mist');
+
+        if (isCooling) {
+            tube.style.transform = "translate(120px, 30px) rotate(10deg)";
+            btn.classList.add('active');
+            mist.style.opacity = "0.6";
         } else {
-            alert("للأسف إجابة خاطئة. المادة كانت " + secretIon + ". أعد التجربة.");
-            startUnknownLab();
+            tube.style.transform = "translate(0,0)";
+            btn.classList.remove('active');
+            mist.style.opacity = "0";
         }
     }
 
-    function resetLabUI() {
-        document.getElementById('liq').style.height = "30%";
-        document.getElementById('liq').style.background = "rgba(255,255,255,0.1)";
-        document.getElementById('prec').style.height = "0%";
-        document.getElementById('mist').style.opacity = "0";
-        document.getElementById('flame').classList.remove('active');
+    function cleanTube() {
+        log = []; isHeating = false; isCooling = false;
+        const liq = document.getElementById('liq');
+        const prec = document.getElementById('prec');
+        const mist = document.getElementById('mist');
+        liq.style.height = "30%"; liq.style.background = "rgba(255,255,255,0.2)";
+        prec.style.height = "0%"; prec.style.opacity = "0";
+        mist.style.opacity = "0";
         document.getElementById('tube').style.transform = "translate(0,0)";
+        document.getElementById('flame').classList.remove('active');
+        document.getElementById('heatBtn').classList.remove('active');
+        document.getElementById('coolBtn').classList.remove('active');
+    }
+
+    function openDiagnosis() {
+        const ions = ['الكالسيوم', 'المغنيزيوم', 'الأمونيوم', 'البوتاسيوم'];
+        let choice = prompt("اختر الشاردة المكتشفة:\n1. كالسيوم\n2. مغنيزيوم\n3. أمونيوم\n4. بوتاسيوم\n(اكتب الرقم أو الاسم)");
+        
+        let ans = "";
+        if (choice == "1" || choice == "كالسيوم") ans = "الكالسيوم";
+        if (choice == "2" || choice == "مغنيزيوم") ans = "المغنيزيوم";
+        if (choice == "3" || choice == "أمونيوم") ans = "الأمونيوم";
+        if (choice == "4" || choice == "بوتاسيوم") ans = "البوتاسيوم";
+
+        if (ans === secretIon) alert("🎉 صحيح! المادة هي فعلاً " + secretIon);
+        else alert("❌ خطأ! المادة المجهولة كانت " + secretIon + ". حاول مرة أخرى.");
+        startUnknown();
     }
 </script>
 </body>
