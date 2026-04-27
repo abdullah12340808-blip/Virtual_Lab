@@ -13,220 +13,281 @@
       height: 100vh; overflow: hidden;
     }
 
+    /* الانتقالات الرسومية */
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* شاشة البداية */
     #welcomeScreen {
       position: fixed; inset: 0; z-index: 1000; background: radial-gradient(circle at center, #1e293b 0%, #050a14 100%);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .start-btn {
-      padding: 18px 40px; font-size: 20px; font-weight: bold; color: white;
+      padding: 18px 50px; font-size: 20px; font-weight: bold; color: white;
       background: linear-gradient(45deg, #0ea5e9, #22c55e); border: none; border-radius: 50px;
-      cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: 0.3s;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3); transition: 0.3s;
     }
-    .start-btn:active { transform: scale(0.95); }
 
-    /* الهيكل العام */
+    /* الهيكل */
     .app-container { height: 100%; display: flex; flex-direction: column; }
-    .screen { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-    .screen.active { display: flex; }
-
-    /* البار العلوي */
     .nav-header {
-      padding: 12px 16px; display: flex; align-items: center; gap: 15px;
+      padding: 15px; display: flex; align-items: center; justify-content: space-between;
       background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    .back-btn { background: #1e293b; border: none; color: white; padding: 8px 12px; border-radius: 8px; }
+    .back-btn { background: #1e293b; border: none; color: white; padding: 8px 15px; border-radius: 10px; }
 
-    /* منطقة المختبر */
+    /* مسرح التجربة */
     .lab-stage {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      position: relative; background: radial-gradient(circle at center, #1e293b 0%, #050a14 100%);
+      flex: 1; position: relative; overflow: hidden;
+      background: radial-gradient(circle at 70% 50%, #1e293b 0%, #050a14 100%);
+      display: flex; align-items: center; justify-content: center;
     }
-    .tube-holder { position: relative; width: 60px; height: 180px; }
-    .tube-body {
-      position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(3px); overflow: hidden; z-index: 5;
+
+    /* اللهب على اليسار */
+    .burner {
+      position: absolute; left: 30px; bottom: 40%; width: 60px; height: 100px;
+      display: flex; flex-direction: column; align-items: center;
     }
-    .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1s ease; }
+    .fire {
+      width: 30px; height: 45px; background: linear-gradient(to top, #ff4d00, #ffcc00);
+      border-radius: 50% 50% 20% 20%; filter: blur(2px); opacity: 0.8;
+      animation: flicker 0.1s infinite alternate; display: none;
+    }
+    .fire.active { display: block; }
+    @keyframes flicker { from { height: 40px; transform: scaleX(0.9); } to { height: 50px; transform: scaleX(1.1); } }
+    .base { width: 50px; height: 10px; background: #475569; border-radius: 5px; margin-top: 5px; }
+
+    /* الأنبوب القابل للسحب */
+    .tube-draggable {
+      width: 55px; height: 170px; position: relative; z-index: 10;
+      touch-action: none; transition: transform 0.1s;
+    }
+    .tube-glass {
+      position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 0 0 28px 28px; background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px); overflow: hidden;
+    }
+    .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1s; }
     .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; background: #fff; filter: blur(1px); opacity: 0; transition: 1s; }
-    .fire-effect {
-      position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);
-      width: 35px; height: 45px; background: orange; border-radius: 50% 50% 20% 20%;
-      filter: blur(4px); opacity: 0; transition: 0.3s;
-    }
-    .fire-active { opacity: 0.8; animation: flicker 0.1s infinite alternate; }
-    @keyframes flicker { from { height: 40px; } to { height: 50px; } }
 
-    /* شبكة الخيارات */
-    .controls-grid {
-      background: var(--panel); padding: 15px; border-radius: 25px 25px 0 0;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    /* الأزرار في المنتصف */
+    .controls-panel {
+      background: var(--panel); padding: 20px; border-radius: 30px 30px 0 0;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
-    .option-btn {
-      background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-      padding: 15px 10px; color: white; font-size: 13px; text-align: center;
-      display: flex; align-items: center; justify-content: center; min-height: 70px;
+    .options-grid {
+      display: grid; grid-template-columns: 1fr; width: 100%; max-width: 300px; gap: 10px;
     }
-    .option-btn.correct { background: rgba(34, 197, 94, 0.2); border-color: var(--success); }
-    .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); }
+    .opt-btn {
+      background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: white;
+      padding: 15px; border-radius: 15px; text-align: center; font-size: 14px;
+    }
+    .opt-btn:active { background: var(--accent); }
 
-    /* القوائم */
-    .menu-scroll { flex: 1; overflow-y: auto; padding: 15px; }
-    .menu-card { 
-      background: var(--panel); padding: 20px; border-radius: 15px; margin-bottom: 12px;
-      border: 1px solid rgba(255,255,255,0.05); text-align: center;
+    .menu-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    .menu-item { 
+        width: 100%; max-width: 350px; background: var(--panel); padding: 20px; 
+        border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05);
     }
   </style>
 </head>
 <body>
 
 <div id="welcomeScreen">
-    <h1 style="color: var(--accent); margin-bottom: 10px;">المخبر الافتراضي</h1>
-    <p style="color: var(--muted); margin-bottom: 30px;">كلية الصيدلة - جامعة حماة</p>
-    <button class="start-btn" onclick="startApp()">لنبدأ التجربة</button>
+    <h1 style="color: var(--accent);">المخبر الافتراضي</h1>
+    <p style="color: #94a3b8; margin-bottom: 30px;">جامعة حماة - كلية الصيدلة</p>
+    <button class="start-btn" onclick="closeWelcome()">ابدأ الآن</button>
 </div>
 
 <div class="app-container">
-  <div class="nav-header">
-    <button class="back-btn" onclick="navigateBack()">← عودة</button>
-    <span id="headerTitle" style="font-weight: bold; font-size: 15px;">المخبر الافتراضي</span>
-  </div>
+    <div class="nav-header">
+        <button class="back-btn" onclick="goBack()">← عودة</button>
+        <span id="titleLabel" style="font-weight: bold;">المخبر</span>
+    </div>
 
-  <div id="menuScreen" class="screen active">
-    <div class="menu-scroll" id="menuArea"></div>
-  </div>
+    <div id="menuView" class="screen active fade-in">
+        <div class="menu-list" id="menuContent"></div>
+    </div>
 
-  <div id="labScreen" class="screen">
-    <div class="lab-stage">
-      <div id="hintBox" style="position:absolute; top:15px; text-align:center; padding:0 20px; font-size:13px; color:var(--accent);"></div>
-      <div class="tube-holder">
-        <div class="tube-body">
-          <div id="liquidFill" class="liquid"></div>
-          <div id="precipFill" class="precipitate"></div>
+    <div id="labView" class="screen fade-in">
+        <div class="lab-stage" id="stage">
+            <div class="burner">
+                <div id="fire" class="fire"></div>
+                <div class="base"></div>
+                <small style="font-size: 10px; color: #64748b;">منطقة التسخين</small>
+            </div>
+
+            <div id="tube" class="tube-draggable">
+                <div class="tube-glass">
+                    <div id="liq" class="liquid"></div>
+                    <div id="pre" class="precipitate"></div>
+                </div>
+            </div>
+
+            <div id="labHint" style="position:absolute; top:20px; width:100%; text-align:center; padding:0 20px; font-size:13px; color:var(--accent);"></div>
+            <div id="actionMsg" style="position:absolute; bottom:20px; font-size:12px; color:#94a3b8;"></div>
         </div>
-        <div id="flameLayer" class="fire-effect"></div>
-      </div>
-      <div id="visualStatus" style="font-size: 13px; color: #94a3b8; margin-top: 30px;">جاهز</div>
+
+        <div class="controls-panel">
+            <div id="stepInfo" style="font-size: 12px; color: var(--accent);">الخطوة 1</div>
+            <div class="options-grid" id="options"></div>
+        </div>
     </div>
-    <div class="controls-grid" id="optionsGrid">
-      <div style="grid-column: span 2; text-align:center; font-size:12px; color:var(--accent); margin-bottom:5px;" id="statusLabel">الخطوة 1</div>
-    </div>
-  </div>
 </div>
 
 <script>
-  const db = {
-    y2: { name: "السنة الثانية", t2: ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"] },
-    y3: { name: "السنة الثالثة", t2: ["الدمويات", "الكيمياء الصيدلية 1", "التحليل الآلي", "الأحياء 2", "كيمياء العقاقير", "فارماكولوجي 2"] }
-  };
+    const data = {
+        y2: { name: "السنة الثانية", subs: ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"] },
+        y3: { name: "السنة الثالثة", subs: ["الدمويات", "الكيمياء الصيدلية 1", "التحليل الآلي", "الأحياء 2", "كيمياء العقاقير", "فارماكولوجي 2"] }
+    };
 
-  // هيكلية الاختبارات مدمجة في جلسات
-  const sessions = {
-    "الكيمياء الصيدلية 1": [
-      {
-        title: "الجلسة 1: الشوارد الموجبة (Ca / Mg)",
-        hint: "المطلوب: الكشف التسلسلي عن الكالسيوم ثم المغنيزيوم",
-        steps: [
-          { q: "إضافة 2 مل من عينة الكالسيوم", w: ["إضافة حمض خل", "تسخين شديد", "إضافة نشادر"], e: { h: "20%", c: "rgba(200,220,255,0.4)", m: "تم وضع عينة الكالسيوم" } },
-          { q: "إضافة حماضات النشادر", w: ["إضافة يود", "إضافة كاشف بندكت"], e: { h: "35%", c: "#fff", p: "15%", m: "راسب أبيض من حماضات الكالسيوم" } },
-          { q: "إضافة حمض HCl لتدويم الراسب", w: ["إضافة ماء", "التبريد"], e: { h: "45%", p: "0%", c: "rgba(255,255,255,0.2)", m: "ذاب الراسب" } },
-          { q: "إضافة عينة المغنيزيوم لنفس الأنبوب", w: ["إضافة زيت", "غليان"], e: { h: "60%", c: "rgba(200,200,200,0.3)", m: "تمت إضافة المغنيزيوم" } },
-          { q: "إضافة فوسفات ثنائية الصوديوم + هيدروكسيد الأمونيوم", w: ["إضافة كبريتات", "إضافة كحول"], e: { h: "80%", c: "#fff", p: "30%", m: "راسب أبيض بلوري فوسفاتي" } }
+    const tests = {
+        "الكيمياء الصيدلية 1": [
+            {
+                title: "الجلسة 1: الكشف عن الكالسيوم",
+                hint: "المطلوب: تشكيل راسب حماضات الكالسيوم الأبيض",
+                steps: [
+                    { q: "إضافة 2 مل من محلول العينة (Ca++)", w: ["إضافة ماء مقطر", "إضافة حمض نمل"], e: { h: "25%", c: "rgba(255,255,255,0.2)", m: "تم وضع العينة" } },
+                    { q: "إضافة محلول حماضات النشادر", w: ["إضافة كاشف يود", "إضافة هيدروكسيد"], e: { h: "40%", c: "#fff", p: "20%", m: "ظهر راسب أبيض" } },
+                    { q: "تسخين الأنبوب لتسريع التفاعل", w: ["تبريد الأنبوب", "إضافة ماء بارد"], e: { fire: true, h: "40%", m: "اسحب الأنبوب لليسار فوق اللهب" }, needHeat: true },
+                    { q: "إضافة حمض HCl (تأكيد الذوبانية)", w: ["إضافة كحول", "إضافة محلول ملحي"], e: { h: "55%", p: "0%", m: "ذاب الراسب تماماً" } }
+                ]
+            },
+            {
+                title: "الجلسة 1: الكشف عن المغنيزيوم",
+                hint: "المطلوب: تشكيل راسب فوسفات الأمونيوم والمغنيزيوم",
+                steps: [
+                    { q: "إضافة 1 مل من شوارد المغنيزيوم", w: ["إضافة كاشف فهلنغ", "إضافة حمض كبريت"], e: { h: "20%", c: "rgba(200,200,200,0.3)", m: "تم وضع عينة المغنيزيوم" } },
+                    { q: "إضافة فوسفات ثنائية الصوديوم 10%", w: ["إضافة غليكوز", "إضافة نشاء"], e: { h: "35%", m: "تمت إضافة الفوسفات" } },
+                    { q: "إضافة هيدروكسيد الأمونيوم (نشادر)", w: ["إضافة حمض كلور", "التسخين"], e: { h: "50%", c: "#fff", p: "25%", m: "ظهر راسب أبيض بلوري" } }
+                ]
+            }
         ]
-      }
-    ]
-  };
+    };
 
-  let cur = { view: 'years', year: null, sub: null, session: null, step: 0 };
+    let cur = { view: 'years', y: null, s: null, test: null, step: 0 };
 
-  function startApp() { document.getElementById('welcomeScreen').style.display = 'none'; renderMenu(); }
+    function closeWelcome() { document.getElementById('welcomeScreen').style.display = 'none'; render(); }
 
-  function renderMenu() {
-    const area = document.getElementById('menuArea');
-    const title = document.getElementById('headerTitle');
-    area.innerHTML = "";
-    if (cur.view === 'years') {
-      title.innerText = "المخبر الافتراضي";
-      Object.keys(db).forEach(y => area.appendChild(menuBtn(db[y].name, () => { cur.year = y; cur.view = 'subs'; renderMenu(); })));
-    } else if (cur.view === 'subs') {
-      title.innerText = db[cur.year].name;
-      db[cur.year].t2.forEach(s => area.appendChild(menuBtn(s, () => { cur.sub = s; cur.view = 'sessions'; renderMenu(); })));
-    } else if (cur.view === 'sessions') {
-      title.innerText = cur.sub;
-      const list = sessions[cur.sub] || [];
-      if (list.length === 0) area.innerHTML = "<p style='text-align:center'>سيتم إضافة الجلسات قريباً</p>";
-      list.forEach(s => area.appendChild(menuBtn(s.title, () => startSession(s))));
-    }
-  }
-
-  function menuBtn(txt, fn) {
-    const d = document.createElement('div'); d.className = 'menu-card';
-    d.innerHTML = `<h3>${txt}</h3>`; d.onclick = fn; return d;
-  }
-
-  function startSession(s) {
-    cur.session = s; cur.step = 0;
-    document.getElementById('menuScreen').classList.remove('active');
-    document.getElementById('labScreen').classList.add('active');
-    document.getElementById('headerTitle').innerText = s.title;
-    document.getElementById('hintBox').innerText = s.hint;
-    resetVisuals();
-    renderStep();
-  }
-
-  function renderStep() {
-    const step = cur.session.steps[cur.step];
-    document.getElementById('statusLabel').innerText = `الخطوة ${cur.step + 1} من ${cur.session.steps.length}`;
-    const grid = document.getElementById('optionsGrid');
-    Array.from(grid.getElementsByClassName('option-btn')).forEach(el => el.remove());
-
-    let opts = [{ t: step.q, ok: true }, ...step.w.map(x => ({ t: x, ok: false }))].sort(() => Math.random() - 0.5);
-    opts.forEach(o => {
-      const b = document.createElement('div'); b.className = 'option-btn'; b.innerText = o.t;
-      b.onclick = () => {
-        if (o.ok) {
-          b.classList.add('correct'); apply(step.e); cur.step++;
-          if (cur.step < cur.session.steps.length) setTimeout(renderStep, 1000);
-          else document.getElementById('visualStatus').innerText = "اكتملت الجلسة بنجاح! 🎉";
-        } else {
-          b.classList.add('wrong'); setTimeout(() => b.classList.remove('wrong'), 800);
+    function render() {
+        const content = document.getElementById('menuContent');
+        const title = document.getElementById('titleLabel');
+        content.innerHTML = "";
+        
+        if (cur.view === 'years') {
+            title.innerText = "السنوات الدراسية";
+            Object.keys(data).forEach(y => content.appendChild(createItem(data[y].name, () => { cur.y = y; cur.view = 'subs'; render(); })));
+        } else if (cur.view === 'subs') {
+            title.innerText = data[cur.y].name;
+            data[cur.y].subs.forEach(s => content.appendChild(createItem(s, () => { cur.s = s; cur.view = 'tests'; render(); })));
+        } else if (cur.view === 'tests') {
+            title.innerText = cur.s;
+            (tests[cur.s] || []).forEach(t => content.appendChild(createItem(t.title, () => startTest(t))));
         }
-      };
-      grid.appendChild(b);
-    });
-  }
-
-  function apply(e) {
-    if (e.h) document.getElementById('liquidFill').style.height = e.h;
-    if (e.c) document.getElementById('liquidFill').style.background = e.c;
-    if (e.p !== undefined) { 
-        document.getElementById('precipFill').style.height = e.p;
-        document.getElementById('precipFill').style.opacity = e.p === "0%" ? "0" : "1";
     }
-    if (e.m) document.getElementById('visualStatus').innerText = e.m;
-    const f = document.getElementById('flameLayer');
-    if (e.fire) f.classList.add('fire-active'); else f.classList.remove('fire-active');
-  }
 
-  function navigateBack() {
-    if (document.getElementById('labScreen').classList.contains('active')) {
-      document.getElementById('labScreen').classList.remove('active');
-      document.getElementById('menuScreen').classList.add('active');
-      cur.view = 'sessions';
-    } else {
-      if (cur.view === 'sessions') cur.view = 'subs';
-      else if (cur.view === 'subs') cur.view = 'years';
+    function createItem(txt, fn) {
+        const d = document.createElement('div'); d.className = 'menu-item fade-in';
+        d.innerHTML = `<h3>${txt}</h3>`; d.onclick = fn; return d;
     }
-    renderMenu();
-  }
 
-  function resetVisuals() {
-    document.getElementById('liquidFill').style.height = "0%";
-    document.getElementById('precipFill').style.height = "0%";
-    document.getElementById('flameLayer').classList.remove('fire-active');
-    document.getElementById('visualStatus').innerText = "جاهز";
-  }
+    function startTest(t) {
+        cur.test = t; cur.step = 0;
+        document.getElementById('menuView').classList.remove('active');
+        document.getElementById('labView').classList.add('active');
+        document.getElementById('labHint').innerText = t.hint;
+        resetTube();
+        renderStep();
+    }
+
+    function renderStep() {
+        const step = cur.test.steps[cur.step];
+        document.getElementById('stepInfo').innerText = `الخطوة ${cur.step + 1} من ${cur.test.steps.length}`;
+        const grid = document.getElementById('options');
+        grid.innerHTML = "";
+
+        let opts = [{ t: step.q, ok: true }, ...step.w.map(x => ({ t: x, ok: false }))].sort(() => Math.random() - 0.5);
+        opts.forEach(o => {
+            const b = document.createElement('div'); b.className = 'opt-btn fade-in'; b.innerText = o.t;
+            b.onclick = () => {
+                if (o.ok) {
+                    if (step.needHeat) {
+                        apply(step.e);
+                        waitForHeat();
+                    } else {
+                        apply(step.e);
+                        next();
+                    }
+                } else {
+                    b.style.borderColor = "var(--danger)";
+                    document.getElementById('actionMsg').innerText = "خطأ علمي!";
+                }
+            };
+            grid.appendChild(b);
+        });
+    }
+
+    function apply(e) {
+        if (e.h) document.getElementById('liq').style.height = e.h;
+        if (e.c) document.getElementById('liq').style.background = e.c;
+        if (e.p !== undefined) {
+            document.getElementById('pre').style.height = e.p;
+            document.getElementById('pre').style.opacity = e.p === "0%" ? "0" : "1";
+        }
+        if (e.m) document.getElementById('actionMsg').innerText = e.m;
+        document.getElementById('fire').className = e.fire ? "fire active" : "fire";
+    }
+
+    function next() {
+        cur.step++;
+        if (cur.step < cur.test.steps.length) setTimeout(renderStep, 1200);
+        else document.getElementById('actionMsg').innerText = "تمت التجربة بنجاح! 🔬";
+    }
+
+    // منطق السحب (Drag and Drop)
+    let isDragging = false;
+    const tube = document.getElementById('tube');
+    tube.onpointerdown = (e) => { isDragging = true; tube.setPointerCapture(e.pointerId); };
+    tube.onpointermove = (e) => {
+        if (!isDragging) return;
+        let rect = document.getElementById('stage').getBoundingClientRect();
+        let x = e.clientX - rect.left - 27;
+        tube.style.transform = `translateX(${x}px)`;
+        
+        // التحقق من القرب من اللهب (على اليسار)
+        if (x < -80 && cur.test.steps[cur.step]?.needHeat) {
+            document.getElementById('actionMsg').innerText = "يتم التسخين الآن...";
+            setTimeout(() => {
+                if(isDragging) {
+                    isDragging = false;
+                    tube.style.transform = `translateX(0px)`;
+                    next();
+                }
+            }, 2000);
+        }
+    };
+    tube.onpointerup = () => { isDragging = false; tube.style.transform = `translateX(0px)`; };
+
+    function goBack() {
+        if (cur.view === 'years') return;
+        if (document.getElementById('labView').classList.contains('active')) {
+            document.getElementById('labView').classList.remove('active');
+            document.getElementById('menuView').classList.add('active');
+            cur.view = 'tests';
+        } else {
+            cur.view = cur.view === 'tests' ? 'subs' : 'years';
+        }
+        render();
+    }
+
+    function resetTube() {
+        document.getElementById('liq').style.height = "0%";
+        document.getElementById('pre').style.height = "0%";
+        document.getElementById('fire').className = "fire";
+        document.getElementById('actionMsg').innerText = "ابدأ بإضافة المواد";
+    }
+
+    render();
 </script>
 </body>
 </html>
