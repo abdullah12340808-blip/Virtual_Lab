@@ -5,169 +5,431 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>المخبر الافتراضي</title>
   <style>
-    /* أضف هنا النمط السابق الذي قمت بإرساله سابقًا */
+    :root {
+      --bg: #08111f;
+      --panel: #101c33;
+      --panel-2: #162544;
+      --text: #eef4ff;
+      --muted: #9fb2d1;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #112040 0%, #08111f 60%);
-      color: #eef4ff;
+      background: radial-gradient(circle at top, #112040 0%, var(--bg) 60%);
+      color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
-      margin: 0;
+    }
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
       padding: 16px;
     }
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       padding: 14px 16px;
       background: rgba(16, 28, 51, .86);
+      border: 1px solid var(--border);
       border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
       margin-bottom: 16px;
     }
-    .brand h1 { margin: 0; font-size: 22px; color: #7dd3fc; }
-    .brand p { margin: 4px 0 0; color: #9fb2d1; font-size: 13px; }
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #7dd3fc;
+    }
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 840px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, .12);
+      color: #bfe9ff;
+      border: 1px solid rgba(56, 189, 248, .22);
+      font-size: 13px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
     .screen { display: none; }
     .screen.active { display: block; }
-    .panel { background: rgba(16, 28, 51, .92); border-radius: 24px; box-shadow: 0 12px 30px rgba(0, 0, 0, .25); padding: 18px; }
-    .btn {
-      padding: 12px 18px;
-      font-size: 16px;
-      background-color: #38bdf8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color .3s ease;
-      margin: 10px 0;
+    .panel {
+      background: rgba(16, 28, 51, .92);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 18px;
     }
-    .btn:hover {
-      background-color: #22c55e;
+    .title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    .btn.secondary {
-      background-color: #d1d5db;
-      color: #333;
+    .title-row h2 {
+      margin: 0;
+      font-size: 22px;
     }
-    .btn.secondary:hover {
-      background-color: #9ca3af;
+    .title-row p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.8;
     }
-    .grid {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
+    .grid { display: grid; gap: 14px; }
+    .sessions-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
     .card {
       background: linear-gradient(180deg, rgba(22,37,68,.95), rgba(12,21,39,.95));
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 16px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
-      transition: transform .2s ease;
+      box-shadow: var(--shadow);
     }
-    .card:hover {
-      transform: translateY(-5px);
+    .click-card {
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease;
     }
-    .card h3 { margin: 0 0 8px; font-size: 18px; color: #eef4ff; }
-    .card p { color: #9fb2d1; line-height: 1.7; font-size: 14px; }
-  </style>
-</head>
-<body>
-
-  <div class="topbar">
-    <div class="brand">
-      <h1>المخبر الافتراضي</h1>
-      <p>واجهة امتحانية تفاعلية مبنية على المواد الدراسية المختلفة للجلسات المخبرية.</p>
-    </div>
-    <div class="chip" id="breadcrumbChip">الصفحة الرئيسية</div>
-  </div><!-- Home -->
-
-  <section id="homeScreen" class="screen active">
-    <div class="panel">
-      <h2>الاختبارات</h2>
-      <p>اختر السنة، الفصل، المادة، ثم الجلسة لإجراء الاختبار.</p>
-
-      <button class="btn" onclick="selectYear(2)">السنة الثانية</button>
-      <button class="btn" onclick="selectYear(3)">السنة الثالثة</button>
-
-      <div id="faselSelect" class="hidden">
-        <button class="btn" onclick="selectFasel(1)">الفصل الأول</button>
-        <button class="btn" onclick="selectFasel(2)">الفصل الثاني</button>
-      </div>
-
-      <div id="materiaSelect" class="hidden">
-        <button class="btn" onclick="selectMateria('الكيمياء الفيزيائية')">الكيمياء الفيزيائية</button>
-        <button class="btn" onclick="selectMateria('الصيدلانيات1')">الصيدلانيات1</button>
-      </div>
-
-      <div id="sessionSelect" class="hidden">
-        <button class="btn" onclick="startTest()">ابدأ الاختبار</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="testsScreen" class="screen hidden">
-    <div class="panel">
-      <h2 id="unitTitle">الاختبار الأول</h2>
-      <p id="unitDesc">قم بحل هذا الاختبار بناءً على الجلسة المختارة.</p>
-      <button class="btn secondary" onclick="goHome()">العودة</button>
-    </div>
-  </section>
-
-  <section id="labScreen" class="screen hidden">
-    <div class="panel">
-      <h2 id="labTitle">المخبر الافتراضي</h2>
-      <p id="labSubtitle"></p>
-      <button class="btn secondary" onclick="backToTests()">العودة للتجارب</button>
-      <button class="btn secondary" onclick="restartTest()">إعادة المحاولة</button>
-    </div>
-  </section>
-
-  <script>
-    const data = {
-      2: { 1: ['الكيمياء الفيزيائية', 'الصيدلانيات1'], 2: ['الكيمياء العضوية2', 'الصيدلانيات1'] },
-      3: { 1: ['الأحياء1', 'فارماكولوجي1'], 2: ['الدمويات', 'فارماكولوجي2'] }
-    };
-
-    let selectedYear = null;
-    let selectedFasel = null;
-    let selectedMateria = null;
-
-    function selectYear(year) {
-      selectedYear = year;
-      document.getElementById('faselSelect').classList.remove('hidden');
-      document.getElementById('homeScreen').classList.add('hidden');
+    .click-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125, 211, 252, .35);
     }
-
-    function selectFasel(fasel) {
-      selectedFasel = fasel;
-      document.getElementById('materiaSelect').classList.remove('hidden');
-      document.getElementById('faselSelect').classList.add('hidden');
+    .click-card h3 {
+      margin: 0 0 8px;
+      color: #e8f7ff;
     }
-
-    function selectMateria(materia) {
-      selectedMateria = materia;
-      document.getElementById('sessionSelect').classList.remove('hidden');
-      document.getElementById('materiaSelect').classList.add('hidden');
+    .click-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
     }
-
-    function startTest() {
-      document.getElementById('testsScreen').classList.remove('hidden');
-      document.getElementById('homeScreen').classList.add('hidden');
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
     }
-
-    function goHome() {
-      document.getElementById('homeScreen').classList.remove('hidden');
-      document.getElementById('testsScreen').classList.add('hidden');
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      color: #d8e6ff;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 12px;
     }
-
-    function backToTests() {
-      document.getElementById('testsScreen').classList.remove('hidden');
-      document.getElementById('labScreen').classList.add('hidden');
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
-
-    function restartTest() {
-      alert('إعادة المحاولة');
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #07101d;
+      background: #cfefff;
+      transition: transform .12s ease, opacity .12s ease;
     }
-  </script>
-
-</body>
-</html>
+    .btn:hover { transform: translateY(-1px); }
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .hidden { display: none !important; }
+    /* horizontal slider sections */
+    .h-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 2px 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .h-scroll::-webkit-scrollbar { height: 10px; }
+    .h-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+    }
+    .h-card {
+      flex: 0 0 260px;
+      scroll-snap-align: start;
+    }
+    .h-card.compact { flex-basis: 280px; }
+    .lab-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .lab-layout { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+    .lab-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-height: 430px;
+      justify-content: flex-start;
+    }
+    .lab-board {
+      width: 100%;
+    }
+    .lab-status {
+      margin-top: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      line-height: 1.8;
+    }
+    /* Realistic empty test tube */
+    .tube-wrap {
+      width: 180px;
+      height: 340px;
+      position: relative;
+      margin-top: 8px;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.28));
+    }
+    .tube-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: 42px 42px 34px 34px;
+      background: radial-gradient(circle at 50% 20%, rgba(125, 211, 252, .16), rgba(255,255,255,0) 70%);
+      pointer-events: none;
+    }
+    .tube-opening {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 36px;
+      border: 4px solid rgba(255,255,255,.88);
+      border-bottom: none;
+      border-radius: 999px 999px 16px 16px;
+      background: rgba(255,255,255,.03);
+      overflow: hidden;
+      z-index: 4;
+    }
+    .tube-opening::after {
+      content: "";
+      position: absolute;
+      inset: 6px 14px 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+    }
+    .tube-body {
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 286px;
+      border-radius: 44px 44px 38px 38px;
+      border: 4px solid rgba(255,255,255,.88);
+      border-top-width: 4px;
+      background:
+        linear-gradient(90deg,
+          rgba(255,255,255,.10) 0%,
+          rgba(255,255,255,.02) 14%,
+          rgba(255,255,255,.05) 35%,
+          rgba(255,255,255,.02) 65%,
+          rgba(255,255,255,.12) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      overflow: hidden;
+      z-index: 2;
+    }
+    .tube-body::before {
+      content: "";
+      position: absolute;
+      left: 16px;
+      top: 10px;
+      bottom: 16px;
+      width: 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0));
+      opacity: .82;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .tube-bottom {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 98px;
+      height: 34px;
+      border: 4px solid rgba(255,255,255,.88);
+      border-top: none;
+      border-radius: 0 0 24px 24px;
+      background: rgba(255,255,255,.03);
+      z-index: 4;
+    }
+    .inner-liquid {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 0%;
+      background: transparent;
+      transition: height .35s ease, background .35s ease, opacity .35s ease;
+      z-index: 1;
+      opacity: 1;
+    }
+    .meniscus {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 0%;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,.18), rgba(255,255,255,0) 72%);
+      opacity: 0;
+      transition: opacity .3s ease, bottom .35s ease;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .precipitate {
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      bottom: 10px;
+      height: 24%;
+      border-radius: 18px 18px 14px 14px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: .35s ease;
+      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.96), rgba(255,255,255,.74) 35%, rgba(255,255,255,.25) 72%, rgba(255,255,255,0) 100%);
+      filter: blur(.2px);
+      z-index: 2;
+    }
+    .precipitate.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .flame {
+      width: 66px;
+      height: 104px;
+      margin-top: -8px;
+      opacity: 0;
+      transform: scale(.7);
+      transition: .3s ease;
+      background: radial-gradient(circle at 50% 70%, #fff7b0 0%, #ffb347 18%, #ff7a00 42%, rgba(255,122,0,.15) 68%, rgba(255,122,0,0) 72%);
+      clip-path: polygon(50% 0%, 70% 18%, 84% 38%, 90% 60%, 76% 84%, 50% 100%, 24% 84%, 10% 60%, 16% 38%, 30% 18%);
+    }
+    .flame.show { opacity: 1; transform: scale(1); }
+    .progress {
+      height: 12px;
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #38bdf8);
+      transition: width .3s ease;
+    }
+    .step-list-wrap {
+      margin-top: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .step-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .step-list::-webkit-scrollbar { height: 10px; }
+    .step-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+    }
+    .step-btn {
+      flex: 0 0 220px;
+      scroll-snap-align: start;
+      text-align: right;
+      width: 220px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(35,57,93,.9), rgba(22,37,68,.95));
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, opacity .12s ease;
+      min-height: 72px;
+      line-height: 1.6;
+      white-space: normal;
+    }
+    .step-btn:hover { transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
+    .step-btn:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+    .step-btn .label {
+      display: block;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .step-btn.correct-step {
+      border-color: rgba(34,197,94,.45);
+      box-shadow: inset 0 0 0 1px rgba(34,197,94,.15);
+    }
+    .step-btn.wrong-step {
+      border-color: rgba(239,68,68,.55);
+      animation: shake .32s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(4px); }
+      40% { transform: translateX(-4px); }
+      60% { transform: translateX(3px); }
+      80% { transform: translateX(-3px); }
+    }
+    .status-good { color: #86efac; }
+    .status-bad { color: #fca5a5; }
+    .status-warn { color: #fde68a; }
+    .lab-status {
+      margin-top: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      line-height: 1.85;
+    }
+    .result-box {
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border
