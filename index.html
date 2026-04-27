@@ -5,167 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>المخبر الافتراضي</title>
   <style>
-    :root {
-      --bg: #08111f;
-      --panel: #101c33;
-      --panel-2: #162544;
-      --text: #eef4ff;
-      --muted: #9fb2d1;
-      --accent: #38bdf8;
-      --accent-2: #22c55e;
-      --danger: #ef4444;
-      --warn: #f59e0b;
-      --border: rgba(255,255,255,.08);
-      --shadow: 0 12px 30px rgba(0,0,0,.25);
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #112040 0%, var(--bg) 60%);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    .app { max-width: 1200px; margin: 0 auto; padding: 16px; }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      background: rgba(16, 28, 51, .86);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-      margin-bottom: 16px;
-    }
-    .brand h1 { margin: 0; font-size: 22px; color: #7dd3fc; }
-    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; max-width: 840px; }
-    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: rgba(56, 189, 248, .12); color: #bfe9ff; border: 1px solid rgba(56, 189, 248, .22); font-size: 13px; white-space: nowrap; flex: 0 0 auto; }
-    .screen { display: none; }
-    .screen.active { display: block; }
-    .panel { background: rgba(16, 28, 51, .92); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); padding: 18px; }
-    .title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-    .title-row h2 { margin: 0; font-size: 22px; }
-    .title-row p { margin: 6px 0 0; color: var(--muted); line-height: 1.8; }
-    .grid { display: grid; gap: 14px; }
-    .sessions-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-    .card {
-      background: linear-gradient(180deg, rgba(22,37,68,.95), rgba(12,21,39,.95));
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-    }
-    .click-card {
-      cursor: pointer;
-      transition: transform .15s ease, border-color .15s ease;
-    }
-    .click-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(125, 211, 252, .35);
-    }
-    .click-card h3 {
-      margin: 0 0 8px;
-      color: #e8f7ff;
-    }
-    .click-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
-    }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .tag {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.05);
-      color: #d8e6ff;
-      border: 1px solid rgba(255,255,255,.08);
-      font-size: 12px;
-    }
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 11px 14px;
-      font-size: 14px;
-      cursor: pointer;
-      color: #07101d;
-      background: #cfefff;
-      transition: transform .12s ease, opacity .12s ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn.secondary {
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .hidden { display: none !important; }
-    .h-scroll {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding: 4px 2px 12px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-    .h-scroll::-webkit-scrollbar { height: 10px; }
-    .h-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,.14);
-      border-radius: 999px;
-    }
-    .h-card {
-      flex: 0 0 260px;
-      scroll-snap-align: start;
-    }
-    .h-card.compact { flex-basis: 280px; }
-    .lab-layout {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-    @media (max-width: 920px) {
-      .lab-layout { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: flex-start; }
-    }
-    .lab-visual {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      min-height: 430px;
-      justify-content: flex-start;
-    }
-    .lab-board {
-      width: 100%;
-    }
-    .lab-status {
-      margin-top: 12px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-      line-height: 1.8;
-    }
+    /* أضف هنا النمط السابق الذي قمت بإرساله سابقًا */
+    /* أضف أنماطك هنا (CSS) */
   </style>
 </head>
 <body>
-
   <div class="app">
     <div class="topbar">
       <div class="brand">
@@ -184,34 +28,48 @@
           </div>
         </div>
 
-        <div id="unitCards" class="grid sessions-grid"></div>
+        <!-- زر لاختيار السنة -->
+        <div id="yearSelect">
+          <button onclick="selectYear(2)">السنة الثانية</button>
+          <button onclick="selectYear(3)">السنة الثالثة</button>
+        </div>
+
+        <!-- زر لاختيار الفصل -->
+        <div id="faselSelect" class="hidden">
+          <button onclick="selectFasel(1)">الفصل الأول</button>
+          <button onclick="selectFasel(2)">الفصل الثاني</button>
+        </div>
+
+        <!-- زر لاختيار المادة -->
+        <div id="materiaSelect" class="hidden">
+          <button onclick="selectMateria('الكيمياء الفيزيائية')">الكيمياء الفيزيائية</button>
+          <button onclick="selectMateria('الصيدلانيات1')">الصيدلانيات1</button>
+          <!-- أضف المزيد من المواد هنا -->
+        </div>
+
+        <!-- زر لاختيار الجلسة -->
+        <div id="sessionSelect" class="hidden">
+          <button onclick="startTest()">ابدأ الاختبار</button>
+        </div>
       </div>
     </section>
 
-    <!-- Tests inside a session -->
-    <section id="testsScreen" class="screen">
+    <!-- اختبارات داخل الجلسة -->
+    <section id="testsScreen" class="screen hidden">
       <div class="panel">
         <div class="screen-head">
           <div>
             <h2 id="unitTitle">الاختبار الأول</h2>
-            <p id="unitDesc"></p>
+            <p id="unitDesc">قم بحل هذا الاختبار بناءً على الجلسة المختارة.</p>
           </div>
-          <div class="actions">
-            <button class="btn secondary" onclick="goHome()">العودة</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:12px;">
-          <h3 style="margin:0 0 8px;">التجارب المتاحة</h3>
-          <p style="margin:0; color:var(--muted); line-height:1.8;">اختر التجربة التي تريد حلها.</p>
         </div>
 
         <div id="testCards" class="h-scroll"></div>
       </div>
     </section>
 
-    <!-- Lab -->
-    <section id="labScreen" class="screen">
+    <!-- المخبر -->
+    <section id="labScreen" class="screen hidden">
       <div class="panel">
         <div class="title-row">
           <div>
@@ -226,161 +84,62 @@
 
         <div class="lab-layout">
           <div class="lab-visual card">
-            <div class="tube-wrap">
-              <div class="tube-glow"></div>
-              <div class="tube-opening"></div>
-              <div class="tube-body">
-                <div id="innerLiquid" class="inner-liquid"></div>
-                <div id="meniscus" class="meniscus"></div>
-                <div id="precipitate" class="precipitate"></div>
-              </div>
-              <div class="tube-bottom"></div>
-            </div>
-            <div id="flame" class="flame"></div>
-            <div class="small" id="visualLabel">الأنبوب فارغ وجاهز للتجربة.</div>
+            <div id="visualLabel">الأنبوب فارغ وجاهز للتجربة.</div>
           </div>
-
-          <div class="lab-board">
-            <div class="card">
-              <h3 style="margin-top:0">الوصف الامتحاني</h3>
-              <p id="examPrompt" style="margin:0; color:var(--muted); line-height:1.9;">—</p>
-              <div class="progress"><div id="progressBar"></div></div>
-            </div>
-
-            <div class="step-list-wrap">
-              <h3 style="margin:0 0 8px;">الخطوات المتاحة</h3>
-              <div id="stepList" class="step-list"></div>
-            </div>
-
-            <div class="lab-status">
-              <h3 style="margin:0 0 8px;">حالة التجربة</h3>
-              <p id="statusText" style="margin:0; color:var(--muted); line-height:1.85;">ابدأ باختيار الخطوة الصحيحة من الذاكرة.</p>
-              <div id="resultBox" class="result-box hidden"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="footer-note">
-          كل ما في هذه الواجهة مأخوذ من الجلسة العملية المرفقة فقط، مع تحويله إلى نمط امتحاني تسلسلي.
         </div>
       </div>
     </section>
-  </div>  
+  </div>
 
   <script>
-    // الكود الخاص بالتفاعل مع الأزرار
-    const units = [
-      {
-        id: 'u1',
-        title: 'الاختبار الأول',
-        subtitle: 'يحوي جميع التجارب المستخرجة من ملف الجلسة العملية الخاصة بالشوارد الموجبة الكالسيوم والمغنيزيوم.',
-        tests: [
-          {
-            id: 't1',
-            title: 'التجربة 1',
-            prompt: 'عينة مجهولة. نفّذ فحصًا يؤدي إلى راسب أبيض يدل على الشاردة المطلوبة.',
-            finalResult: 'تأكدت الشاردة بالمشاهدة الصحيحة وفق تسلسل الخطوات.',
-            failureReason: 'أُفسدت التجربة لأن الخطوات لم تُنفّذ بالشكل الصحيح.',
-            successVisual: { liquid: '#ffffff', precipitate: true, flame: false, precipitateColor: 'rgba(255,255,255,.95)' },
-            steps: [
-              { id: 't1-1', title: 'ضع 1 مل من محلول الشوارد في أنبوب الاختبار', correct: true, effect: { liquid: '#24405f', precipitate: false, flame: false, visual: 'تم تجهيز العينة.' } },
-              { id: 't1-2', title: 'أضف محلول أوكسالات الأمونيوم', correct: true, effect: { liquid: '#ffffff', precipitate: true, flame: false, visual: 'تشكل راسب أبيض.' } },
-              { id: 't1-3', title: 'أكمل الملاحظة حتى تثبت النتيجة', correct: true, effect: { liquid: '#ffffff', precipitate: true, flame: false, visual: 'النتيجة النهائية أصبحت واضحة.' } },
-              { id: 't1-x1', title: 'أضف حمضًا قويًا أولًا ثم استنتج النتيجة', correct: false },
-              { id: 't1-x2', title: 'بدّل الكاشف بكربونات الصوديوم', correct: false },
-              { id: 't1-x3', title: 'انتقل مباشرة إلى الاستنتاج دون تفاعل', correct: false }
-            ]
-          }
-        ]
-      }
-    ];
+    // البيانات المتعلقة بالسنة والفصل والمادة
+    const data = {
+      2: { 1: ['الكيمياء الفيزيائية', 'الصيدلانيات1'], 2: ['الكيمياء العضوية2', 'الصيدلانيات1'] },
+      3: { 1: ['الأحياء1', 'فارماكولوجي1'], 2: ['الدمويات', 'فارماكولوجي2'] }
+    };
 
-    let currentUnit = null;
-    let currentTest = null;
-    let currentStepIndex = 0;
-    let failed = false;
+    let selectedYear = null;
+    let selectedFasel = null;
+    let selectedMateria = null;
 
-    const homeScreen = document.getElementById('homeScreen');
-    const testsScreen = document.getElementById('testsScreen');
-    const labScreen = document.getElementById('labScreen');
-    const breadcrumbChip = document.getElementById('breadcrumbChip');
-    const unitCards = document.getElementById('unitCards');
-    const testCards = document.getElementById('testCards');
-    const unitTitle = document.getElementById('unitTitle');
-    const unitDesc = document.getElementById('unitDesc');
-    const labTitle = document.getElementById('labTitle');
-    const labSubtitle = document.getElementById('labSubtitle');
-    const examPrompt = document.getElementById('examPrompt');
-    const stepList = document.getElementById('stepList');
-    const statusText = document.getElementById('statusText');
-    const resultBox = document.getElementById('resultBox');
-    const progressBar = document.getElementById('progressBar');
-    const innerLiquid = document.getElementById('innerLiquid');
-    const meniscus = document.getElementById('meniscus');
-    const precipitate = document.getElementById('precipitate');
-    const flame = document.getElementById('flame');
-    const visualLabel = document.getElementById('visualLabel');
-
-    function showScreen(screen) {
-      homeScreen.classList.toggle('active', screen === 'home');
-      testsScreen.classList.toggle('active', screen === 'tests');
-      labScreen.classList.toggle('active', screen === 'lab');
-      if (screen === 'home') breadcrumbChip.textContent = 'الصفحة الرئيسية';
-      if (screen === 'tests') breadcrumbChip.textContent = currentUnit?.title || 'الاختبار';
-      if (screen === 'lab') breadcrumbChip.textContent = currentTest?.title || 'المخبر';
+    // تغيير السنة
+    function selectYear(year) {
+      selectedYear = year;
+      document.getElementById('faselSelect').classList.remove('hidden');
+      document.getElementById('yearSelect').classList.add('hidden');
     }
 
-    function renderUnits() {
-      unitCards.innerHTML = '';
-      units.forEach(unit => {
-        const card = document.createElement('div');
-        card.className = 'card click-card';
-        card.innerHTML = `
-          <h3>${unit.title}</h3>
-          <p>${unit.subtitle}</p>
-          <div class="meta">
-            <span class="tag">${unit.tests.length} تجارب</span>
-            <span class="tag">نمط امتحاني</span>
-          </div>
-        `;
-        card.onclick = () => openUnit(unit.id);
-        unitCards.appendChild(card);
-      });
+    // تغيير الفصل
+    function selectFasel(fasel) {
+      selectedFasel = fasel;
+      document.getElementById('materiaSelect').classList.remove('hidden');
+      document.getElementById('faselSelect').classList.add('hidden');
     }
 
-    function openUnit(unitId) {
-      currentUnit = units.find(u => u.id === unitId);
-      unitTitle.textContent = currentUnit.title;
-      unitDesc.textContent = currentUnit.subtitle;
-      renderTests();
-      showScreen('tests');
+    // تغيير المادة
+    function selectMateria(materia) {
+      selectedMateria = materia;
+      document.getElementById('sessionSelect').classList.remove('hidden');
+      document.getElementById('materiaSelect').classList.add('hidden');
     }
 
-    function renderTests() {
-      testCards.innerHTML = '';
-      currentUnit.tests.forEach((test, index) => {
-        const card = document.createElement('div');
-        card.className = 'card click-card h-card compact';
-        card.innerHTML = `
-          <h3>${test.title}</h3>
-          <p>${test.prompt}</p>
-          <div class="meta">
-            <span class="tag">${index + 1}</span>
-            <span class="tag">ابدأ هنا</span>
-          </div>
-        `;
-        card.onclick = () => openTest(test.id);
-        testCards.appendChild(card);
-      });
+    // بدء الاختبار
+    function startTest() {
+      document.getElementById('testsScreen').classList.remove('hidden');
+      document.getElementById('homeScreen').classList.add('hidden');
     }
 
-    function openTest(testId) {
-      currentTest = currentUnit.tests.find(t => t.id === testId);
-      currentStepIndex = 0;
-      failed = false;
-      labTitle.textContent = currentTest.title;
-      labSubtitle.textContent = currentUnit.title + ' — ' + currentTest.prompt;
-      examPrompt.textContent = currentTest.prompt;
-      resetLab();
-      renderSteps();
-      statusText.innerHTML = 'ابدأ باختيار الخطوة الصحيحة من الذاكرة. لا توجد ت
+    // العودة إلى الصفحة الرئيسية
+    function backToTests() {
+      document.getElementById('homeScreen').classList.remove('hidden');
+      document.getElementById('labScreen').classList.add('hidden');
+    }
+
+    // إعادة المحاولة
+    function restartTest() {
+      alert('إعادة المحاولة');
+      // أضف هنا منطق إعادة الاختبار
+    }
+  </script>
+</body>
+</html>
