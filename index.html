@@ -2,200 +2,196 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>المخبر الافتراضي - صيدلة حماة</title>
+  <title>المخبر الافتراضي - جامعة حماة</title>
   <style>
-    :root {
-      --bg: #050a14; --panel: #0f172a; --accent: #38bdf8; --success: #22c55e; --danger: #ef4444; --text: #f8fafc;
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { 
-      margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); 
-      height: 100vh; overflow: hidden;
-    }
+    :root { --bg: #050a14; --panel: #0f172a; --accent: #38bdf8; --success: #22c55e; --danger: #ef4444; --text: #f8fafc; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-    /* أنيميشن الانتقال بين الشاشات */
-    .screen { display: none; height: 100%; flex-direction: column; animation: fadeIn 0.4s ease; }
+    /* نظام الشاشات المعزولة */
+    .screen { display: none; height: 100vh; flex-direction: column; overflow-y: auto; padding-bottom: 20px; }
     .screen.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-    /* البار العلوي */
-    .header {
-      padding: 15px; display: flex; align-items: center; justify-content: space-between;
-      background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 100;
-    }
-    .btn-back { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 15px; border-radius: 10px; }
+    .header { background: var(--panel); padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; }
+    .btn-back { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 18px; border-radius: 12px; cursor: pointer; }
 
-    /* القوائم المركزية */
-    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 20px; }
-    .btn-main {
-      width: 100%; max-width: 320px; background: var(--panel); border: 1px solid rgba(255,255,255,0.1);
-      padding: 22px; border-radius: 20px; text-align: center; font-size: 17px; font-weight: bold; transition: 0.2s;
+    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; }
+    .btn-main { 
+      width: 100%; max-width: 340px; background: var(--panel); border: 1px solid rgba(255,255,255,0.15); 
+      padding: 24px; border-radius: 20px; text-align: center; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-    .btn-main:active { background: var(--accent); color: #000; transform: translateY(2px); }
+    .btn-main:active { transform: scale(0.96); background: var(--accent); color: #000; }
 
     /* مسرح المختبر */
-    .lab-stage {
-      flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #050a14 100%);
-      display: flex; align-items: center; justify-content: center;
+    #labScreen { overflow: hidden; }
+    .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b, #050a14); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    
+    /* اللهب الحقيقي */
+    .burner-unit { position: absolute; left: 30px; bottom: 80px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+    .fire { 
+      width: 35px; height: 50px; background: linear-gradient(to top, #ff4d00, #ffcc00, #fff); 
+      border-radius: 50% 50% 20% 20%; filter: blur(1px); opacity: 0; transition: 0.3s;
     }
-    .tube-box { width: 60px; height: 180px; position: relative; z-index: 10; touch-action: none; transition: 0.1s; }
-    .tube-glass {
-      position: absolute; inset: 0; border: 2.5px solid rgba(255,255,255,0.5);
-      border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); overflow: hidden;
-    }
-    .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1s ease; }
-    .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; background: #fff; filter: blur(1.5px); opacity: 0; transition: 1s; }
+    .fire.active { opacity: 0.9; animation: flamePulse 0.1s infinite alternate; }
+    @keyframes flamePulse { from { transform: scaleY(1); } to { transform: scaleY(1.2) scaleX(1.1); } }
+    .base { width: 40px; height: 10px; background: #334155; border-radius: 4px; }
 
-    /* اللهب */
-    .burner { position: absolute; left: 30px; bottom: 35%; display: flex; flex-direction: column; align-items: center; }
-    .fire {
-      width: 35px; height: 50px; background: linear-gradient(to top, #ff4d00, #ffcc00, #fff);
-      border-radius: 50% 50% 20% 20%; filter: blur(2px); opacity: 0; transition: 0.3s;
+    /* الأنبوب المتحرك */
+    .tube-proxy { width: 60px; height: 180px; position: relative; z-index: 50; touch-action: none; cursor: grab; }
+    .tube-glass { 
+      position: absolute; inset: 0; border: 2.5px solid rgba(255,255,255,0.5); 
+      border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); overflow: hidden;
     }
-    .fire.active { opacity: 0.8; animation: flameMove 0.1s infinite alternate; }
-    @keyframes flameMove { from { height: 45px; transform: scaleX(0.9); } to { height: 55px; transform: scaleX(1.1); } }
+    .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1s; }
+    .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; background: #fff; filter: blur(1px); opacity: 0; transition: 1s; }
 
-    /* التحكم بالخطوات */
-    .controls { background: var(--panel); padding: 20px; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .opt-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; max-width: 320px; }
-    .btn-opt { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; color: white; text-align: center; }
+    .controls-panel { background: var(--panel); padding: 20px; border-radius: 25px 25px 0 0; border-top: 1px solid rgba(255,255,255,0.1); }
+    .option-btn { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; text-align: center; margin-bottom: 10px; width: 100%; max-width: 320px; cursor: pointer; }
+    
+    #statusLine { text-align: center; font-size: 13px; color: #94a3b8; margin-top: 5px; }
   </style>
 </head>
 <body>
 
 <div id="app">
-    <div id="welcomeScreen" class="screen active" style="display: flex; align-items: center; justify-content: center; text-align: center;">
-        <h1 style="color: var(--accent); margin-bottom: 5px;">المخبر الافتراضي</h1>
-        <p style="color: #94a3b8; margin-bottom: 30px;">كلية الصيدلة - جامعة حماة</p>
-        <button class="btn-main" onclick="showYears()" style="background: linear-gradient(45deg, #0ea5e9, #22c55e); color: white; border: none;">ابدأ الرحلة</button>
-    </div>
-
-    <div id="yearsScreen" class="screen">
-        <div class="header"><span>اختر السنة الدراسية</span></div>
+    <div id="screenYears" class="screen active">
+        <div class="header"><span>كلية الصيدلة - نظام المختبرات</span></div>
         <div class="menu-container">
-            <div class="btn-main" onclick="showSubs('y2')">السنة الثانية</div>
-            <div class="btn-main" onclick="showSubs('y3')">السنة الثالثة</div>
+            <div class="btn-main" onclick="openSubs('السنة الثانية')">السنة الثانية</div>
+            <div class="btn-main" onclick="openSubs('السنة الثالثة')">السنة الثالثة</div>
         </div>
     </div>
 
-    <div id="subsScreen" class="screen">
-        <div class="header"><button class="btn-back" onclick="showYears()">←</button><span id="yearTitle"></span></div>
-        <div class="menu-container" id="subsList"></div>
+    <div id="screenSubs" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('screenYears')">←</button><span id="txtYear"></span></div>
+        <div class="menu-container" id="listSubs"></div>
     </div>
 
-    <div id="testsScreen" class="screen">
-        <div class="header"><button class="btn-back" onclick="goBackToSubs()">←</button><span id="subTitle"></span></div>
-        <div class="menu-container" id="testsList"></div>
+    <div id="screenSessions" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('screenSubs')">←</button><span id="txtSub"></span></div>
+        <div class="menu-container" id="listSessions"></div>
     </div>
 
-    <div id="labScreen" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="goBackToTests()">← خروج</button>
-            <span id="testTitle" style="font-size: 14px;"></span>
-        </div>
-        <div class="lab-stage" id="stage">
-            <div class="burner"><div id="flame" class="fire"></div><div style="width:45px; height:8px; background:#444; border-radius:4px; margin-top:5px;"></div></div>
-            <div id="tube" class="tube-box">
+    <div id="screenTests" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('screenSessions')">←</button><span id="txtSession"></span></div>
+        <div class="menu-container" id="listTests"></div>
+    </div>
+
+    <div id="screenLab" class="screen">
+        <div class="header"><button class="btn-back" onclick="confirmExit()">← إنهاء</button><span id="txtTest"></span></div>
+        <div class="lab-stage" id="labArea">
+            <div class="burner-unit">
+                <div id="flame" class="fire"></div>
+                <div class="base"></div>
+            </div>
+            <div id="tube" class="tube-proxy">
                 <div class="tube-glass">
                     <div id="liq" class="liquid"></div>
                     <div id="pre" class="precipitate"></div>
                 </div>
             </div>
-            <div id="hintMsg" style="position:absolute; top:20px; width:100%; text-align:center; padding:0 20px; font-size:13px; color:var(--accent);"></div>
-            <div id="statusMsg" style="position:absolute; bottom:20px; font-size:12px; color:#94a3b8;"></div>
+            <div id="labHint" style="position:absolute; top:20px; text-align:center; padding:0 30px; font-size:14px; color:var(--accent);"></div>
         </div>
-        <div class="controls">
-            <div id="stepNum" style="font-size: 11px; color: var(--accent);">الخطوة 1</div>
-            <div class="opt-grid" id="options"></div>
+        <div class="controls-panel">
+            <div id="optionsList" style="display:flex; flex-direction:column; align-items:center;"></div>
+            <div id="statusLine">جاهز لبدء التجربة</div>
         </div>
     </div>
 </div>
 
 <script>
-    const data = {
-        y2: { name: "السنة الثانية", subs: ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"] },
-        y3: { name: "السنة الثالثة", subs: ["الدمويات", "الكيمياء الصيدلية 1", "التحليل الآلي", "الأحياء 2", "كيمياء العقاقير", "فارماكولوجي 2"] }
+    // قاعدة البيانات المنظمة حسب طلبك
+    const db = {
+        "السنة الثانية": ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1"],
+        "السنة الثالثة": ["الكيمياء الصيدلية 1", "التحليل الآلي", "الدمويات", "فارماكولوجي 2"]
     };
 
-    const experiments = {
-        "الكيمياء الصيدلية 1": [
+    const sessions = {
+        "الكيمياء الصيدلية 1": [{ id: "s1", name: "الجلسة الأولى: الكالسيوم والمغنيزيوم" }]
+    };
+
+    const tests = {
+        "s1": [
             {
                 title: "الكشف عن الكالسيوم (Ca++)",
+                hint: "المطلوب: إجراء اختبار اللهب للكالسيوم",
                 steps: [
-                    { q: "إضافة 2 مل من محلول عينة الكالسيوم", w: ["إضافة حمض نمل", "إضافة كحول"], e: { h: "25%", c: "rgba(255,255,255,0.2)", m: "تم وضع العينة" } },
-                    { q: "إضافة أوكسالات (حماضات) النشادر", w: ["إضافة كاشف يود", "إضافة سكر"], e: { h: "40%", c: "#fff", p: "20%", m: "راسب أبيض من حماضات الكالسيوم" } },
-                    { q: "إضافة حمض HCl لتدويم الراسب", w: ["إضافة ماء مقطر", "التسخين الشديد"], e: { h: "55%", p: "0%", m: "ذاب الراسب تماماً" } }
-                ]
-            },
-            {
-                title: "الكشف عن المغنيزيوم (Mg++)",
-                steps: [
-                    { q: "إضافة 1 مل من شوارد المغنيزيوم", w: ["إضافة حمض كبريت", "إضافة فينوفتالين"], e: { h: "20%", c: "rgba(200,200,200,0.3)", m: "تم وضع العينة" } },
-                    { q: "إضافة فوسفات ثنائية الصوديوم 10%", w: ["إضافة كلوريد صوديوم", "إضافة يود"], e: { h: "35%", m: "تمت إضافة الفوسفات" } },
-                    { q: "إضافة هيدروكسيد الأمونيوم (نشادر)", w: ["إضافة حمض كلور", "التسخين"], e: { h: "50%", c: "#fff", p: "30%", m: "ظهور راسب أبيض بلوري" } }
+                    { q: "إضافة 2 مل من محلول شوارد الكالسيوم", w: ["إضافة حمض نمل", "إضافة ماء مقطر"], e: { h: "30%", c: "rgba(255,255,255,0.2)", m: "تم وضع العينة" } },
+                    { q: "إضافة 1 مل من حمض كلور الماء HCl", w: ["إضافة حمض كبريت", "إضافة نشادر"], e: { h: "45%", m: "تم تحميض العينة، اسحب الأنبوب للهب" } },
+                    { q: "تعريض الأنبوب للهب (سحب الأنبوب لليسار)", w: [], e: { fire: true, m: "انتظر حتى يتغير اللون" }, heat: true },
+                    { q: "ملاحظة تلون اللهب باللون البرتقالي", w: ["لون أخضر", "لون أزرق"], e: { m: "تم تأكيد وجود الكالسيوم بنجاح! 🎉" } }
                 ]
             }
         ]
     };
 
-    let state = { curYear: null, curSub: null, curTest: null, curStep: 0 };
+    let state = { currentTest: null, step: 0, isHeating: false };
 
-    function hideAll() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); }
-
-    function showYears() { hideAll(); document.getElementById('yearsScreen').classList.add('active'); }
-
-    function showSubs(y) {
-        state.curYear = y; hideAll();
-        const screen = document.getElementById('subsScreen');
-        document.getElementById('yearTitle').innerText = data[y].name;
-        const list = document.getElementById('subsList'); list.innerHTML = "";
-        data[y].subs.forEach(s => {
-            const b = document.createElement('div'); b.className = 'btn-main';
-            b.innerText = s; b.onclick = () => showTests(s); list.appendChild(b);
-        });
-        screen.classList.add('active');
+    function nav(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
-    function showTests(s) {
-        state.curSub = s; hideAll();
-        const screen = document.getElementById('testsScreen');
-        document.getElementById('subTitle').innerText = s;
-        const list = document.getElementById('testsList'); list.innerHTML = "";
-        const tests = experiments[s] || [];
-        if (tests.length === 0) list.innerHTML = "<p>سيتم إضافة التجارب قريباً</p>";
-        tests.forEach(t => {
-            const b = document.createElement('div'); b.className = 'btn-main';
-            b.innerText = t.title; b.onclick = () => startLab(t); list.appendChild(b);
+    function openSubs(year) {
+        document.getElementById('txtYear').innerText = year;
+        const list = document.getElementById('listSubs'); list.innerHTML = "";
+        db[year].forEach(sub => {
+            const d = document.createElement('div'); d.className = 'btn-main';
+            d.innerText = sub; d.onclick = () => openSessions(sub); list.appendChild(d);
         });
-        screen.classList.add('active');
+        nav('screenSubs');
+    }
+
+    function openSessions(sub) {
+        document.getElementById('txtSub').innerText = sub;
+        const list = document.getElementById('listSessions'); list.innerHTML = "";
+        if (!sessions[sub]) { list.innerHTML = "<p>سيتم الإضافة قريباً</p>"; }
+        else {
+            sessions[sub].forEach(sess => {
+                const d = document.createElement('div'); d.className = 'btn-main';
+                d.innerText = sess.name; d.onclick = () => openTests(sess); list.appendChild(d);
+            });
+        }
+        nav('screenSessions');
+    }
+
+    function openTests(sess) {
+        document.getElementById('txtSession').innerText = sess.name;
+        const list = document.getElementById('listTests'); list.innerHTML = "";
+        const available = tests[sess.id] || [];
+        available.forEach(t => {
+            const d = document.createElement('div'); d.className = 'btn-main';
+            d.innerText = t.title; d.onclick = () => startLab(t); list.appendChild(d);
+        });
+        nav('screenTests');
     }
 
     function startLab(test) {
-        state.curTest = test; state.curStep = 0; hideAll();
-        document.getElementById('testTitle').innerText = test.title;
-        resetLab(); renderStep();
-        document.getElementById('labScreen').classList.add('active');
+        state.currentTest = test; state.step = 0;
+        document.getElementById('txtTest').innerText = test.title;
+        document.getElementById('labHint').innerText = test.hint;
+        resetLabUI();
+        renderStep();
+        nav('screenLab');
     }
 
     function renderStep() {
-        const step = state.curTest.steps[state.curStep];
-        document.getElementById('stepNum').innerText = `الخطوة ${state.curStep + 1} من ${state.curTest.steps.length}`;
-        const box = document.getElementById('options'); box.innerHTML = "";
+        const step = state.currentTest.steps[state.step];
+        const box = document.getElementById('optionsList'); box.innerHTML = "";
         
+        if (step.heat) {
+            document.getElementById('optionsList').innerHTML = "<p style='color:orange'>قم بسحب الأنبوب فوق اللهب الآن</p>";
+            document.getElementById('flame').classList.add('active');
+            return;
+        }
+
         let choices = [{ t: step.q, ok: true }, ...step.w.map(x => ({ t: x, ok: false }))].sort(() => Math.random() - 0.5);
         choices.forEach(c => {
-            const b = document.createElement('div'); b.className = 'btn-opt';
-            b.innerText = c.t;
+            const b = document.createElement('div'); b.className = 'option-btn'; b.innerText = c.t;
             b.onclick = () => {
-                if (c.ok) {
-                    applyEffect(step.e);
-                    state.curStep++;
-                    if (state.curStep < state.curTest.steps.length) setTimeout(renderStep, 1000);
-                    else document.getElementById('statusMsg').innerText = "تمت التجربة بنجاح! 🔬";
-                } else {
-                    b.style.borderColor = "var(--danger)";
-                    document.getElementById('statusMsg').innerText = "خطأ في التسلسل العلمي!";
-                }
+                if (c.ok) { applyEffect(step.e); state.step++; if(state.step < state.currentTest.steps.length) setTimeout(renderStep, 1000); }
+                else { document.getElementById('statusLine').innerText = "خطأ في التسلسل! أعد المحاولة."; b.style.background = "var(--danger)"; }
             };
             box.appendChild(b);
         });
@@ -204,40 +200,36 @@
     function applyEffect(e) {
         if (e.h) document.getElementById('liq').style.height = e.h;
         if (e.c) document.getElementById('liq').style.background = e.c;
-        if (e.p !== undefined) {
-            const p = document.getElementById('pre'); p.style.height = e.p; p.style.opacity = e.p === "0%" ? "0" : "1";
-        }
-        if (e.m) document.getElementById('statusMsg').innerText = e.m;
-        document.getElementById('flame').className = e.fire ? "fire active" : "fire";
+        if (e.m) document.getElementById('statusLine').innerText = e.m;
+        if (e.fire) document.getElementById('flame').classList.add('active');
     }
 
-    function resetLab() {
+    function resetLabUI() {
         document.getElementById('liq').style.height = "0%";
-        document.getElementById('pre').style.height = "0%";
-        document.getElementById('flame').className = "fire";
-        document.getElementById('statusMsg').innerText = "جاهز للإضافة";
+        document.getElementById('flame').classList.remove('active');
+        document.getElementById('statusLine').innerText = "جاهز";
+        document.getElementById('tube').style.transform = "translateX(0)";
     }
 
-    // التنقل للخلف
-    function goBackToSubs() { showSubs(state.curYear); }
-    function goBackToTests() { showTests(state.curSub); }
-
-    // منطق السحب للحرارة
+    // منطق سحب الأنبوب السلس نحو اللهب
     let isDragging = false;
     const tube = document.getElementById('tube');
     tube.onpointerdown = (e) => { isDragging = true; tube.setPointerCapture(e.pointerId); };
     tube.onpointermove = (e) => {
         if (!isDragging) return;
-        let rect = document.getElementById('stage').getBoundingClientRect();
-        let x = e.clientX - rect.left - 30;
+        const rect = document.getElementById('labArea').getBoundingClientRect();
+        const x = e.clientX - rect.left - 30;
         tube.style.transform = `translateX(${x}px)`;
-        if (x < -80 && state.curTest.steps[state.curStep]?.needHeat) {
-            document.getElementById('statusMsg').innerText = "يتم التسخين...";
-            setTimeout(() => { if(isDragging) { isDragging = false; tube.style.transform = "translateX(0)"; state.curStep++; renderStep(); } }, 1500);
+        
+        // التحقق من التصادم مع اللهب (المسافة التقريبية)
+        if (x < -80 && state.currentTest.steps[state.step]?.heat) {
+            document.getElementById('statusLine').innerText = "يتم التسخين الآن... 🔥";
+            setTimeout(() => { if(isDragging) { isDragging = false; tube.style.transform = "translateX(0)"; state.step++; renderStep(); } }, 2000);
         }
     };
     tube.onpointerup = () => { isDragging = false; tube.style.transform = "translateX(0)"; };
 
+    function confirmExit() { if(confirm("هل تريد الخروج من المختبر؟")) nav('screenTests'); }
 </script>
 </body>
 </html>
