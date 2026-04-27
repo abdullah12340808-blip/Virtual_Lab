@@ -268,7 +268,119 @@
   </div>  
 
   <script>
-    // يمكنك إدخال الكود الخاص بالتفاعل مع الخطوات هنا...
-  </script>
-</body>
-</html>
+    // الكود الخاص بالتفاعل مع الأزرار
+    const units = [
+      {
+        id: 'u1',
+        title: 'الاختبار الأول',
+        subtitle: 'يحوي جميع التجارب المستخرجة من ملف الجلسة العملية الخاصة بالشوارد الموجبة الكالسيوم والمغنيزيوم.',
+        tests: [
+          {
+            id: 't1',
+            title: 'التجربة 1',
+            prompt: 'عينة مجهولة. نفّذ فحصًا يؤدي إلى راسب أبيض يدل على الشاردة المطلوبة.',
+            finalResult: 'تأكدت الشاردة بالمشاهدة الصحيحة وفق تسلسل الخطوات.',
+            failureReason: 'أُفسدت التجربة لأن الخطوات لم تُنفّذ بالشكل الصحيح.',
+            successVisual: { liquid: '#ffffff', precipitate: true, flame: false, precipitateColor: 'rgba(255,255,255,.95)' },
+            steps: [
+              { id: 't1-1', title: 'ضع 1 مل من محلول الشوارد في أنبوب الاختبار', correct: true, effect: { liquid: '#24405f', precipitate: false, flame: false, visual: 'تم تجهيز العينة.' } },
+              { id: 't1-2', title: 'أضف محلول أوكسالات الأمونيوم', correct: true, effect: { liquid: '#ffffff', precipitate: true, flame: false, visual: 'تشكل راسب أبيض.' } },
+              { id: 't1-3', title: 'أكمل الملاحظة حتى تثبت النتيجة', correct: true, effect: { liquid: '#ffffff', precipitate: true, flame: false, visual: 'النتيجة النهائية أصبحت واضحة.' } },
+              { id: 't1-x1', title: 'أضف حمضًا قويًا أولًا ثم استنتج النتيجة', correct: false },
+              { id: 't1-x2', title: 'بدّل الكاشف بكربونات الصوديوم', correct: false },
+              { id: 't1-x3', title: 'انتقل مباشرة إلى الاستنتاج دون تفاعل', correct: false }
+            ]
+          }
+        ]
+      }
+    ];
+
+    let currentUnit = null;
+    let currentTest = null;
+    let currentStepIndex = 0;
+    let failed = false;
+
+    const homeScreen = document.getElementById('homeScreen');
+    const testsScreen = document.getElementById('testsScreen');
+    const labScreen = document.getElementById('labScreen');
+    const breadcrumbChip = document.getElementById('breadcrumbChip');
+    const unitCards = document.getElementById('unitCards');
+    const testCards = document.getElementById('testCards');
+    const unitTitle = document.getElementById('unitTitle');
+    const unitDesc = document.getElementById('unitDesc');
+    const labTitle = document.getElementById('labTitle');
+    const labSubtitle = document.getElementById('labSubtitle');
+    const examPrompt = document.getElementById('examPrompt');
+    const stepList = document.getElementById('stepList');
+    const statusText = document.getElementById('statusText');
+    const resultBox = document.getElementById('resultBox');
+    const progressBar = document.getElementById('progressBar');
+    const innerLiquid = document.getElementById('innerLiquid');
+    const meniscus = document.getElementById('meniscus');
+    const precipitate = document.getElementById('precipitate');
+    const flame = document.getElementById('flame');
+    const visualLabel = document.getElementById('visualLabel');
+
+    function showScreen(screen) {
+      homeScreen.classList.toggle('active', screen === 'home');
+      testsScreen.classList.toggle('active', screen === 'tests');
+      labScreen.classList.toggle('active', screen === 'lab');
+      if (screen === 'home') breadcrumbChip.textContent = 'الصفحة الرئيسية';
+      if (screen === 'tests') breadcrumbChip.textContent = currentUnit?.title || 'الاختبار';
+      if (screen === 'lab') breadcrumbChip.textContent = currentTest?.title || 'المخبر';
+    }
+
+    function renderUnits() {
+      unitCards.innerHTML = '';
+      units.forEach(unit => {
+        const card = document.createElement('div');
+        card.className = 'card click-card';
+        card.innerHTML = `
+          <h3>${unit.title}</h3>
+          <p>${unit.subtitle}</p>
+          <div class="meta">
+            <span class="tag">${unit.tests.length} تجارب</span>
+            <span class="tag">نمط امتحاني</span>
+          </div>
+        `;
+        card.onclick = () => openUnit(unit.id);
+        unitCards.appendChild(card);
+      });
+    }
+
+    function openUnit(unitId) {
+      currentUnit = units.find(u => u.id === unitId);
+      unitTitle.textContent = currentUnit.title;
+      unitDesc.textContent = currentUnit.subtitle;
+      renderTests();
+      showScreen('tests');
+    }
+
+    function renderTests() {
+      testCards.innerHTML = '';
+      currentUnit.tests.forEach((test, index) => {
+        const card = document.createElement('div');
+        card.className = 'card click-card h-card compact';
+        card.innerHTML = `
+          <h3>${test.title}</h3>
+          <p>${test.prompt}</p>
+          <div class="meta">
+            <span class="tag">${index + 1}</span>
+            <span class="tag">ابدأ هنا</span>
+          </div>
+        `;
+        card.onclick = () => openTest(test.id);
+        testCards.appendChild(card);
+      });
+    }
+
+    function openTest(testId) {
+      currentTest = currentUnit.tests.find(t => t.id === testId);
+      currentStepIndex = 0;
+      failed = false;
+      labTitle.textContent = currentTest.title;
+      labSubtitle.textContent = currentUnit.title + ' — ' + currentTest.prompt;
+      examPrompt.textContent = currentTest.prompt;
+      resetLab();
+      renderSteps();
+      statusText.innerHTML = 'ابدأ باختيار الخطوة الصحيحة من الذاكرة. لا توجد ت
