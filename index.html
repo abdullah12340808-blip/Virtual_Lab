@@ -1,235 +1,249 @@
 <!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>المخبر الافتراضي - جامعة حماة</title>
   <style>
     :root {
-      --bg: #08111f; --panel: #101c33; --panel-2: #162544; --text: #eef4ff;
+      --bg: #08111f; --panel: #101c33; --text: #eef4ff;
       --muted: #9fb2d1; --accent: #38bdf8; --accent-2: #22c55e; --danger: #ef4444;
-      --warn: #f59e0b; --border: rgba(255,255,255,.08); --shadow: 0 12px 30px rgba(0,0,0,.25);
-    }* { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: radial-gradient(circle at top, #112040 0%, var(--bg) 60%); color: var(--text); min-height: 100vh; }
-    .app { max-width: 1200px; margin: 0 auto; padding: 16px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(16, 28, 51, .86); border: 1px solid var(--border); border-radius: 20px; margin-bottom: 16px; backdrop-filter: blur(8px); }
-    .brand h1 { margin: 0; font-size: 20px; color: #7dd3fc; }
-    .chip { padding: 6px 12px; border-radius: 999px; background: rgba(56, 189, 248, .12); color: #bfe9ff; font-size: 13px; border: 1px solid rgba(56, 189, 248, .22); }
-    .screen { display: none; } .screen.active { display: block; }
-    .panel { background: rgba(16, 28, 51, .92); border: 1px solid var(--border); border-radius: 24px; padding: 20px; }
-    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-    .card { background: linear-gradient(180deg, rgba(22,37,68,.95), rgba(12,21,39,.95)); border: 1px solid var(--border); border-radius: 20px; padding: 18px; cursor: pointer; transition: 0.2s; }
-    .card:hover { transform: translateY(-3px); border-color: var(--accent); }
-    .btn { border: none; border-radius: 12px; padding: 10px 16px; cursor: pointer; background: var(--accent); color: #08111f; font-weight: bold; }
-    .btn.secondary { background: rgba(255,255,255,.1); color: white; border: 1px solid var(--border); }
-    /* Lab Visuals */
-    .lab-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-    .tube-wrap { width: 100px; height: 250px; border: 4px solid white; border-radius: 0 0 50px 50px; position: relative; margin: 20px auto; overflow: hidden; }
-    .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 0.5s; background: rgba(255,255,255,0.2); }
-    .precipitate { position: absolute; bottom: 0; width: 100%; height: 20%; background: white; opacity: 0; transition: 0.5s; }
-    .step-list { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
-    .step-btn { flex: 0 0 180px; padding: 12px; background: var(--panel-2); border: 1px solid var(--border); color: white; border-radius: 12px; cursor: pointer; }
-    .correct { border-color: var(--accent-2) !important; } .wrong { border-color: var(--danger) !important; }
+      --border: rgba(255,255,255,.08); --shadow: 0 12px 30px rgba(0,0,0,.3);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: var(--bg); color: var(--text); 
+      height: 100vh; overflow: hidden;
+    }
+    
+    /* تنسيق الحاويات الأساسية */
+    .app { height: 100%; display: flex; flex-direction: column; }
+    .screen { display: none; flex: 1; flex-direction: column; padding: 15px; overflow-y: auto; }
+    .screen.active { display: flex; }
+
+    /* البار العلوي */
+    .topbar { 
+      padding: 10px 15px; background: var(--panel); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .topbar h1 { font-size: 18px; margin: 0; color: var(--accent); }
+
+    /* القوائم والبطاقات */
+    .grid { display: grid; gap: 12px; grid-template-columns: 1fr; padding-bottom: 20px; }
+    .card { 
+      background: var(--panel); border: 1px solid var(--border); border-radius: 15px; 
+      padding: 20px; text-align: center; cursor: pointer; box-shadow: var(--shadow);
+    }
+    .card:active { transform: scale(0.98); background: #162544; }
+
+    /* واجهة المختبر - مخصصة للجوال */
+    #labScreen { padding: 0; overflow: hidden; background: radial-gradient(circle at center, #112040 0%, #08111f 100%); }
+    
+    .lab-header { padding: 15px; text-align: center; z-index: 10; }
+    .lab-header h2 { margin: 0; font-size: 18px; }
+
+    .visual-area {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative;
+    }
+
+    /* تصميم أنبوب الاختبار */
+    .tube-container { width: 80px; height: 220px; position: relative; }
+    .tube-glass {
+      position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.8);
+      border-radius: 0 0 40px 40px; border-top: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05); overflow: hidden; z-index: 2;
+    }
+    .liquid {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+      background: rgba(125, 211, 252, 0.3); transition: all 0.8s ease;
+    }
+    .precipitate {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+      background: #fff; opacity: 0; transition: all 1s ease; filter: blur(1px);
+    }
+
+    /* منطقة التحكم (السلايدر) */
+    .controls-area {
+      background: var(--panel); border-radius: 25px 25px 0 0; padding: 20px 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5); border-top: 1px solid var(--border);
+    }
+    .step-slider {
+      display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 15px;
+      scroll-snap-type: x mandatory; scrollbar-width: none;
+    }
+    .step-slider::-webkit-scrollbar { display: none; }
+    
+    .step-item {
+      flex: 0 0 160px; scroll-snap-align: center;
+      background: #1c2b4a; border: 1px solid var(--border); border-radius: 18px;
+      padding: 15px; text-align: center; font-size: 14px; min-height: 90px;
+      display: flex; align-items: center; justify-content: center; color: white;
+      transition: 0.3s;
+    }
+    .step-item.correct { border-color: var(--accent-2); background: rgba(34, 197, 94, 0.1); }
+    .step-item.wrong { border-color: var(--danger); background: rgba(239, 68, 68, 0.1); animation: shake 0.4s; }
+
+    @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+
+    .status-bar { padding: 0 20px; text-align: center; font-size: 13px; color: var(--muted); height: 20px; }
+
+    .btn-exit { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 12px; border-radius: 10px; font-size: 12px; }
   </style>
 </head>
 <body>
+
   <div class="app">
-    <div class="topbar">
-      <div class="brand"><h1>المخبر الافتراضي</h1></div>
-      <div class="chip" id="navPath">الرئيسية</div>
+    <div class="topbar" id="mainTopbar">
+      <h1>المخبر الافتراضي</h1>
+      <div class="chip" id="navLabel">السنوات</div>
     </div>
 
     <section id="selectionScreen" class="screen active">
-      <div class="panel">
-        <h2 id="selectionTitle">اختر السنة الدراسية</h2>
-        <div id="selectionGrid" class="grid"></div>
-        <div class="actions" style="margin-top:20px; display:none;" id="backBtnArea">
-            <button class="btn secondary" onclick="goBack()">العودة</button>
-        </div>
-      </div>
+      <h2 id="viewTitle" style="font-size: 20px; margin-bottom: 20px;">اختر السنة</h2>
+      <div id="grid" class="grid"></div>
     </section>
 
     <section id="labScreen" class="screen">
-      <div class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="labTitle">التجربة</h2>
-            <button class="btn secondary" onclick="exitLab()">إنهاء</button>
-        </div>
-        <div class="lab-layout">
-          <div class="card" style="text-align:center;">
-            <div class="tube-wrap">
-                <div id="liquid" class="liquid"></div>
-                <div id="precip" class="precipitate"></div>
-            </div>
-            <p id="visualStatus">الأنبوب فارغ</p>
-          </div>
-          <div>
-            <div class="card">
-                <h3>المطلوب:</h3>
-                <p id="labPrompt"></p>
-            </div>
-            <div style="margin-top:20px;">
-                <h3>الخطوات:</h3>
-                <div id="stepList" class="step-list"></div>
-            </div>
-            <div id="statusMsg" style="margin-top:20px; font-weight:bold;"></div>
+      <button class="btn-exit" onclick="exitLab()">خروج</button>
+      <div class="lab-header">
+        <h2 id="labTitle">تجربة</h2>
+        <p id="labTarget" style="font-size: 13px; color: var(--muted); margin: 5px 0 0;"></p>
+      </div>
+
+      <div class="visual-area">
+        <div class="tube-container">
+          <div class="tube-glass">
+            <div id="liquid" class="liquid"></div>
+            <div id="precip" class="precipitate"></div>
           </div>
         </div>
+        <p id="visualText" style="margin-top: 15px; font-size: 14px;">الأنبوب فارغ</p>
+      </div>
+
+      <div class="controls-area">
+        <div class="status-bar" id="statusMsg">اسحب الخطوات لاختيار الصحيح</div>
+        <div class="step-slider" id="stepSlider"></div>
       </div>
     </section>
   </div>
 
   <script>
-    const academicData = {
-      "years": [
-        { id: "y2", name: "السنة الثانية", terms: {
-            "t1": ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات 1", "الكيمياء العضوية 1"],
-            "t2": ["الكيمياء العضوية 2", "الكيمياء الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"]
-        }},
-        { id: "y3", name: "السنة الثالثة", terms: {
-            "t1": ["التحليلية 2", "الأحياء 1", "العقاقير 2", "فارماكولوجي 1", "التكنولوجيا الصيدلية"],
-            "t2": ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي 2", "الكيمياء صيدلية 1", "الأحياء 2"]
-        }}
-      ]
+    const data = {
+      y2: { name: "السنة الثانية", terms: { t1: ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات 1", "الكيمياء العضوية 1"], t2: ["الكيمياء العضوية 2", "الكيمياء الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"] } },
+      y3: { name: "السنة الثالثة", terms: { t1: ["التحليلية 2", "الأحياء 1", "العقاقير 2", "فارماكولوجي 1", "التكنولوجيا الصيدلية"], t2: ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي 2", "الكيمياء صيدلية 1", "الأحياء 2"] } }
     };
 
-    // بيانات التجارب المستخرجة من ملف الكيمياء الصيدلية 1 (الكالسيوم والمغنيزيوم)
     const labs = {
       "الكيمياء صيدلية 1": [
         {
-          title: "الكشف عن الكالسيوم (حماضات النشادر)",
-          prompt: "لديك محلول يحتوي شوارد الكالسيوم، قم بالكشف عنه باستخدام حماضات النشادر.",
+          title: "الكشف عن الكالسيوم",
+          target: "المطلوب: تشكيل راسب حماضات الكالسيوم",
           steps: [
-            { id: 1, text: "إضافة 2 مل من محلول الكالسيوم", correct: true, effect: { h: "20%", c: "rgba(255,255,255,0.2)" }},
-            { id: 2, text: "إضافة 1 مل من حماضات النشادر", correct: true, effect: { h: "40%", c: "#fff", precip: true }},
-            { id: 3, text: "التحقق من ذوبان الراسب بحمض كلور الماء", correct: true, effect: { h: "50%", c: "rgba(255,255,255,0.3)", precip: false }}
+            { id: 1, text: "إضافة 2 مل من محلول الكالسيوم", effect: { h: "25%", c: "rgba(200,220,255,0.4)" } },
+            { id: 2, text: "إضافة حماضات النشادر", effect: { h: "45%", c: "#fff", p: "15%" } },
+            { id: 3, text: "إضافة حمض كلور الماء (HCl)", effect: { h: "55%", c: "rgba(255,255,255,0.2)", p: "0%" } }
           ]
         },
         {
-          title: "الكشف عن المغنيزيوم (فوسفات ثنائية الصوديوم)",
-          prompt: "قم بالكشف عن شوارد المغنيزيوم لتشكيل راسب أبيض بلوري.",
+          title: "الكشف عن المغنيزيوم",
+          target: "المطلوب: تشكيل راسب أبيض بلوري",
           steps: [
-            { id: 1, text: "إضافة 1 مل من شوارد المغنيزيوم", correct: true, effect: { h: "20%" }},
-            { id: 2, text: "إضافة 1 مل فوسفات ثنائية الصوديوم 10%", correct: true, effect: { h: "35%" }},
-            { id: 3, text: "إضافة هيدروكسيد الأمونيوم", correct: true, effect: { h: "50%", c: "#fff", precip: true }}
+            { id: 1, text: "إضافة 1 مل من شوارد المغنيزيوم", effect: { h: "20%", c: "rgba(200,200,200,0.3)" } },
+            { id: 2, text: "إضافة فوسفات ثنائية الصوديوم", effect: { h: "35%" } },
+            { id: 3, text: "إضافة هيدروكسيد الأمونيوم", effect: { h: "50%", c: "#fff", p: "25%" } }
           ]
         }
       ]
     };
 
-    let state = { view: 'years', year: null, term: null, subject: null };
-    let currentLab = null;
-    let currentStep = 0;
+    let current = { view: 'y', year: null, term: null, sub: null };
+    let labState = { active: null, step: 0 };
 
     function render() {
-      const grid = document.getElementById('selectionGrid');
-      const title = document.getElementById('selectionTitle');
-      const backBtn = document.getElementById('backBtnArea');
-      grid.innerHTML = "";
-      
-      if (state.view === 'years') {
-        title.innerText = "اختر السنة الدراسية";
-        backBtn.style.display = "none";
-        academicData.years.forEach(y => grid.appendChild(createCard(y.name, () => { state.year = y; state.view = 'terms'; render(); })));
-      } 
-      else if (state.view === 'terms') {
-        title.innerText = state.year.name;
-        backBtn.style.display = "block";
-        [1, 2].forEach(t => grid.appendChild(createCard(`الفصل ${t === 1 ? 'الأول' : 'الثاني'}`, () => { state.term = t; state.view = 'subjects'; render(); })));
+      const g = document.getElementById('grid');
+      const vt = document.getElementById('viewTitle');
+      const nl = document.getElementById('navLabel');
+      g.innerHTML = "";
+
+      if (current.view === 'y') {
+        vt.innerText = "اختر السنة الدراسية"; nl.innerText = "السنوات";
+        Object.keys(data).forEach(k => g.appendChild(card(data[k].name, () => { current.year = k; current.view = 't'; render(); })));
+      } else if (current.view === 't') {
+        vt.innerText = data[current.year].name; nl.innerText = data[current.year].name;
+        [1, 2].forEach(n => g.appendChild(card(`الفصل ${n===1?'الأول':'الثاني'}`, () => { current.term = n; current.view = 's'; render(); })));
+      } else if (current.view === 's') {
+        vt.innerText = "اختر المادة"; nl.innerText = "المواد";
+        data[current.year].terms['t'+current.term].forEach(s => g.appendChild(card(s, () => { current.sub = s; current.view = 'lab_list'; render(); })));
+      } else if (current.view === 'lab_list') {
+        vt.innerText = current.sub;
+        const list = labs[current.sub] || [];
+        if (list.length === 0) g.innerHTML = "<p style='text-align:center; color:var(--muted)'>قريباً سيتم إضافة التجارب...</p>";
+        list.forEach(l => g.appendChild(card(l.title, () => startLab(l))));
       }
-      else if (state.view === 'subjects') {
-        title.innerText = `مواد الفصل ${state.term === 1 ? 'الأول' : 'الثاني'}`;
-        const subjects = state.year.terms[`t${state.term}`] || [];
-        subjects.forEach(s => grid.appendChild(createCard(s, () => { state.subject = s; state.view = 'sessions'; render(); })));
-      }
-      else if (state.view === 'sessions') {
-        title.innerText = `جلسات ${state.subject}`;
-        const sessions = labs[state.subject] || [];
-        if (sessions.length === 0) grid.innerHTML = "<p>سيتم إضافة التجارب قريباً...</p>";
-        sessions.forEach(lab => grid.appendChild(createCard(lab.title, () => startLab(lab))));
-      }
-      updatePath();
     }
 
-    function createCard(text, onClick) {
-      const d = document.createElement('div');
-      d.className = 'card';
-      d.innerHTML = `<h3>${text}</h3>`;
-      d.onclick = onClick;
-      return d;
+    function card(txt, fn) {
+      const d = document.createElement('div'); d.className = 'card'; d.innerHTML = `<h3>${txt}</h3>`; d.onclick = fn; return d;
     }
 
-    function goBack() {
-      if (state.view === 'sessions') state.view = 'subjects';
-      else if (state.view === 'subjects') state.view = 'terms';
-      else if (state.view === 'terms') state.view = 'years';
-      render();
-    }
-
-    function updatePath() {
-        let path = "الرئيسية";
-        if (state.year) path += ` > ${state.year.name}`;
-        if (state.subject) path += ` > ${state.subject}`;
-        document.getElementById('navPath').innerText = path;
-    }
-
-    // Lab Logic
     function startLab(lab) {
-      currentLab = lab;
-      currentStep = 0;
+      labState = { active: lab, step: 0 };
       document.getElementById('selectionScreen').classList.remove('active');
+      document.getElementById('mainTopbar').style.display = "none";
       document.getElementById('labScreen').classList.add('active');
+      
       document.getElementById('labTitle').innerText = lab.title;
-      document.getElementById('labPrompt').innerText = lab.prompt;
-      resetLabVisuals();
-      renderSteps();
+      document.getElementById('labTarget').innerText = lab.target;
+      resetVisuals();
+      renderSlider();
     }
 
-    function renderSteps() {
-      const area = document.getElementById('stepList');
-      area.innerHTML = "";
-      // عرض الخطوات بترتيب عشوائي للتمويه
-      const shuffled = [...currentLab.steps].sort(() => Math.random() - 0.5);
-      shuffled.forEach(step => {
-        const btn = document.createElement('button');
-        btn.className = 'step-btn';
-        btn.innerText = step.text;
-        btn.onclick = () => handleStep(step, btn);
-        area.appendChild(btn);
+    function renderSlider() {
+      const s = document.getElementById('stepSlider'); s.innerHTML = "";
+      const shuffled = [...labState.active.steps].sort(() => Math.random() - 0.5);
+      shuffled.forEach(st => {
+        const i = document.createElement('div'); i.className = 'step-item'; i.innerText = st.text;
+        i.onclick = () => handleStep(st, i);
+        s.appendChild(i);
       });
     }
 
-    function handleStep(step, btn) {
-      const correctStep = currentLab.steps[currentStep];
-      if (step.id === correctStep.id) {
-        btn.classList.add('correct');
-        btn.disabled = true;
+    function handleStep(step, el) {
+      const correct = labState.active.steps[labState.step];
+      if (step.id === correct.id) {
+        el.classList.add('correct'); el.onclick = null;
         applyEffect(step.effect);
-        currentStep++;
-        if (currentStep === currentLab.steps.length) {
-          document.getElementById('statusMsg').innerHTML = "<span style='color:var(--accent-2)'>أحسنت! تمت التجربة بنجاح.</span>";
+        labState.step++;
+        document.getElementById('statusMsg').innerText = "خطوة صحيحة!";
+        if (labState.step === labState.active.steps.length) {
+          document.getElementById('statusMsg').innerText = "تمت التجربة بنجاح!";
+          document.getElementById('statusMsg').style.color = "var(--accent-2)";
         }
       } else {
-        btn.classList.add('wrong');
-        document.getElementById('statusMsg').innerHTML = "<span style='color:var(--danger)'>خطأ في التسلسل! أعد المحاولة.</span>";
-        setTimeout(exitLab, 1500);
+        el.classList.add('wrong');
+        document.getElementById('statusMsg').innerText = "ترتيب خاطئ! حاول مجدداً";
+        setTimeout(exitLab, 1200);
       }
     }
 
-    function applyEffect(eff) {
-      if (eff.h) document.getElementById('liquid').style.height = eff.h;
-      if (eff.c) document.getElementById('liquid').style.background = eff.c;
-      if (eff.precip) document.getElementById('precip').style.opacity = "1";
+    function applyEffect(e) {
+      if (e.h) document.getElementById('liquid').style.height = e.h;
+      if (e.c) document.getElementById('liquid').style.background = e.c;
+      if (e.p) { document.getElementById('precip').style.height = e.p; document.getElementById('precip').style.opacity = "1"; }
       else document.getElementById('precip').style.opacity = "0";
     }
 
-    function resetLabVisuals() {
+    function resetVisuals() {
       document.getElementById('liquid').style.height = "0%";
       document.getElementById('precip').style.opacity = "0";
-      document.getElementById('statusMsg').innerText = "";
+      document.getElementById('statusMsg').innerText = "اسحب الخطوات لاختيار الصحيح";
+      document.getElementById('statusMsg').style.color = "var(--muted)";
     }
 
     function exitLab() {
       document.getElementById('labScreen').classList.remove('active');
+      document.getElementById('mainTopbar').style.display = "flex";
       document.getElementById('selectionScreen').classList.add('active');
     }
 
