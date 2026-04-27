@@ -6,93 +6,122 @@
   <title>المخبر الافتراضي</title>
   <style>
     /* أضف هنا النمط السابق الذي قمت بإرساله سابقًا */
-    /* أضف أنماطك هنا (CSS) */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #112040 0%, #08111f 60%);
+      color: #eef4ff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(16, 28, 51, .86);
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
+      margin-bottom: 16px;
+    }
+    .brand h1 { margin: 0; font-size: 22px; color: #7dd3fc; }
+    .brand p { margin: 4px 0 0; color: #9fb2d1; font-size: 13px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .panel { background: rgba(16, 28, 51, .92); border-radius: 24px; box-shadow: 0 12px 30px rgba(0, 0, 0, .25); padding: 18px; }
+    .btn {
+      padding: 12px 18px;
+      font-size: 16px;
+      background-color: #38bdf8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color .3s ease;
+      margin: 10px 0;
+    }
+    .btn:hover {
+      background-color: #22c55e;
+    }
+    .btn.secondary {
+      background-color: #d1d5db;
+      color: #333;
+    }
+    .btn.secondary:hover {
+      background-color: #9ca3af;
+    }
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(22,37,68,.95), rgba(12,21,39,.95));
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      transition: transform .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 18px; color: #eef4ff; }
+    .card p { color: #9fb2d1; line-height: 1.7; font-size: 14px; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <h1>المخبر الافتراضي</h1>
-        <p>واجهة امتحانية تفاعلية مبنية على المواد الدراسية المختلفة للجلسات المخبرية.</p>
+
+  <div class="topbar">
+    <div class="brand">
+      <h1>المخبر الافتراضي</h1>
+      <p>واجهة امتحانية تفاعلية مبنية على المواد الدراسية المختلفة للجلسات المخبرية.</p>
+    </div>
+    <div class="chip" id="breadcrumbChip">الصفحة الرئيسية</div>
+  </div><!-- Home -->
+
+  <section id="homeScreen" class="screen active">
+    <div class="panel">
+      <h2>الاختبارات</h2>
+      <p>اختر السنة، الفصل، المادة، ثم الجلسة لإجراء الاختبار.</p>
+
+      <button class="btn" onclick="selectYear(2)">السنة الثانية</button>
+      <button class="btn" onclick="selectYear(3)">السنة الثالثة</button>
+
+      <div id="faselSelect" class="hidden">
+        <button class="btn" onclick="selectFasel(1)">الفصل الأول</button>
+        <button class="btn" onclick="selectFasel(2)">الفصل الثاني</button>
       </div>
-      <div class="chip" id="breadcrumbChip">الصفحة الرئيسية</div>
-    </div><!-- Home -->
 
-    <section id="homeScreen" class="screen active">
-      <div class="panel">
-        <div class="screen-head">
-          <div>
-            <h2>الاختبارات</h2>
-            <p>اختر السنة، الفصل، المادة، ثم الجلسة لإجراء الاختبار.</p>
-          </div>
-        </div>
-
-        <!-- زر لاختيار السنة -->
-        <div id="yearSelect">
-          <button onclick="selectYear(2)">السنة الثانية</button>
-          <button onclick="selectYear(3)">السنة الثالثة</button>
-        </div>
-
-        <!-- زر لاختيار الفصل -->
-        <div id="faselSelect" class="hidden">
-          <button onclick="selectFasel(1)">الفصل الأول</button>
-          <button onclick="selectFasel(2)">الفصل الثاني</button>
-        </div>
-
-        <!-- زر لاختيار المادة -->
-        <div id="materiaSelect" class="hidden">
-          <button onclick="selectMateria('الكيمياء الفيزيائية')">الكيمياء الفيزيائية</button>
-          <button onclick="selectMateria('الصيدلانيات1')">الصيدلانيات1</button>
-          <!-- أضف المزيد من المواد هنا -->
-        </div>
-
-        <!-- زر لاختيار الجلسة -->
-        <div id="sessionSelect" class="hidden">
-          <button onclick="startTest()">ابدأ الاختبار</button>
-        </div>
+      <div id="materiaSelect" class="hidden">
+        <button class="btn" onclick="selectMateria('الكيمياء الفيزيائية')">الكيمياء الفيزيائية</button>
+        <button class="btn" onclick="selectMateria('الصيدلانيات1')">الصيدلانيات1</button>
       </div>
-    </section>
 
-    <!-- اختبارات داخل الجلسة -->
-    <section id="testsScreen" class="screen hidden">
-      <div class="panel">
-        <div class="screen-head">
-          <div>
-            <h2 id="unitTitle">الاختبار الأول</h2>
-            <p id="unitDesc">قم بحل هذا الاختبار بناءً على الجلسة المختارة.</p>
-          </div>
-        </div>
-
-        <div id="testCards" class="h-scroll"></div>
+      <div id="sessionSelect" class="hidden">
+        <button class="btn" onclick="startTest()">ابدأ الاختبار</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- المخبر -->
-    <section id="labScreen" class="screen hidden">
-      <div class="panel">
-        <div class="title-row">
-          <div>
-            <h2 id="labTitle">المخبر الافتراضي</h2>
-            <p id="labSubtitle"></p>
-          </div>
-          <div class="actions">
-            <button class="btn secondary" onclick="backToTests()">العودة للتجارب</button>
-            <button class="btn secondary" onclick="restartTest()">إعادة المحاولة</button>
-          </div>
-        </div>
+  <section id="testsScreen" class="screen hidden">
+    <div class="panel">
+      <h2 id="unitTitle">الاختبار الأول</h2>
+      <p id="unitDesc">قم بحل هذا الاختبار بناءً على الجلسة المختارة.</p>
+      <button class="btn secondary" onclick="goHome()">العودة</button>
+    </div>
+  </section>
 
-        <div class="lab-layout">
-          <div class="lab-visual card">
-            <div id="visualLabel">الأنبوب فارغ وجاهز للتجربة.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
+  <section id="labScreen" class="screen hidden">
+    <div class="panel">
+      <h2 id="labTitle">المخبر الافتراضي</h2>
+      <p id="labSubtitle"></p>
+      <button class="btn secondary" onclick="backToTests()">العودة للتجارب</button>
+      <button class="btn secondary" onclick="restartTest()">إعادة المحاولة</button>
+    </div>
+  </section>
 
   <script>
-    // البيانات المتعلقة بالسنة والفصل والمادة
     const data = {
       2: { 1: ['الكيمياء الفيزيائية', 'الصيدلانيات1'], 2: ['الكيمياء العضوية2', 'الصيدلانيات1'] },
       3: { 1: ['الأحياء1', 'فارماكولوجي1'], 2: ['الدمويات', 'فارماكولوجي2'] }
@@ -102,44 +131,43 @@
     let selectedFasel = null;
     let selectedMateria = null;
 
-    // تغيير السنة
     function selectYear(year) {
       selectedYear = year;
       document.getElementById('faselSelect').classList.remove('hidden');
-      document.getElementById('yearSelect').classList.add('hidden');
+      document.getElementById('homeScreen').classList.add('hidden');
     }
 
-    // تغيير الفصل
     function selectFasel(fasel) {
       selectedFasel = fasel;
       document.getElementById('materiaSelect').classList.remove('hidden');
       document.getElementById('faselSelect').classList.add('hidden');
     }
 
-    // تغيير المادة
     function selectMateria(materia) {
       selectedMateria = materia;
       document.getElementById('sessionSelect').classList.remove('hidden');
       document.getElementById('materiaSelect').classList.add('hidden');
     }
 
-    // بدء الاختبار
     function startTest() {
       document.getElementById('testsScreen').classList.remove('hidden');
       document.getElementById('homeScreen').classList.add('hidden');
     }
 
-    // العودة إلى الصفحة الرئيسية
-    function backToTests() {
+    function goHome() {
       document.getElementById('homeScreen').classList.remove('hidden');
+      document.getElementById('testsScreen').classList.add('hidden');
+    }
+
+    function backToTests() {
+      document.getElementById('testsScreen').classList.remove('hidden');
       document.getElementById('labScreen').classList.add('hidden');
     }
 
-    // إعادة المحاولة
     function restartTest() {
       alert('إعادة المحاولة');
-      // أضف هنا منطق إعادة الاختبار
     }
   </script>
+
 </body>
 </html>
