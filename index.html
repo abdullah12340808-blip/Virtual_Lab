@@ -5,61 +5,67 @@
   <title>المخبر الافتراضي - جامعة حماة</title>
   <style>
     :root { --bg: #050a14; --panel: #0f172a; --accent: #38bdf8; --success: #22c55e; --danger: #ef4444; --text: #f8fafc; }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-    body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-    /* نظام الشاشات المعزولة */
-    .screen { display: none; height: 100vh; flex-direction: column; overflow-y: auto; padding-bottom: 20px; }
+    /* الشاشات */
+    .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; }
     .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .header { background: var(--panel); padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; }
-    .btn-back { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 18px; border-radius: 12px; cursor: pointer; }
+    /* الهيدر */
+    .header { background: var(--panel); padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; }
+    .btn-back { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer; }
 
-    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; }
+    /* القوائم */
+    .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; overflow-y: auto; }
     .btn-main { 
-      width: 100%; max-width: 340px; background: var(--panel); border: 1px solid rgba(255,255,255,0.15); 
-      padding: 24px; border-radius: 20px; text-align: center; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      width: 100%; max-width: 320px; background: var(--panel); border: 1px solid rgba(255,255,255,0.1); 
+      padding: 20px; border-radius: 18px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; 
     }
-    .btn-main:active { transform: scale(0.96); background: var(--accent); color: #000; }
+    .btn-main:active { background: var(--accent); color: #000; }
 
-    /* مسرح المختبر */
-    #labScreen { overflow: hidden; }
-    .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b, #050a14); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    /* المختبر */
+    .lab-stage { flex: 1; position: relative; background: radial-gradient(circle, #1e293b, #050a14); display: flex; align-items: center; justify-content: center; overflow: hidden; }
     
-    /* اللهب الحقيقي */
-    .burner-unit { position: absolute; left: 30px; bottom: 80px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-    .fire { 
-      width: 35px; height: 50px; background: linear-gradient(to top, #ff4d00, #ffcc00, #fff); 
-      border-radius: 50% 50% 20% 20%; filter: blur(1px); opacity: 0; transition: 0.3s;
-    }
-    .fire.active { opacity: 0.9; animation: flamePulse 0.1s infinite alternate; }
-    @keyframes flamePulse { from { transform: scaleY(1); } to { transform: scaleY(1.2) scaleX(1.1); } }
-    .base { width: 40px; height: 10px; background: #334155; border-radius: 4px; }
+    /* اللهب */
+    .burner-unit { position: absolute; left: 30px; bottom: 80px; text-align: center; }
+    .fire { width: 35px; height: 50px; background: linear-gradient(to top, #ff4d00, #ffcc00, #fff); border-radius: 50% 50% 20% 20%; filter: blur(2px); opacity: 0; }
+    .fire.active { opacity: 1; animation: flicker 0.1s infinite alternate; }
+    @keyframes flicker { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-    /* الأنبوب المتحرك */
-    .tube-proxy { width: 60px; height: 180px; position: relative; z-index: 50; touch-action: none; cursor: grab; }
-    .tube-glass { 
-      position: absolute; inset: 0; border: 2.5px solid rgba(255,255,255,0.5); 
-      border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); overflow: hidden;
-    }
+    /* الأنبوب */
+    #tube { width: 55px; height: 160px; position: relative; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+    .tube-glass { position: absolute; inset: 0; border: 2.5px solid rgba(255,255,255,0.4); border-radius: 0 0 25px 25px; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); overflow: hidden; }
     .liquid { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1s; }
     .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; background: #fff; filter: blur(1px); opacity: 0; transition: 1s; }
 
-    .controls-panel { background: var(--panel); padding: 20px; border-radius: 25px 25px 0 0; border-top: 1px solid rgba(255,255,255,0.1); }
-    .option-btn { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 15px; color: white; text-align: center; margin-bottom: 10px; width: 100%; max-width: 320px; cursor: pointer; }
-    
-    #statusLine { text-align: center; font-size: 13px; color: #94a3b8; margin-top: 5px; }
+    /* سهم الحركة */
+    #moveBtn {
+      position: absolute; right: 40px; bottom: 50%; background: var(--accent); color: #000;
+      width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 24px; box-shadow: 0 0 20px var(--accent); animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+    .controls { background: var(--panel); padding: 20px; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; align-items: center; }
+    .opt-btn { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: white; width: 100%; max-width: 300px; margin-bottom: 8px; text-align: center; }
   </style>
 </head>
 <body>
 
 <div id="app">
-    <div id="screenYears" class="screen active">
-        <div class="header"><span>كلية الصيدلة - نظام المختبرات</span></div>
+    <div id="screenStart" class="screen active" style="justify-content: center; align-items: center;">
+        <h1 style="color: var(--accent);">المخبر الافتراضي</h1>
+        <p style="color: #94a3b8; margin-bottom: 40px;">جامعة حماة - كلية الصيدلة</p>
+        <button class="btn-main" onclick="nav('screenYears')" style="background: var(--accent); color: #000;">لنبدأ</button>
+    </div>
+
+    <div id="screenYears" class="screen">
+        <div class="header"><span>اختر السنة</span></div>
         <div class="menu-container">
-            <div class="btn-main" onclick="openSubs('السنة الثانية')">السنة الثانية</div>
-            <div class="btn-main" onclick="openSubs('السنة الثالثة')">السنة الثالثة</div>
+            <div class="btn-main" onclick="openYear('y2')">السنة الثانية</div>
+            <div class="btn-main" onclick="openYear('y3')">السنة الثالثة</div>
         </div>
     </div>
 
@@ -74,162 +80,140 @@
     </div>
 
     <div id="screenTests" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('screenSessions')">←</button><span id="txtSession"></span></div>
+        <div class="header"><button class="btn-back" onclick="nav('screenSessions')">←</button><span id="txtSess"></span></div>
         <div class="menu-container" id="listTests"></div>
     </div>
 
     <div id="screenLab" class="screen">
-        <div class="header"><button class="btn-back" onclick="confirmExit()">← إنهاء</button><span id="txtTest"></span></div>
-        <div class="lab-stage" id="labArea">
+        <div class="header"><button class="btn-back" onclick="nav('screenTests')">← خروج</button><span id="txtTest"></span></div>
+        <div class="lab-stage">
             <div class="burner-unit">
                 <div id="flame" class="fire"></div>
-                <div class="base"></div>
+                <div style="width:40px; height:8px; background:#334155; border-radius:4px;"></div>
             </div>
-            <div id="tube" class="tube-proxy">
-                <div class="tube-glass">
-                    <div id="liq" class="liquid"></div>
-                    <div id="pre" class="precipitate"></div>
-                </div>
-            </div>
-            <div id="labHint" style="position:absolute; top:20px; text-align:center; padding:0 30px; font-size:14px; color:var(--accent);"></div>
+            <div id="tube"><div class="tube-glass"><div id="liq" class="liquid"></div><div id="pre" class="precipitate"></div></div></div>
+            <div id="moveBtn" onclick="moveTubeToFire()">←</div>
+            <div id="labHint" style="position:absolute; top:20px; color:var(--accent); font-size:14px; text-align:center; padding:0 20px;"></div>
         </div>
-        <div class="controls-panel">
-            <div id="optionsList" style="display:flex; flex-direction:column; align-items:center;"></div>
-            <div id="statusLine">جاهز لبدء التجربة</div>
+        <div class="controls">
+            <div id="options"></div>
+            <div id="status" style="font-size: 12px; color: #94a3b8; margin-top: 10px;">جاهز</div>
         </div>
     </div>
 </div>
 
 <script>
-    // قاعدة البيانات المنظمة حسب طلبك
     const db = {
-        "السنة الثانية": ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1"],
-        "السنة الثالثة": ["الكيمياء الصيدلية 1", "التحليل الآلي", "الدمويات", "فارماكولوجي 2"]
+        y2: { name: "السنة الثانية", subs: ["العضوية 2", "الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 2"] },
+        y3: { name: "السنة الثالثة", subs: ["الدمويات", "الكيمياء الصيدلية 1", "التحليل الآلي", "الأحياء 2", "كيمياء العقاقير", "فارماكولوجي 2"] }
     };
 
-    const sessions = {
-        "الكيمياء الصيدلية 1": [{ id: "s1", name: "الجلسة الأولى: الكالسيوم والمغنيزيوم" }]
+    const sessData = {
+        "الكيمياء الصيدلية 1": [{ id: "cs1_s1", name: "الجلسة الأولى: الكشف عن الشوارد الموجبة 1" }]
     };
 
-    const tests = {
-        "s1": [
-            {
-                title: "الكشف عن الكالسيوم (Ca++)",
-                hint: "المطلوب: إجراء اختبار اللهب للكالسيوم",
+    const testsData = {
+        "cs1_s1": [
+            { 
+                title: "الكشف عن الكالسيوم (Ca++)", 
                 steps: [
-                    { q: "إضافة 2 مل من محلول شوارد الكالسيوم", w: ["إضافة حمض نمل", "إضافة ماء مقطر"], e: { h: "30%", c: "rgba(255,255,255,0.2)", m: "تم وضع العينة" } },
-                    { q: "إضافة 1 مل من حمض كلور الماء HCl", w: ["إضافة حمض كبريت", "إضافة نشادر"], e: { h: "45%", m: "تم تحميض العينة، اسحب الأنبوب للهب" } },
-                    { q: "تعريض الأنبوب للهب (سحب الأنبوب لليسار)", w: [], e: { fire: true, m: "انتظر حتى يتغير اللون" }, heat: true },
-                    { q: "ملاحظة تلون اللهب باللون البرتقالي", w: ["لون أخضر", "لون أزرق"], e: { m: "تم تأكيد وجود الكالسيوم بنجاح! 🎉" } }
+                    { q: "إضافة عينة الكالسيوم (2 مل)", w: ["إضافة حمض نمل", "إضافة ماء"], e: { h: "25%", c: "rgba(255,255,255,0.2)", m: "تم وضع العينة" } },
+                    { q: "إضافة حمض HCl للتحميض", w: ["إضافة نشادر", "إضافة سكر"], e: { h: "40%", m: "تم التحميض.. الآن يجب التسخين" } },
+                    { q: "انقر على السهم لتحريك الأنبوب نحو اللهب", w: [], e: { fire: true }, isHeat: true },
+                    { q: "ملاحظة تلون اللهب بالبرتقالي", w: ["لون أزرق", "لون أخضر"], e: { m: "تم الكشف بنجاح! 🎉" } }
                 ]
             }
         ]
     };
 
-    let state = { currentTest: null, step: 0, isHeating: false };
+    let cur = { step: 0, test: null };
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function openSubs(year) {
-        document.getElementById('txtYear').innerText = year;
+    function openYear(y) {
+        document.getElementById('txtYear').innerText = db[y].name;
         const list = document.getElementById('listSubs'); list.innerHTML = "";
-        db[year].forEach(sub => {
-            const d = document.createElement('div'); d.className = 'btn-main';
-            d.innerText = sub; d.onclick = () => openSessions(sub); list.appendChild(d);
+        db[y].subs.forEach(s => {
+            const btn = document.createElement('div'); btn.className = 'btn-main';
+            btn.innerText = s; btn.onclick = () => openSub(s); list.appendChild(btn);
         });
         nav('screenSubs');
     }
 
-    function openSessions(sub) {
+    function openSub(sub) {
         document.getElementById('txtSub').innerText = sub;
         const list = document.getElementById('listSessions'); list.innerHTML = "";
-        if (!sessions[sub]) { list.innerHTML = "<p>سيتم الإضافة قريباً</p>"; }
-        else {
-            sessions[sub].forEach(sess => {
-                const d = document.createElement('div'); d.className = 'btn-main';
-                d.innerText = sess.name; d.onclick = () => openTests(sess); list.appendChild(d);
-            });
-        }
+        if (!sessData[sub]) list.innerHTML = "سيتم الإضافة قريباً";
+        else sessData[sub].forEach(sess => {
+            const btn = document.createElement('div'); btn.className = 'btn-main';
+            btn.innerText = sess.name; btn.onclick = () => openTests(sess); list.appendChild(btn);
+        });
         nav('screenSessions');
     }
 
     function openTests(sess) {
-        document.getElementById('txtSession').innerText = sess.name;
+        document.getElementById('txtSess').innerText = sess.name;
         const list = document.getElementById('listTests'); list.innerHTML = "";
-        const available = tests[sess.id] || [];
-        available.forEach(t => {
-            const d = document.createElement('div'); d.className = 'btn-main';
-            d.innerText = t.title; d.onclick = () => startLab(t); list.appendChild(d);
+        (testsData[sess.id] || []).forEach(t => {
+            const btn = document.createElement('div'); btn.className = 'btn-main';
+            btn.innerText = t.title; btn.onclick = () => startLab(t); list.appendChild(btn);
         });
         nav('screenTests');
     }
 
-    function startLab(test) {
-        state.currentTest = test; state.step = 0;
-        document.getElementById('txtTest').innerText = test.title;
-        document.getElementById('labHint').innerText = test.hint;
-        resetLabUI();
-        renderStep();
-        nav('screenLab');
+    function startLab(t) {
+        cur.test = t; cur.step = 0;
+        document.getElementById('txtTest').innerText = t.title;
+        resetLab(); renderStep(); nav('screenLab');
     }
 
     function renderStep() {
-        const step = state.currentTest.steps[state.step];
-        const box = document.getElementById('optionsList'); box.innerHTML = "";
-        
-        if (step.heat) {
-            document.getElementById('optionsList').innerHTML = "<p style='color:orange'>قم بسحب الأنبوب فوق اللهب الآن</p>";
-            document.getElementById('flame').classList.add('active');
-            return;
-        }
+        const step = cur.test.steps[cur.step];
+        const box = document.getElementById('options'); box.innerHTML = "";
+        document.getElementById('moveBtn').style.display = step.isHeat ? "flex" : "none";
 
-        let choices = [{ t: step.q, ok: true }, ...step.w.map(x => ({ t: x, ok: false }))].sort(() => Math.random() - 0.5);
-        choices.forEach(c => {
-            const b = document.createElement('div'); b.className = 'option-btn'; b.innerText = c.t;
-            b.onclick = () => {
-                if (c.ok) { applyEffect(step.e); state.step++; if(state.step < state.currentTest.steps.length) setTimeout(renderStep, 1000); }
-                else { document.getElementById('statusLine').innerText = "خطأ في التسلسل! أعد المحاولة."; b.style.background = "var(--danger)"; }
-            };
-            box.appendChild(b);
-        });
+        if (!step.isHeat) {
+            let opts = [{ t: step.q, ok: true }, ...step.w.map(x => ({ t: x, ok: false }))].sort(() => Math.random() - 0.5);
+            opts.forEach(o => {
+                const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = o.t;
+                b.onclick = () => {
+                    if (o.ok) { apply(step.e); cur.step++; if(cur.step < cur.test.steps.length) setTimeout(renderStep, 800); }
+                    else { document.getElementById('status').innerText = "خطأ!"; b.style.borderColor = "red"; }
+                };
+                box.appendChild(b);
+            });
+        } else {
+            document.getElementById('status').innerText = "اضغط على السهم للتحريك نحو اللهب";
+            apply(step.e);
+        }
     }
 
-    function applyEffect(e) {
+    function moveTubeToFire() {
+        const tube = document.getElementById('tube');
+        tube.style.transform = "translateX(-120px)";
+        document.getElementById('status').innerText = "يتم التسخين الآن...";
+        setTimeout(() => {
+            tube.style.transform = "translateX(0)";
+            cur.step++; renderStep();
+        }, 2000);
+    }
+
+    function apply(e) {
         if (e.h) document.getElementById('liq').style.height = e.h;
         if (e.c) document.getElementById('liq').style.background = e.c;
-        if (e.m) document.getElementById('statusLine').innerText = e.m;
+        if (e.m) document.getElementById('status').innerText = e.m;
         if (e.fire) document.getElementById('flame').classList.add('active');
+        else document.getElementById('flame').classList.remove('active');
     }
 
-    function resetLabUI() {
+    function resetLab() {
         document.getElementById('liq').style.height = "0%";
-        document.getElementById('flame').classList.remove('active');
-        document.getElementById('statusLine').innerText = "جاهز";
         document.getElementById('tube').style.transform = "translateX(0)";
+        document.getElementById('flame').classList.remove('active');
     }
-
-    // منطق سحب الأنبوب السلس نحو اللهب
-    let isDragging = false;
-    const tube = document.getElementById('tube');
-    tube.onpointerdown = (e) => { isDragging = true; tube.setPointerCapture(e.pointerId); };
-    tube.onpointermove = (e) => {
-        if (!isDragging) return;
-        const rect = document.getElementById('labArea').getBoundingClientRect();
-        const x = e.clientX - rect.left - 30;
-        tube.style.transform = `translateX(${x}px)`;
-        
-        // التحقق من التصادم مع اللهب (المسافة التقريبية)
-        if (x < -80 && state.currentTest.steps[state.step]?.heat) {
-            document.getElementById('statusLine').innerText = "يتم التسخين الآن... 🔥";
-            setTimeout(() => { if(isDragging) { isDragging = false; tube.style.transform = "translateX(0)"; state.step++; renderStep(); } }, 2000);
-        }
-    };
-    tube.onpointerup = () => { isDragging = false; tube.style.transform = "translateX(0)"; };
-
-    function confirmExit() { if(confirm("هل تريد الخروج من المختبر؟")) nav('screenTests'); }
 </script>
 </body>
 </html>
