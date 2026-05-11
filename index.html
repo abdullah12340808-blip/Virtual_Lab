@@ -6,44 +6,44 @@
     <title>المخبر الافتراضي - جامعة حماة</title>
     <style>
         :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #f43f5e; --text: #f8fafc; --gold: #fbbf24; } 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; touch-action: none; } 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; } 
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; } 
         
-        .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.2s ease; } 
+        /* التنظيم العام */
+        .screen { display: none; height: 100vh; flex-direction: column; } 
         .screen.active { display: flex; } 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
         .header { background: var(--panel); padding: 15px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; } 
         .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 6px 12px; border-radius: 8px; border:none; cursor:pointer; } 
-        .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 20px; overflow-y: auto; touch-action: pan-y; } 
-        .btn-main { width: 100%; max-width: 340px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; color: white; border:none; } 
+        .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; overflow-y: auto; touch-action: pan-y; } 
+        .btn-main { width: 100%; max-width: 340px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 12px; text-align: center; font-weight: bold; color: white; border:none; cursor:pointer; } 
 
         /* شبكة الكلمات المتقاطعة */
-        .cw-board { display: grid; grid-template-columns: repeat(10, 32px); gap: 4px; padding: 15px; background: #334155; border-radius: 10px; box-shadow: inset 0 0 15px #000; position: relative; }
-        .cw-cell { width: 32px; height: 32px; background: rgba(15, 23, 42, 0.7); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: transparent; pointer-events: auto; }
+        .cw-board { display: grid; grid-template-columns: repeat(8, 35px); gap: 5px; padding: 15px; background: #334155; border-radius: 10px; box-shadow: inset 0 0 15px #000; }
+        .cw-cell { width: 35px; height: 35px; background: rgba(15, 23, 42, 0.8); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: transparent; font-size: 16px; }
         .cw-cell.active-cell { background: #1e293b; border: 1px solid var(--accent); }
-        .cw-cell.solved { background: var(--success) !important; color: white !important; border: none; }
+        .cw-cell.solved { background: var(--success) !important; color: white !important; border: none; transition: 0.5s; }
 
-        /* نافذة وصلة */
-        .wasla-modal { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; align-items: center; padding: 20px; touch-action: auto; }
+        /* نافذة حل السؤال */
+        .wasla-modal { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; flex-direction: column; align-items: center; padding: 20px; touch-action: auto; }
         .wasla-modal.active { display: flex; }
         .q-img-box { width: 100%; max-width: 280px; height: 180px; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 3px solid var(--accent); }
         .q-img-box img { width: 100%; height: 100%; object-fit: contain; }
-        .ans-slots { display: flex; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
-        .slot { width: 38px; height: 45px; border-bottom: 3px solid var(--accent); font-size: 24px; font-weight: bold; text-align: center; color: white; display:flex; align-items:center; justify-content:center; }
+        .ans-slots { display: flex; gap: 8px; margin-bottom: 30px; }
+        .slot { width: 35px; height: 40px; border-bottom: 3px solid var(--accent); font-size: 22px; font-weight: bold; text-align: center; }
         .slot.fixed { color: var(--success); border-bottom-color: var(--success); }
         
         /* لوحة الحروف الثابتة */
-        .keys-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; max-width: 380px; }
-        .key-btn { background: var(--panel); border: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 18px; color: white; cursor:pointer; }
-        .key-btn.used { visibility: hidden; pointer-events: none; }
+        .keys-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; width: 100%; max-width: 380px; }
+        .key-btn { background: var(--panel); border: 1px solid rgba(255,255,255,0.1); height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; font-size: 20px; color: white; cursor:pointer; }
+        .key-btn.hidden { opacity: 0; pointer-events: none; } /* يختفي ويبقى مكانه فارغاً */
 
-        /* كود المختبر (الأصلي) */
+        /* المختبر (إصلاح شامل) */
         .lab-stage { flex: 1; position: relative; background: radial-gradient(circle, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center; }
-        #tube { width: 55px; height: 170px; position: relative; transition: 1s; }
-        .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.3); border-radius: 0 0 25px 25px; background: rgba(255,255,255,0.1); }
+        #tube { width: 55px; height: 170px; position: relative; transition: 0.8s; z-index: 10; }
+        .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.3); border-radius: 0 0 25px 25px; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
         .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1s; background: rgba(255,255,255,0.2); border-radius: 0 0 22px 22px; }
-        #prec { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 2s; border-radius: 0 0 22px 22px; }
-        .flame { width: 25px; height: 40px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; transition: 0.3s; position: absolute; bottom: 20px; }
+        #prec { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 1.5s; border-radius: 0 0 22px 22px; }
+        .flame { width: 30px; height: 45px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; transition: 0.3s; position: absolute; bottom: 15px; left: 47%; }
         .flame.active { opacity: 1; animation: flicker 0.1s infinite; }
         @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.2); } }
     </style>
@@ -51,9 +51,8 @@
 <body oncontextmenu="return false;">
 
     <div id="scrLogin" class="screen active">
-        <div class="header">🔬 المخبر الافتراضي</div>
+        <div class="header">🔬 المخبر الافتراضي التعليمي</div>
         <div class="menu-container">
-            <div style="font-size: 1.1rem; color: var(--accent);">جامعة حماة - كلية الصيدلة</div>
             <div class="btn-main" onclick="nav('scrYears')">دخول الطالب</div>
         </div>
     </div>
@@ -69,53 +68,55 @@
     <div id="scrTerms" class="screen">
         <div class="header"><button class="btn-back" onclick="nav('scrYears')">←</button> <span id="termTitle"></span></div>
         <div class="menu-container">
-            <div class="btn-main" onclick="showSubs(1)">الفصل الأول</div>
-            <div class="btn-main" onclick="showSubs(2)">الفصل الثاني</div>
+            <div class="btn-main" onclick="showSubs(1)">الفصل الدراسي الأول</div>
+            <div class="btn-main" onclick="showSubs(2)">الفصل الدراسي الثاني</div>
         </div>
     </div>
 
     <div id="scrSubs" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrTerms')">←</button> المواد المتاحة</div>
+        <div class="header"><button class="btn-back" onclick="nav('scrTerms')">←</button> المواد</div>
         <div class="menu-container" id="subList"></div>
     </div>
 
     <div id="scrSessions" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrSubs')">←</button> الجلسات</div>
+        <div class="header"><button class="btn-back" onclick="nav('scrSubs')">←</button> الجلسات المتاحة</div>
         <div class="menu-container" id="sessList"></div>
     </div>
 
     <div id="scrCWBoard" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> شبكة التخطيط</div>
+        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> لغز التخطيط الجرثومي</div>
         <div class="menu-container">
-            <p style="color: var(--gold); font-size: 13px; margin-bottom: 10px;">مرر إصبعك لفتح الأسئلة</p>
-            <div class="cw-board" id="boardGrid" ontouchmove="handleTouchMove(event)"></div>
+            <p style="color:var(--gold); font-size:14px;">مرر إصبعك فوق المربعات للدخول للسؤال</p>
+            <div class="cw-board" id="boardGrid" ontouchmove="handleSwipe(event)"></div>
         </div>
     </div>
 
     <div id="modWasla" class="wasla-modal">
-        <div class="header" style="width: 100%; background: none; border: none;">
+        <div class="header" style="width:100%; background:none; border:none;">
             <button class="btn-back" onclick="closeWasla()">إلغاء</button>
-            <div style="flex:1; text-align:center; font-weight:bold;">ما نوع التخطيط؟</div>
+            <div style="flex:1; text-align:center;">ما هو نوع التخطيط؟</div>
         </div>
         <div class="q-img-box"><img id="qImg" src=""></div>
         <div class="ans-slots" id="ansSlots"></div>
         <div class="keys-grid" id="keysGrid"></div>
-        <button class="btn-main" style="margin-top:20px; background: var(--danger); padding:10px;" onclick="resetEntry()">إعادة المحاولة</button>
+        <button class="btn-main" style="margin-top:20px; background:var(--danger);" onclick="resetEntry()">إعادة محاولة</button>
     </div>
 
     <div id="scrLab" class="screen">
-        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> كشف الشوارد</div>
+        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> كشف الشاردة المجهولة</div>
         <div class="lab-stage">
             <div id="tube"><div class="glass"></div><div id="liq" class="liquid"></div><div id="prec"></div></div>
-            <div id="flame" class="flame" style="left: 48%;"></div>
+            <div id="flame" class="flame"></div>
         </div>
-        <div style="background:var(--panel); padding:20px; border-radius: 20px 20px 0 0;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-                <button class="btn-main" style="padding:10px;" onclick="addReagent('HCl')">إضافة HCl</button>
-                <button class="btn-main" style="padding:10px;" onclick="addReagent('NH3')">إضافة نشادر</button>
+        <div style="background:var(--panel); padding:20px; border-radius: 25px 25px 0 0; border-top: 2px solid var(--accent);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                <button class="btn-main" style="padding:10px;" onclick="addReagent('HCl')">HCl</button>
+                <button class="btn-main" style="padding:10px;" onclick="addReagent('NH3')">NH3</button>
+                <button class="btn-main" style="padding:10px;" onclick="addReagent('PO4')">فوسفات</button>
+                <button class="btn-main" style="padding:10px;" onclick="addReagent('Acetic')">حمض خل</button>
             </div>
-            <button class="btn-main" style="background:var(--danger); width:100%;" onclick="toggleHeat()">تسخين 🔥</button>
-            <button class="btn-main" style="background:var(--success); width:100%; margin-top:10px;" onclick="diagnose()">التشخيص النهائي</button>
+            <button class="btn-main" style="background:var(--danger); width:100%;" onclick="toggleHeat()">تسخين بنزن 🔥</button>
+            <button class="btn-main" style="background:var(--success); width:100%; margin-top:10px;" onclick="diagnose()">تقديم التشخيص</button>
         </div>
     </div>
 
@@ -127,19 +128,18 @@
                   t2: ["الأحياء 2", "الكيمياء صيدلية 1", "الدمويات", "التحليل الآلي"] }
         };
 
-        // صور حقيقية من ويكيميديا للتخطيط الجرثومي
+        // هندسة اللغز: استمراري (8 حروف) يتقاطع مع اشعاعي (6 حروف) في حرف "ا"
         const cwData = {
             questions: [
-                { id: 1, word: "استمراري", img: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Staphylococcus_aureus_on_Agar.jpg", cells: [[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8]] },
-                { id: 2, word: "اشعاعي", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Agar_plate_with_colonies.jpg/640px-Agar_plate_with_colonies.jpg", cells: [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1]] },
-                { id: 3, word: "حرفT", img: "https://upload.wikimedia.org/wikipedia/commons/7/71/Streak_plates.jpg", cells: [[6,1],[6,2],[6,3],[6,4],[6,5]] },
-                { id: 4, word: "اربعحجرات", img: "https://microbiologyinfo.com/wp-content/uploads/2016/01/Quadrant-Streak-Method.jpg", cells: [[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8]] }
+                { id: 1, word: "استمراري", img: "https://i.ibb.co/LzNf9Xp/image.png", cells: [[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]] },
+                { id: 2, word: "اشعاعي", img: "https://i.ibb.co/vYm0f4g/image.png", cells: [[0,6],[1,6],[2,6],[3,6],[4,6],[5,6]] },
+                { id: 3, word: "حرفT", img: "https://i.ibb.co/Zz6m7qf/image.png", cells: [[4,2],[4,3],[4,4],[4,5],[4,6]] },
+                { id: 4, word: "اربعحجرات", img: "https://i.ibb.co/SrtpY2k/image.png", cells: [[7,0],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7],[7,8]] }
             ]
         };
 
         let globalGrid = Array(10).fill().map(() => Array(10).fill(null));
-        let currentYear = '', currentTerm = 1, currentQ = null, userEntry = [], secretIon = '', isHeating = false;
-        let isModalOpen = false;
+        let curYear, curTerm, secretIon, isHeating = false, currentQ = null, userEntry = [], modalActive = false;
 
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -147,16 +147,13 @@
         }
 
         function showTerms(y) {
-            currentYear = y;
-            document.getElementById('termTitle').innerText = (y === 'y2' ? "السنة الثانية" : "السنة الثالثة");
-            nav('scrTerms');
+            curYear = y; document.getElementById('termTitle').innerText = (y==='y2'?"السنة الثانية":"السنة الثالثة"); nav('scrTerms');
         }
 
         function showSubs(t) {
-            currentTerm = t;
-            const list = document.getElementById('subList'); list.innerHTML = "";
-            curriculum[currentYear]['t'+t].forEach(sub => {
-                const b = document.createElement('button'); b.className = 'btn-main'; b.innerText = sub;
+            curTerm = t; const list = document.getElementById('subList'); list.innerHTML = "";
+            curriculum[curYear]['t'+t].forEach(sub => {
+                const b = document.createElement('div'); b.className = 'btn-main'; b.innerText = sub;
                 b.onclick = () => showSessions(sub); list.appendChild(b);
             });
             nav('scrSubs');
@@ -164,23 +161,22 @@
 
         function showSessions(sub) {
             const list = document.getElementById('sessList'); list.innerHTML = "";
-            let sess = (sub === "الأحياء 2") ? [{n: "اختبار الكلمات المتقاطعة", type: 'cw'}] : 
-                       (sub === "الكيمياء صيدلية 1") ? [{n: "كشف الشوارد المجهولة", type: 'lab'}] : [{n: "الجلسة الأولى", type: 'none'}];
-            sess.forEach(s => {
-                const b = document.createElement('button'); b.className = 'btn-main'; b.innerText = s.n;
-                b.onclick = () => { if(s.type==='cw') initBoard(); else if(s.type==='lab') startLab(); else alert("قيد التجهيز"); };
+            let sList = (sub==="الأحياء 2")?[{n:"اختبار الكلمات المتقاطعة",t:'cw'}]:(sub==="الكيمياء صيدلية 1")?[{n:"كشف الشوارد المجهولة",t:'lab'}]:[{n:"الجلسة الأولى",t:'n'}];
+            sList.forEach(s => {
+                const b = document.createElement('div'); b.className = 'btn-main'; b.innerText = s.n;
+                b.onclick = () => { if(s.t==='cw') initBoard(); else if(s.t==='lab') startLab(); else alert("قيد التجهيز"); };
                 list.appendChild(b);
             });
             nav('scrSessions');
         }
 
-        // --- نظام التمرير Swipe الحقيقي ---
-        function handleTouchMove(e) {
-            if (isModalOpen) return;
+        /* --- نظام التمرير الحقيقي --- */
+        function handleSwipe(e) {
+            if (modalActive) return;
             const touch = e.touches[0];
-            const elem = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (elem && elem.classList.contains('active-cell')) {
-                const r = elem.dataset.r, c = elem.dataset.c;
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains('active-cell')) {
+                const r = target.dataset.r, c = target.dataset.c;
                 const q = cwData.questions.find(q => q.cells.some(p => p[0] == r && p[1] == c));
                 if (q) openWasla(q);
             }
@@ -188,17 +184,14 @@
 
         function initBoard() {
             const board = document.getElementById('boardGrid'); board.innerHTML = "";
-            for(let r=0; r<10; r++) {
-                for(let c=0; c<10; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cw-cell'; cell.dataset.r = r; cell.dataset.c = c;
+            for(let r=0; r<10; r++){
+                for(let c=0; c<8; c++){
+                    const cell = document.createElement('div'); cell.className = 'cw-cell';
+                    cell.dataset.r = r; cell.dataset.c = c;
                     const q = cwData.questions.find(q => q.cells.some(p => p[0]===r && p[1]===c));
                     if(q) {
                         cell.classList.add('active-cell');
-                        if (globalGrid[r][c]) {
-                            cell.innerText = globalGrid[r][c];
-                            cell.classList.add('solved');
-                        }
+                        if (globalGrid[r][c]) { cell.innerText = globalGrid[r][c]; cell.classList.add('solved'); }
                     }
                     board.appendChild(cell);
                 }
@@ -207,100 +200,77 @@
         }
 
         function openWasla(q) {
-            isModalOpen = true;
-            currentQ = q; userEntry = [];
+            modalActive = true; currentQ = q; userEntry = [];
             document.getElementById('qImg').src = q.img;
-            
-            // تعبئة الحروف المتقاطعة المحلولة مسبقاً
-            q.cells.forEach((pos, i) => {
-                userEntry[i] = globalGrid[pos[0]][pos[1]] || "";
-            });
-            
+            q.cells.forEach((p, i) => userEntry[i] = globalGrid[p[0]][p[1]] || "");
+            if (!currentQ.shuffled) currentQ.shuffled = (currentQ.word + "نمتلوبج").split('').sort(()=>Math.random()-0.5);
             renderWaslaUI();
             document.getElementById('modWasla').classList.add('active');
         }
 
         function renderWaslaUI() {
             const slots = document.getElementById('ansSlots'); slots.innerHTML = "";
-            currentQ.cells.forEach((pos, i) => {
+            currentQ.cells.forEach((p, i) => {
                 const s = document.createElement('div');
-                s.className = 'slot' + (globalGrid[pos[0]][pos[1]] ? " fixed" : "");
-                s.innerText = userEntry[i] || "";
-                slots.appendChild(s);
+                s.className = 'slot' + (globalGrid[p[0]][p[1]] ? " fixed" : "");
+                s.innerText = userEntry[i]; slots.appendChild(s);
             });
 
             const keys = document.getElementById('keysGrid'); keys.innerHTML = "";
-            // توليد لوحة حروف ثابتة مبعثرة
-            if (!currentQ.pool) {
-                currentQ.pool = (currentQ.word + "نمتلوبج").split('').sort(() => Math.random() - 0.5);
-            }
+            currentQ.shuffled.forEach((char, idx) => {
+                const k = document.createElement('div'); k.className = 'key-btn'; k.innerText = char;
+                // فحص إذا كان الحرف مستخدماً في الإدخال الحالي لكي يختفي
+                let usedInEntry = userEntry.filter((c, i) => c === char && !globalGrid[currentQ.cells[i][0]][currentQ.cells[i][1]]).length;
+                let usedInPool = currentQ.shuffled.slice(0, idx).filter(c => c === char).length;
+                if (usedInPool < usedInEntry) k.classList.add('hidden');
 
-            currentQ.pool.forEach((l, idx) => {
-                const b = document.createElement('div');
-                b.className = 'key-btn';
-                b.innerText = l;
-                // إخفاء الحرف إذا كان مستخدماً في الإجابة الحالية (وليس من التقاطع)
-                const usedCount = userEntry.filter((val, i) => val === l && !globalGrid[currentQ.cells[i][0]][currentQ.cells[i][1]]).length;
-                const poolCount = currentQ.pool.slice(0, idx + 1).filter(x => x === l).length;
-                if (poolCount <= usedCount) b.classList.add('used');
-
-                b.onclick = () => {
-                    const nextIdx = userEntry.findIndex(val => val === "");
-                    if(nextIdx !== -1) {
-                        userEntry[nextIdx] = l;
-                        renderWaslaUI();
-                        checkWasla();
-                    }
+                k.onclick = () => {
+                    const next = userEntry.indexOf("");
+                    if (next !== -1) { userEntry[next] = char; renderWaslaUI(); checkWasla(); }
                 };
-                keys.appendChild(b);
+                keys.appendChild(k);
             });
         }
 
         function checkWasla() {
-            if(!userEntry.includes("")) {
-                if(userEntry.join('') === currentQ.word) {
-                    alert("إجابة صحيحة! استمر في الحل.");
-                    currentQ.cells.forEach((pos, i) => { globalGrid[pos[0]][pos[1]] = currentQ.word[i]; });
-                    closeWasla(); initBoard();
-                }
+            if (!userEntry.includes("") && userEntry.join('') === currentQ.word) {
+                currentQ.cells.forEach((p, i) => globalGrid[p[0]][p[1]] = currentQ.word[i]);
+                setTimeout(() => { alert("أحسنت! إجابة صحيحة"); closeWasla(); initBoard(); }, 300);
             }
         }
 
         function resetEntry() {
-            currentQ.cells.forEach((pos, i) => {
-                if (!globalGrid[pos[0]][pos[1]]) userEntry[i] = "";
-            });
+            currentQ.cells.forEach((p, i) => { if(!globalGrid[p[0]][p[1]]) userEntry[i] = ""; });
             renderWaslaUI();
         }
 
-        function closeWasla() { 
-            document.getElementById('modWasla').classList.remove('active'); 
-            isModalOpen = false;
-            currentQ = null;
-        }
+        function closeWasla() { document.getElementById('modWasla').classList.remove('active'); modalActive = false; currentQ = null; }
 
-        // --- منطق المختبر الأصلي ---
+        /* --- نظام كشف المجهول (الأصلي) --- */
         function startLab() {
             secretIon = ['كالسيوم', 'مغنيزيوم', 'بوتاسيوم'][Math.floor(Math.random()*3)];
             document.getElementById('liq').style.background = "rgba(255,255,255,0.2)";
             document.getElementById('prec').style.height = "0";
             nav('scrLab');
         }
-        function addReagent(r) { 
-            const liq = document.getElementById('liq'); liq.style.height = "50%"; 
-            if(secretIon==='مغنيزيوم' && r==='NH3') {
-                document.getElementById('prec').style.height = "25%";
-                document.getElementById('prec').style.background = "white";
-            }
+
+        function addReagent(r) {
+            const liq = document.getElementById('liq'), prec = document.getElementById('prec');
+            liq.style.height = "50%";
+            if(secretIon==='مغنيزيوم' && r==='NH3') { prec.style.height="20%"; prec.style.background="white"; }
+            if(secretIon==='بوتاسيوم' && r==='Acetic') { prec.style.height="20%"; prec.style.background="yellow"; }
         }
+
         function toggleHeat() {
-            isHeating = !isHeating;
-            document.getElementById('flame').classList.toggle('active', isHeating);
-            if(isHeating && secretIon==='كالسيوم') {
-                setTimeout(() => document.getElementById('liq').style.background = "#fca5a5", 1000);
-            }
+            isHeating = !isHeating; document.getElementById('flame').classList.toggle('active', isHeating);
+            if(isHeating && secretIon==='كالسيوم') { setTimeout(()=> document.getElementById('liq').style.background="#fca5a5", 1000); }
         }
-        function diagnose() { alert("تم التشخيص! الشاردة هي: " + secretIon); startLab(); }
+
+        function diagnose() {
+            const ans = prompt("ما هو تشخيصك للشاردة؟ (كالسيوم، مغنيزيوم، بوتاسيوم)");
+            if(ans === secretIon) alert("🎉 صحيح!"); else alert("❌ خطأ، كانت: " + secretIon);
+            startLab();
+        }
     </script>
 </body>
 </html>
