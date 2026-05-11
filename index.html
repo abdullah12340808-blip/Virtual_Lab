@@ -6,42 +6,35 @@
     <title>المخبر الافتراضي التعليمي - جامعة حماة</title>
     <style>
         :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #f43f5e; --text: #f8fafc; --gold: #fbbf24; } 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; } 
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; } 
 
         .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; } 
         .screen.active { display: flex; } 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
 
-        .header { background: var(--panel); padding: 18px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); } 
-        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; } 
+        .header { background: var(--panel); padding: 15px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; } 
+        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 5px 12px; border-radius: 8px; cursor: pointer; } 
 
-        .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 25px; overflow-y: auto; } 
-        .btn-main { width: 100%; max-width: 360px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); } 
-        .btn-main:active { transform: scale(0.98); background: var(--accent); color: #000; } 
+        .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; overflow-y: auto; } 
+        .btn-main { width: 100%; max-width: 340px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; } 
+        .btn-main:active { transform: scale(0.97); background: var(--accent); color: #000; } 
 
-        /* تنسيقات المختبر */
-        .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; } 
-        #tube { width: 60px; height: 180px; position: relative; z-index: 100; transition: 1s; } 
-        .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.4); border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); overflow: hidden; } 
-        .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1.5s; background: rgba(255,255,255,0.2); } 
-        .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 2s; filter: blur(1px); } 
-        .flame { width: 30px; height: 50px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; }
-        .flame.active { opacity: 1; animation: flicker 0.1s infinite; }
-        @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.3); } }
+        /* لقطة المختبر */
+        .lab-stage { flex: 1; position: relative; background: radial-gradient(circle, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center; } 
+        #tube { width: 50px; height: 160px; border: 3px solid rgba(255,255,255,0.3); border-radius: 0 0 25px 25px; position: relative; background: rgba(255,255,255,0.05); } 
+        .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; background: rgba(255,255,255,0.2); transition: 1s; border-radius: 0 0 22px 22px; }
 
-        /* تنسيقات الكلمات المتقاطعة */
-        .crossword-grid { display: grid; grid-template-columns: repeat(8, 40px); gap: 5px; background: #334155; padding: 10px; border-radius: 10px; }
-        .cell { width: 40px; height: 40px; background: #1e293b; border: 1px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
-        .cell.empty { background: transparent; border: none; cursor: default; }
-        .cell.solved { background: var(--success); color: white; }
-
-        .letter-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 20px; }
-        .key { background: #334155; padding: 12px; border-radius: 8px; min-width: 40px; text-align: center; cursor: pointer; font-weight: bold; }
-        .key:active { background: var(--accent); }
-        .answer-slots { display: flex; gap: 5px; margin: 20px 0; }
-        .slot { width: 35px; height: 35px; border-bottom: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
-        .q-image { width: 250px; height: 250px; border-radius: 15px; border: 2px solid var(--accent); object-fit: contain; background: white; }
+        /* نظام وصلة (الأحياء) */
+        .wasla-q-box { background: var(--panel); border-radius: 15px; padding: 15px; text-align: center; width: 90%; max-width: 400px; margin-bottom: 10px; border: 1px solid var(--accent); }
+        .wasla-img { width: 150px; height: 150px; border-radius: 10px; margin-bottom: 10px; background: white; object-fit: contain; }
+        .answer-container { display: flex; gap: 5px; margin: 15px 0; justify-content: center; flex-wrap: wrap; }
+        .ans-box { width: 35px; height: 35px; border: 2px solid #334155; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; background: #0f172a; cursor: pointer; }
+        .ans-box.filled { border-color: var(--accent); color: var(--accent); }
+        .letter-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 320px; }
+        .letter-btn { width: 38px; height: 38px; background: #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .letter-btn.hidden { visibility: hidden; pointer-events: none; }
+        .letter-btn:active { background: var(--accent); color: black; }
     </style>
 </head>
 <body>
@@ -49,24 +42,23 @@
     <div id="scrLogin" class="screen active">
         <div class="header">🔬 المخبر الافتراضي</div>
         <div class="menu-container">
-            <div style="text-align:center; margin-bottom:20px;">جامعة حماة - كلية الصيدلة</div>
+            <h2 style="margin:0">جامعة حماة</h2>
+            <p style="margin-top:0; opacity:0.7">كلية الصيدلة</p>
             <div class="btn-main" onclick="nav('scrYears')">دخول الطالب</div>
         </div>
     </div>
 
     <div id="scrYears" class="screen">
-        <div class="header">اختر السنة</div>
+        <div class="header"><button class="btn-back" onclick="nav('scrLogin')">←</button> اختر السنة</div>
         <div class="menu-container">
             <div class="btn-main" onclick="showTerms('y2')">السنة الثانية</div>
             <div class="btn-main" onclick="showTerms('y3')">السنة الثالثة</div>
+            <div class="btn-main" style="opacity:0.5">السنة الرابعة (قريباً)</div>
         </div>
     </div>
 
     <div id="scrTerms" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrYears')">←</button>
-            <div id="termTitle">الفصل الدراسي</div>
-        </div>
+        <div class="header"><button class="btn-back" onclick="nav('scrYears')">←</button> <span id="termTitle"></span></div>
         <div class="menu-container">
             <div class="btn-main" onclick="showSubs(1)">الفصل الأول</div>
             <div class="btn-main" onclick="showSubs(2)">الفصل الثاني</div>
@@ -74,98 +66,66 @@
     </div>
 
     <div id="scrSubs" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrTerms')">←</button>
-            <div>المواد المتاحة</div>
-        </div>
+        <div class="header"><button class="btn-back" onclick="nav('scrTerms')">←</button> المواد المتاحة</div>
         <div class="menu-container" id="subList"></div>
     </div>
 
     <div id="scrSessions" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrSubs')">←</button>
-            <div id="sessTitle">الجلسات</div>
-        </div>
+        <div class="header"><button class="btn-back" onclick="nav('scrSubs')">←</button> <span id="sessTitle"></span></div>
         <div class="menu-container" id="sessList"></div>
     </div>
 
-    <div id="scrCrossword" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrSessions')">←</button>
-            <div>كلمات متقاطعة: أنواع التخطيط</div>
-        </div>
+    <div id="scrWasla" class="screen">
+        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> اختبار كلمات متقاطعة</div>
         <div class="menu-container">
-            <div id="cwMessage" style="margin-bottom:10px; color:var(--gold);">اضغط على رقم السؤال للبدء</div>
-            <div class="crossword-grid" id="mainGrid">
-                </div>
-        </div>
-    </div>
-
-    <div id="scrSolve" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrCrossword')">تراجع</button>
-            <div>ما هو نوع التخطيط؟</div>
-        </div>
-        <div class="menu-container">
-            <img id="qImg" class="q-image" src="" alt="تخطيط">
-            <div class="answer-slots" id="answerSlots"></div>
-            <div class="letter-bank" id="letterBank"></div>
-            <button class="btn-main" style="background:var(--danger); padding:10px;" onclick="clearAnswer()">مسح الإجابة</button>
+            <div class="wasla-q-box">
+                <img id="qImg" class="wasla-img" src="" alt="تخطيط">
+                <div style="font-size:14px">ما هو نوع التخطيط الموضح؟</div>
+                <div class="answer-container" id="ansRow"></div>
+            </div>
+            <div class="letter-bank" id="bank"></div>
+            <div id="feedback" style="margin-top:10px; font-weight:bold"></div>
         </div>
     </div>
 
     <div id="scrLab" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="nav('scrSessions')">←</button>
-            <div>كشف المجهول</div>
-        </div>
+        <div class="header"><button class="btn-back" onclick="nav('scrSessions')">←</button> كشف مجهول</div>
         <div class="lab-stage">
-            <div id="tube"><div class="glass"></div><div id="liq" class="liquid"></div><div id="prec" class="precipitate"></div></div>
-            <div style="position:absolute; bottom:20px; left:20px;"><div id="flame" class="flame"></div>🔥</div>
+            <div id="tube"><div id="liq" class="liquid"></div></div>
         </div>
-        <div style="padding:15px; background:var(--panel);">
-            <div class="btn-main" onclick="addReagent('HCl')" style="padding:10px; margin-bottom:5px;">إضافة HCl</div>
-            <div class="btn-main" onclick="toggleHeat()" style="padding:10px; background:var(--danger);">تسخين / إيقاف</div>
-            <div class="btn-main" onclick="checkLabAnswer()" style="padding:10px; margin-top:10px; background:var(--success);">تقديم التشخيص</div>
+        <div style="padding:20px; background:var(--panel);">
+            <div class="btn-main" onclick="alert('تمت إضافة الكاشف')" style="margin-bottom:10px">إضافة HCl</div>
+            <div class="btn-main" onclick="nav('scrSessions')" style="background:var(--success)">إنهاء التجربة</div>
         </div>
     </div>
 
     <script>
-        // داتا المناهج
-        const curriculum = {
-            y2: { t1: ["عضوية 1", "فيزيائية"], t2: ["عضوية 2", "تحليلية 1"] },
-            y3: { t1: ["عقاقير 2", "أحياء 1"], t2: ["الأحياء 2", "الكيمياء صيدلية 1", "الدمويات"] }
-        };
-
-        // داتا الكلمات المتقاطعة
-        const biologyGame = {
-            questions: [
-                { id: 1, answer: "استمراري", img: "https://i.ibb.co/LzNf9Xp/image.png", letters: "ا س ت م ر ا ر ي ل ب ن".split(' ') },
-                { id: 2, answer: "اشعاعي", img: "https://i.ibb.co/vYm0f4g/image.png", letters: "ا ش ع ا ع ي و ك م ن".split(' ') },
-                { id: 3, answer: "حرفT", img: "https://i.ibb.co/Zz6m7qf/image.png", letters: "ح ر ف T س ي ب و".split(' ') },
-                { id: 4, answer: "اربع حجرات", answerDisplay: "أربع حجرات", img: "https://i.ibb.co/SrtpY2k/image.png", letters: "ا ر ب ع ح ج ر ا ت و م".split(' ') }
-            ],
-            solved: []
-        };
-
-        let currentQ = null;
-        let userEntry = [];
-
+        // نظام الملاحة الأساسي - يعمل فوراً
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
         }
 
+        const data = {
+            y2: { t1: ["عضوية 1", "فيزيائية"], t2: ["عضوية 2", "تحليلية 1"] },
+            y3: { t1: ["أحياء 1", "عقاقير 2"], t2: ["الأحياء 2", "كيمياء صيدلية 1", "دمويات"] }
+        };
+
+        let currentYear = "";
+        let currentTerm = 1;
+
         function showTerms(y) {
-            window.curYear = y;
+            currentYear = y;
             document.getElementById('termTitle').innerText = y === 'y2' ? "السنة الثانية" : "السنة الثالثة";
             nav('scrTerms');
         }
 
         function showSubs(t) {
+            currentTerm = t;
             const list = document.getElementById('subList');
             list.innerHTML = "";
-            curriculum[window.curYear]['t' + t].forEach(sub => {
+            data[currentYear]['t' + t].forEach(sub => {
                 const b = document.createElement('div');
                 b.className = 'btn-main';
                 b.innerText = sub;
@@ -179,109 +139,134 @@
             document.getElementById('sessTitle').innerText = sub;
             const list = document.getElementById('sessList');
             list.innerHTML = "";
-            let sess = [];
             
-            if(sub === "الأحياء 2") sess = [{n: "اختبار كلمات متقاطعة", type: "cw"}];
-            else if(sub === "الكيمياء صيدلية 1") sess = [{n: "كشف الشوارد المجهولة", type: "lab"}];
-            else sess = [{n: "الجلسة الأولى (قريباً)", type: "none"}];
+            let sessions = [];
+            if(sub === "الأحياء 2") {
+                sessions = [{n: "اختبار كلمات متقاطعة", type: "wasla"}];
+            } else if(sub === "كيمياء صيدلية 1") {
+                sessions = [{n: "كشف الشوارد المجهولة", type: "lab"}];
+            } else {
+                sessions = [{n: "الجلسة الأولى (نظري)", type: "msg"}];
+            }
 
-            sess.forEach(s => {
+            sessions.forEach(s => {
                 const b = document.createElement('div');
                 b.className = 'btn-main';
                 b.innerText = s.n;
                 b.onclick = () => {
-                    if(s.type === "cw") startCrossword();
+                    if(s.type === "wasla") startWasla();
                     else if(s.type === "lab") nav('scrLab');
-                    else alert("هذه الجلسة قيد التطوير");
+                    else alert("هذه الجلسة قيد التجهيز");
                 };
                 list.appendChild(b);
             });
             nav('scrSessions');
         }
 
-        // --- منطق الكلمات المتقاطعة ---
-        function startCrossword() {
-            renderGrid();
-            nav('scrCrossword');
+        // --- منطق لعبة وصلة (الأحياء 2) ---
+        const waslaData = [
+            { a: "استمراري", img: "https://i.ibb.co/LzNf9Xp/image.png" },
+            { a: "إشعاعي", img: "https://i.ibb.co/vYm0f4g/image.png" },
+            { a: "حرفT", img: "https://i.ibb.co/Zz6m7qf/image.png" },
+            { a: "أربع حجرات", img: "https://i.ibb.co/SrtpY2k/image.png" }
+        ];
+
+        let qIdx = 0;
+        let userAns = [];
+
+        function startWasla() {
+            qIdx = 0;
+            loadQuestion();
+            nav('scrWasla');
         }
 
-        function renderGrid() {
-            const grid = document.getElementById('mainGrid');
-            grid.innerHTML = "";
-            // شبكة بسيطة 4x4 توضح الأسئلة المتاحة
-            for(let i=1; i<=4; i++) {
-                const cell = document.createElement('div');
-                cell.className = biologyGame.solved.includes(i) ? "cell solved" : "cell";
-                cell.innerText = i;
-                cell.onclick = () => openQuestion(i);
-                grid.appendChild(cell);
-            }
+        function loadQuestion() {
+            const q = waslaData[qIdx];
+            userAns = new Array(q.a.replace(" ", "").length).fill("");
+            document.getElementById('qImg').src = q.img;
+            document.getElementById('feedback').innerText = "";
+            renderWasla();
         }
 
-        function openQuestion(id) {
-            currentQ = biologyGame.questions.find(q => q.id === id);
-            userEntry = [];
-            document.getElementById('qImg').src = currentQ.img;
-            renderSolveArea();
-            nav('scrSolve');
-        }
+        function renderWasla() {
+            const q = waslaData[qIdx];
+            const cleanA = q.a.replace(" ", "");
+            
+            // مربعات الإجابة
+            const row = document.getElementById('ansRow');
+            row.innerHTML = "";
+            userAns.forEach((char, i) => {
+                const box = document.createElement('div');
+                box.className = "ans-box " + (char ? "filled" : "");
+                box.innerText = char;
+                box.onclick = () => removeLetter(i);
+                row.appendChild(box);
+            });
 
-        function renderSolveArea() {
-            const slots = document.getElementById('answerSlots');
-            slots.innerHTML = "";
-            for(let i=0; i<currentQ.answer.length; i++) {
-                const s = document.createElement('div');
-                s.className = "slot";
-                s.innerText = userEntry[i] || "";
-                slots.appendChild(s);
-            }
-
-            const bank = document.getElementById('letterBank');
+            // بنك الحروف
+            const bank = document.getElementById('bank');
             bank.innerHTML = "";
-            currentQ.letters.forEach(l => {
-                const k = document.createElement('div');
-                k.className = "key";
-                k.innerText = l;
-                k.onclick = () => addLetter(l);
-                bank.appendChild(k);
+            const pool = (cleanA + "وبجمنتك").split("").sort();
+            pool.forEach((l, i) => {
+                const btn = document.createElement('div');
+                btn.className = "letter-btn";
+                btn.innerText = l;
+                btn.onclick = () => addLetter(l, btn);
+                bank.appendChild(btn);
             });
         }
 
-        function addLetter(l) {
-            if(userEntry.length < currentQ.answer.length) {
-                userEntry.push(l);
-                renderSolveArea();
-                if(userEntry.length === currentQ.answer.length) checkAnswer();
+        function addLetter(l, btn) {
+            const emptyIdx = userAns.indexOf("");
+            if(emptyIdx !== -1) {
+                userAns[emptyIdx] = l;
+                btn.classList.add('hidden');
+                btn.dataset.index = emptyIdx;
+                renderWaslaStatus();
+                checkWin();
             }
         }
 
-        function clearAnswer() {
-            userEntry = [];
-            renderSolveArea();
-        }
-
-        function checkAnswer() {
-            if(userEntry.join('') === currentQ.answer) {
-                alert("إجابة صحيحة! 🎉");
-                biologyGame.solved.push(currentQ.id);
-                startCrossword();
-            } else {
-                alert("إجابة خاطئة، حاول مرة أخرى");
-                clearAnswer();
+        function removeLetter(i) {
+            if(userAns[i] !== "") {
+                const letter = userAns[i];
+                userAns[i] = "";
+                // إظهار الحرف في البنك مجدداً
+                const buttons = document.querySelectorAll('.letter-btn.hidden');
+                for(let b of buttons) {
+                    if(b.innerText === letter) {
+                        b.classList.remove('hidden');
+                        break;
+                    }
+                }
+                renderWaslaStatus();
             }
         }
 
-        // --- منطق المختبر البسيط ---
-        function addReagent(r) {
-            document.getElementById('liq').style.height = "60%";
-            document.getElementById('liq').style.background = "#e2e8f0";
+        function renderWaslaStatus() {
+            const boxes = document.querySelectorAll('.ans-box');
+            userAns.forEach((char, i) => {
+                boxes[i].innerText = char;
+                boxes[i].className = "ans-box " + (char ? "filled" : "");
+            });
         }
-        function toggleHeat() {
-            document.getElementById('flame').classList.toggle('active');
-        }
-        function checkLabAnswer() {
-            let choice = prompt("ما هو تشخيصك للشاردة؟");
-            if(choice) alert("سيتم تقييم إجابتك من قبل المشرف.");
+
+        function checkWin() {
+            if(!userAns.includes("")) {
+                const q = waslaData[qIdx];
+                if(userAns.join("") === q.a.replace(" ", "")) {
+                    document.getElementById('feedback').innerText = "✅ صحيح!";
+                    document.getElementById('feedback').style.color = "var(--success)";
+                    setTimeout(() => {
+                        qIdx++;
+                        if(qIdx < waslaData.length) loadQuestion();
+                        else alert("أحسنت! أنهيت جميع الأسئلة.");
+                    }, 1000);
+                } else {
+                    document.getElementById('feedback').innerText = "❌ حاول مرة أخرى";
+                    document.getElementById('feedback').style.color = "var(--danger)";
+                }
+            }
         }
     </script>
 </body>
