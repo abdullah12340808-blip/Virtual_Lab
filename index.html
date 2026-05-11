@@ -5,184 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المخبر الافتراضي التعليمي - جامعة حماة</title>
     <style>
-        :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #f43f5e; --text: #f8fafc; --gold: #fbbf24; } * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; } /* نظام الشاشات */ .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; } .screen.active { display: flex; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } .header { background: var(--panel); padding: 18px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); } .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; } .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 25px; overflow-y: auto; } .btn-main { width: 100%; max-width: 360px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); } .btn-main:active { transform: scale(0.98); background: var(--accent); color: #000; } /* مسرح المختبر */ .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; } /* أدوات */ .tool { position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center; transition: 0.5s; } .burner { left: 30px; } .ice-bath { right: 30px; } .ice-box { width: 90px; height: 60px; background: #bae6fd; border: 3px solid #7dd3fc; border-radius: 10px 10px 25px 25px; box-shadow: 0 0 20px rgba(125,211,252,0.4); } /* الأنبوب */ #tube { width: 60px; height: 180px; position: relative; z-index: 100; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); } .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.4); border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); overflow: hidden; } .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1.5s; background: rgba(255,255,255,0.2); } .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 2s; filter: blur(1px); } /* تأثيرات */ .flame { width: 30px; height: 50px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; transition: 0.3s; } .flame.active { opacity: 1; animation: flicker 0.1s infinite; } @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.3); } } .mist { position: absolute; inset: 0; background: white; opacity: 0; transition: 1.5s; pointer-events: none; } /* لوحة التحكم */ .controls { background: var(--panel); padding: 20px; border-top: 2px solid var(--accent); border-radius: 30px 30px 0 0; } .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; } .btn-opt { background: #334155; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: bold; } .btn-fire.active { background: var(--danger); box-shadow: 0 0 15px var(--danger); } .btn-ice.active { background: #0369a1; box-shadow: 0 0 15px #0369a1; } .btn-clean { background: #64748b; color: white; border: none; padding: 10px; border-radius: 10px; margin-bottom: 10px; width: 100%; font-weight: bold; } 
+        :root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #f43f5e; --text: #f8fafc; --gold: #fbbf24; } 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; } 
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; } 
 
-        /* أنماط الكلمات المتقاطعة الجديدة (الأحياء 2) */
-        .cw-container { flex: 1; padding: 20px; display: flex; align-items: center; justify-content: center; overflow-y: auto; }
-        #cw-grid { display: grid; gap: 4px; border: 1px solid #334155; padding: 10px; border-radius: 10px; max-width: 380px; width: 100%; grid-template-columns: repeat(10, 1fr); }
-        .cw-cell { aspect-ratio: 1; border: 1px solid #334155; border-radius: 4px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; position: relative; color: transparent; cursor: default; }
-        .cw-cell.active { border-color: #38bdf8; cursor: pointer; color: transparent; }
-        .cw-cell.solved { background: #38bdf8; color: #000; border-color: #38bdf8; }
-        .cw-num { position: absolute; top: 2px; right: 2px; font-size: 8px; color: #fff; pointer-events: none; }
+        .screen { display: none; height: 100vh; flex-direction: column; animation: fadeIn 0.3s ease; } 
+        .screen.active { display: flex; } 
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
 
-        .cw-question-screen { background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); }
-        .cw-question-container { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; overflow-y: auto; }
-        .cw-image-frame { width: 180px; height: 180px; border: 2px solid #38bdf8; border-radius: 10px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
-        #cw-q-image { width: 100%; height: 100%; background-size: 400px 400px; background-repeat: no-repeat; image-rendering: pixelated; }
+        .header { background: var(--panel); padding: 18px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); } 
+        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; } 
 
-        .cw-blanks { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; max-width: 320px; margin-top: 10px; }
-        .cw-blank { width: 28px; height: 28px; background: rgba(255,255,255,0.05); border: 2px solid #334155; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; cursor: pointer; color: #38bdf8; transition: border-color 0.1s; }
-        .cw-blank:hover { border-color: #38bdf8; }
-        .cw-blank.error { border-color: #f43f5e; color: #f43f5e; animation: shake 0.3s; }
+        .menu-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 25px; overflow-y: auto; } 
+        .btn-main { width: 100%; max-width: 360px; background: linear-gradient(135deg, #1e293b, #334155); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; text-align: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); } 
+        .btn-main:active { transform: scale(0.98); background: var(--accent); color: #000; } 
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
+        /* تنسيقات المختبر */
+        .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; } 
+        #tube { width: 60px; height: 180px; position: relative; z-index: 100; transition: 1s; } 
+        .glass { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.4); border-radius: 0 0 30px 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); overflow: hidden; } 
+        .liquid { position: absolute; bottom: 0; width: 100%; height: 30%; transition: 1.5s; background: rgba(255,255,255,0.2); } 
+        .precipitate { position: absolute; bottom: 0; width: 100%; height: 0%; transition: 2s; filter: blur(1px); } 
+        .flame { width: 30px; height: 50px; background: linear-gradient(to top, #3b82f6, #f97316, transparent); border-radius: 50% 50% 20% 20%; opacity: 0; }
+        .flame.active { opacity: 1; animation: flicker 0.1s infinite; }
+        @keyframes flicker { from { transform: scaleY(1); } to { transform: scaleY(1.3); } }
 
-        .cw-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; max-width: 340px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .cw-letter { width: 32px; height: 32px; background: #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; cursor: pointer; color: white; transition: 0.1s; border: 1px solid transparent; }
-        .cw-letter:hover { background: #38bdf8; border-color: rgba(0,0,0,0.1); color: black; }
-        .cw-letter.hidden { display: none; }
+        /* تنسيقات الكلمات المتقاطعة */
+        .crossword-grid { display: grid; grid-template-columns: repeat(8, 40px); gap: 5px; background: #334155; padding: 10px; border-radius: 10px; }
+        .cell { width: 40px; height: 40px; background: #1e293b; border: 1px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .cell.empty { background: transparent; border: none; cursor: default; }
+        .cell.solved { background: var(--success); color: white; }
+
+        .letter-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 20px; }
+        .key { background: #334155; padding: 12px; border-radius: 8px; min-width: 40px; text-align: center; cursor: pointer; font-weight: bold; }
+        .key:active { background: var(--accent); }
+        .answer-slots { display: flex; gap: 5px; margin: 20px 0; }
+        .slot { width: 35px; height: 35px; border-bottom: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
+        .q-image { width: 250px; height: 250px; border-radius: 15px; border: 2px solid var(--accent); object-fit: contain; background: white; }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div id="scrLogin" class="screen active">
-            <div class="header">🔬 <div class="test-name">المخبر الافتراضي</div></div>
-            <div class="menu-container">
-                <div class="welcome-text">جامعة حماة - كلية الصيدلة</div>
-                <div class="btn-main" onclick="nav('scrYears')">دخول الطالب </div>
-            </div>
+
+    <div id="scrLogin" class="screen active">
+        <div class="header">🔬 المخبر الافتراضي</div>
+        <div class="menu-container">
+            <div style="text-align:center; margin-bottom:20px;">جامعة حماة - كلية الصيدلة</div>
+            <div class="btn-main" onclick="nav('scrYears')">دخول الطالب</div>
         </div>
+    </div>
 
-        <div id="scrYears" class="screen">
-            <div class="header">اختر السنة الدراسية</div>
-            <div class="menu-container">
-                <div class="btn-main" onclick="showTerms('y2')">السنة الثانية</div>
-                <div class="btn-main" onclick="showTerms('y3')">السنة الثالثة</div>
-                <div class="btn-main" style="opacity:0.5; cursor:default">السنة الرابعة (قريباً)</div>
-                <div class="btn-main" style="opacity:0.5; cursor:default">السنة الخامسة (قريباً)</div>
-            </div>
+    <div id="scrYears" class="screen">
+        <div class="header">اختر السنة</div>
+        <div class="menu-container">
+            <div class="btn-main" onclick="showTerms('y2')">السنة الثانية</div>
+            <div class="btn-main" onclick="showTerms('y3')">السنة الثالثة</div>
         </div>
+    </div>
 
-        <div id="scrTerms" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrYears')">→</button>
-                <div id="termTitle" class="test-name">الفصل الدراسي</div>
-            </div>
-            <div class="menu-container">
-                <div class="btn-main" onclick="showSubs(1)">الفصل الأول</div>
-                <div class="btn-main" onclick="showSubs(2)">الفصل الثاني</div>
-            </div>
+    <div id="scrTerms" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrYears')">←</button>
+            <div id="termTitle">الفصل الدراسي</div>
         </div>
+        <div class="menu-container">
+            <div class="btn-main" onclick="showSubs(1)">الفصل الأول</div>
+            <div class="btn-main" onclick="showSubs(2)">الفصل الثاني</div>
+        </div>
+    </div>
 
-        <div id="scrSubs" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrTerms')">→</button>
-                <div class="test-name">المواد المتاحة</div>
-            </div>
-            <div class="menu-container" id="subList">
+    <div id="scrSubs" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrTerms')">←</button>
+            <div>المواد المتاحة</div>
+        </div>
+        <div class="menu-container" id="subList"></div>
+    </div>
+
+    <div id="scrSessions" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrSubs')">←</button>
+            <div id="sessTitle">الجلسات</div>
+        </div>
+        <div class="menu-container" id="sessList"></div>
+    </div>
+
+    <div id="scrCrossword" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrSessions')">←</button>
+            <div>كلمات متقاطعة: أنواع التخطيط</div>
+        </div>
+        <div class="menu-container">
+            <div id="cwMessage" style="margin-bottom:10px; color:var(--gold);">اضغط على رقم السؤال للبدء</div>
+            <div class="crossword-grid" id="mainGrid">
                 </div>
         </div>
+    </div>
 
-        <div id="scrSessions" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrSubs')">→</button>
-                <div id="sessTitle" class="test-name">الجلسات</div>
-            </div>
-            <div class="menu-container" id="sessList">
-                </div>
+    <div id="scrSolve" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrCrossword')">تراجع</button>
+            <div>ما هو نوع التخطيط؟</div>
         </div>
-
-        <div id="scrCrosswordGrid" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrSessions')">←</button>
-                <div class="test-name">اختبار كلمات متقاطعة</div>
-            </div>
-            <div class="cw-container">
-                <div id="cw-grid">
-                    </div>
-            </div>
+        <div class="menu-container">
+            <img id="qImg" class="q-image" src="" alt="تخطيط">
+            <div class="answer-slots" id="answerSlots"></div>
+            <div class="letter-bank" id="letterBank"></div>
+            <button class="btn-main" style="background:var(--danger); padding:10px;" onclick="clearAnswer()">مسح الإجابة</button>
         </div>
+    </div>
 
-        <div id="scrCrosswordQuestion" class="screen cw-question-screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrCrosswordGrid')">←</button>
-                <div class="test-name">ما هو نوع التخطيط؟</div>
-            </div>
-            <div class="cw-question-container">
-                <div class="cw-image-frame">
-                    <div id="cw-q-image" style="background-image: url('image_0.png');"></div>
-                </div>
-                <div id="cw-q-blanks" class="cw-blanks">
-                    </div>
-                <div id="cw-q-bank" class="cw-bank">
-                    </div>
-            </div>
+    <div id="scrLab" class="screen">
+        <div class="header">
+            <button class="btn-back" onclick="nav('scrSessions')">←</button>
+            <div>كشف المجهول</div>
         </div>
-
-        <div id="scrLab" class="screen">
-            <div class="header">
-                <button class="btn-back" onclick="nav('scrSessions')">→</button>
-                <div id="labTestName" class="test-name">جلسة مجهول</div>
-                <button class="btn-back" onclick="nav('scrLogin')">خروج</button>
-            </div>
-
-            <div class="lab-stage">
-                <div id="tube">
-                    <div class="glass"></div>
-                    <div id="liq" class="liquid"></div>
-                    <div id="prec" class="precipitate"></div>
-                    <div id="mist" class="mist"></div>
-                </div>
-                <div class="tool burner">
-                    <div id="flame" class="flame"></div>
-                    🔥
-                </div>
-                <div class="tool ice-bath">
-                    <div class="ice-box"></div>
-                    حمام ثلجي
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="btn-clean" onclick="cleanTube()">🧼 غسل الأنبوب (Reset) </button>
-                <div id="hintTxt" style="color:var(--text); font-size:12px; margin-bottom:10px; text-align:center;">إرشاد</div>
-                <div class="grid-btns reagents-grid">
-                    <button class="btn-opt" onclick="addReagent('HCl')">HCl</button>
-                    <button class="btn-opt" onclick="addReagent('Ammonia')">نشادر</button>
-                    <button class="btn-opt" onclick="addReagent('Phosphate')">فوسفات</button>
-                    <button class="btn-opt" onclick="addReagent('Nessler')">كاشف نيسلر</button>
-                    <button class="btn-opt" onclick="addReagent('Cobalt')">كوبالتي نتريت</button>
-                    <button class="btn-opt" onclick="addReagent('Acetic')">حمض الخل</button>
-                </div>
-                <div class="grid-btns heat-cool-grid">
-                    <button id="heatBtn" class="btn-opt btn-fire" onclick="toggleHeat()">تسخين 🔥</button>
-                    <button id="coolBtn" class="btn-opt btn-ice" onclick="toggleCool()">تبريد ❄️</button>
-                </div>
-                <button class="btn-main" onclick="openDiagnosis()">تقديم التشخيص النهائي 🔍</button>
-            </div>
+        <div class="lab-stage">
+            <div id="tube"><div class="glass"></div><div id="liq" class="liquid"></div><div id="prec" class="precipitate"></div></div>
+            <div style="position:absolute; bottom:20px; left:20px;"><div id="flame" class="flame"></div>🔥</div>
+        </div>
+        <div style="padding:15px; background:var(--panel);">
+            <div class="btn-main" onclick="addReagent('HCl')" style="padding:10px; margin-bottom:5px;">إضافة HCl</div>
+            <div class="btn-main" onclick="toggleHeat()" style="padding:10px; background:var(--danger);">تسخين / إيقاف</div>
+            <div class="btn-main" onclick="checkLabAnswer()" style="padding:10px; margin-top:10px; background:var(--success);">تقديم التشخيص</div>
         </div>
     </div>
 
     <script>
+        // داتا المناهج
         const curriculum = {
-            y2: { t1: ["الكيمياء الفيزيائية", "الحاسوب", "الصيدلانيات 1", "الكيمياء العضوية 1"], t2: ["الكيمياء العضوية 2", "الكيمياء الحيوية 1", "العقاقير 1", "التحليلية 1", "الصيدلانيات 1"] },
-            y3: { t1: ["التحليلية 2", "الأحياء 1", "العقاقير 2", "فارماكولوجي 1", "التكنولوجيا الصيدلية"], t2: ["التحليل الآلي", "كيمياء العقاقير", "الدمويات", "فارماكولوجي 2", "الكيمياء صيدلية 1", "الأحياء 2"] }
+            y2: { t1: ["عضوية 1", "فيزيائية"], t2: ["عضوية 2", "تحليلية 1"] },
+            y3: { t1: ["عقاقير 2", "أحياء 1"], t2: ["الأحياء 2", "الكيمياء صيدلية 1", "الدمويات"] }
         };
 
-        // بيانات الكلمات المتقاطعة (جديدة للأحياء 2)
-        const crosswordData = {
-            grid: { rows: 10, cols: 10 },
+        // داتا الكلمات المتقاطعة
+        const biologyGame = {
             questions: [
-                { id: 1, text: "ما هو نوع التخطيط؟", answer: "استمراري", imagePos: "-200px 0px", startX: 1, startY: 1, dir: 'h', length: 8, solved: false }, // أعلى يمين
-                { id: 2, text: "ما هو نوع التخطيط؟", answer: "حرف T", imagePos: "0px 0px", startX: 4, startY: 1, dir: 'h', length: 5, solved: false }, // أعلى يسار
-                { id: 3, text: "ما هو نوع التخطيط؟", answer: "إشعاعي", imagePos: "-200px -200px", startX: 7, startY: 1, dir: 'h', length: 6, solved: false }, // أسفل يمين
-                { id: 4, text: "ما هو نوع التخطيط؟", answer: "أربع حجرات", imagePos: "0px -200px", startX: 10, startY: 1, dir: 'h', length: 10, solved: false } // أسفل يسار
-            ]
+                { id: 1, answer: "استمراري", img: "https://i.ibb.co/LzNf9Xp/image.png", letters: "ا س ت م ر ا ر ي ل ب ن".split(' ') },
+                { id: 2, answer: "اشعاعي", img: "https://i.ibb.co/vYm0f4g/image.png", letters: "ا ش ع ا ع ي و ك م ن".split(' ') },
+                { id: 3, answer: "حرفT", img: "https://i.ibb.co/Zz6m7qf/image.png", letters: "ح ر ف T س ي ب و".split(' ') },
+                { id: 4, answer: "اربع حجرات", answerDisplay: "أربع حجرات", img: "https://i.ibb.co/SrtpY2k/image.png", letters: "ا ر ب ع ح ج ر ا ت و م".split(' ') }
+            ],
+            solved: []
         };
 
-        let curYear = '', curTerm = 1, log = [], isHeating = false, isCooling = false;
-        let secretIon = '';
-
-        // متغيرات للعب الكلمات المتقاطعة
-        let currentCrosswordQ = null;
-        let cwAnswerLetters = []; // الحروف المدخلة في السؤال الحالي
-        let cwAvailableLetters = []; // بنك الحروف في السؤال الحالي
+        let currentQ = null;
+        let userEntry = [];
 
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -190,16 +157,15 @@
         }
 
         function showTerms(y) {
-            curYear = y;
+            window.curYear = y;
             document.getElementById('termTitle').innerText = y === 'y2' ? "السنة الثانية" : "السنة الثالثة";
             nav('scrTerms');
         }
 
         function showSubs(t) {
-            curTerm = t;
             const list = document.getElementById('subList');
             list.innerHTML = "";
-            curriculum[curYear]['t' + t].forEach(sub => {
+            curriculum[window.curYear]['t' + t].forEach(sub => {
                 const b = document.createElement('div');
                 b.className = 'btn-main';
                 b.innerText = sub;
@@ -213,11 +179,110 @@
             document.getElementById('sessTitle').innerText = sub;
             const list = document.getElementById('sessList');
             list.innerHTML = "";
-            
             let sess = [];
-            if (sub === "الكيمياء صيدلية 1") {
-                sess = [{n: "اختبار كشف الشوارد الموجبة المجهولة", type: "lab_unknown"}];
-            } else if (sub === "الأحياء 2") {
-                sess = [{n: "اختبار كلمات متقاطعة: أشكال التخطيط", type: "crossword"}]; // جديد
-            } else if (sub === "الدمويات") {
-                sess = [{n: "الجلسة الأولى: سحب الدمhttp://googleusercontent.com/generated_image_content/0
+            
+            if(sub === "الأحياء 2") sess = [{n: "اختبار كلمات متقاطعة", type: "cw"}];
+            else if(sub === "الكيمياء صيدلية 1") sess = [{n: "كشف الشوارد المجهولة", type: "lab"}];
+            else sess = [{n: "الجلسة الأولى (قريباً)", type: "none"}];
+
+            sess.forEach(s => {
+                const b = document.createElement('div');
+                b.className = 'btn-main';
+                b.innerText = s.n;
+                b.onclick = () => {
+                    if(s.type === "cw") startCrossword();
+                    else if(s.type === "lab") nav('scrLab');
+                    else alert("هذه الجلسة قيد التطوير");
+                };
+                list.appendChild(b);
+            });
+            nav('scrSessions');
+        }
+
+        // --- منطق الكلمات المتقاطعة ---
+        function startCrossword() {
+            renderGrid();
+            nav('scrCrossword');
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = "";
+            // شبكة بسيطة 4x4 توضح الأسئلة المتاحة
+            for(let i=1; i<=4; i++) {
+                const cell = document.createElement('div');
+                cell.className = biologyGame.solved.includes(i) ? "cell solved" : "cell";
+                cell.innerText = i;
+                cell.onclick = () => openQuestion(i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function openQuestion(id) {
+            currentQ = biologyGame.questions.find(q => q.id === id);
+            userEntry = [];
+            document.getElementById('qImg').src = currentQ.img;
+            renderSolveArea();
+            nav('scrSolve');
+        }
+
+        function renderSolveArea() {
+            const slots = document.getElementById('answerSlots');
+            slots.innerHTML = "";
+            for(let i=0; i<currentQ.answer.length; i++) {
+                const s = document.createElement('div');
+                s.className = "slot";
+                s.innerText = userEntry[i] || "";
+                slots.appendChild(s);
+            }
+
+            const bank = document.getElementById('letterBank');
+            bank.innerHTML = "";
+            currentQ.letters.forEach(l => {
+                const k = document.createElement('div');
+                k.className = "key";
+                k.innerText = l;
+                k.onclick = () => addLetter(l);
+                bank.appendChild(k);
+            });
+        }
+
+        function addLetter(l) {
+            if(userEntry.length < currentQ.answer.length) {
+                userEntry.push(l);
+                renderSolveArea();
+                if(userEntry.length === currentQ.answer.length) checkAnswer();
+            }
+        }
+
+        function clearAnswer() {
+            userEntry = [];
+            renderSolveArea();
+        }
+
+        function checkAnswer() {
+            if(userEntry.join('') === currentQ.answer) {
+                alert("إجابة صحيحة! 🎉");
+                biologyGame.solved.push(currentQ.id);
+                startCrossword();
+            } else {
+                alert("إجابة خاطئة، حاول مرة أخرى");
+                clearAnswer();
+            }
+        }
+
+        // --- منطق المختبر البسيط ---
+        function addReagent(r) {
+            document.getElementById('liq').style.height = "60%";
+            document.getElementById('liq').style.background = "#e2e8f0";
+        }
+        function toggleHeat() {
+            document.getElementById('flame').classList.toggle('active');
+        }
+        function checkLabAnswer() {
+            let choice = prompt("ما هو تشخيصك للشاردة؟");
+            if(choice) alert("سيتم تقييم إجابتك من قبل المشرف.");
+        }
+    </script>
+</body>
+</html>
