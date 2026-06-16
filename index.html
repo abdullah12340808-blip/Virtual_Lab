@@ -125,8 +125,10 @@ html, body {
   color: #041526; cursor: pointer; width: 100%; max-width: 320px;
   box-shadow: 0 6px 24px rgba(79,195,247,.38);
   transition: transform .12s, box-shadow .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.btn-main:active { transform: scale(.96); box-shadow: 0 3px 10px rgba(79,195,247,.2); }
+.btn-main.red { background: linear-gradient(135deg, #ef5350, #b71c1c); color: #fff; box-shadow: 0 6px 24px rgba(239,83,80,.38); }
+.btn-main:active { transform: scale(.96); }
 
 /* شاشة الألغاز */
 #sc { background: var(--bg); }
@@ -165,21 +167,21 @@ html, body {
   border: 1px solid var(--border); border-radius: 14px;
 }
 .cell {
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 7px; font-size: 15px; font-weight: 700;
+  border-radius: 7px; font-size: 14px; font-weight: 700;
   position: relative; transition: background .18s;
+  text-transform: uppercase;
 }
 .cell.emp { background: transparent; }
-.cell.ltr { background: rgba(12,26,46,.9); border: 1px solid rgba(79,195,247,.12); }
-.cell.clk { cursor: pointer; }
-.cell.clk:active { background: rgba(79,195,247,.28) !important; }
+.cell.ltr { background: rgba(12,26,46,.9); border: 1px solid rgba(79,195,247,.12); cursor: pointer; }
+.cell.ltr:active { background: rgba(79,195,247,.28); }
 .cell.slv { background: rgba(105,240,174,.13); border-color: rgba(105,240,174,.3); color: var(--green); }
 .cnum { position: absolute; top: 1px; left: 2px; font-size: 8px; color: var(--blue); font-weight: 700; line-height: 1; }
 .cell.slv .cnum { color: var(--green); }
 
 /* شاشة السؤال */
-#sq { background: var(--bg); }
+#sq, #sbl { background: var(--bg); }
 .qc { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
 .qmeta {
   display: flex; align-items: center; gap: 10px;
@@ -199,15 +201,15 @@ html, body {
   display: flex; flex-direction: column; align-items: center;
   gap: 14px; min-height: 130px; justify-content: center;
 }
-.qimg { width: 100%; max-height: 160px; object-fit: contain; border-radius: 12px; display: none; }
-.qtxt { font-size: 17px; font-weight: 600; text-align: center; line-height: 1.75; }
+.qimg { width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; display: none; }
+.qtxt { font-size: 17px; font-weight: 600; text-align: center; line-height: 1.75; direction: rtl;}
 
-.abwrap { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; }
+.abwrap { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; direction: ltr; }
 .ab {
-  width: 44px; height: 52px;
+  width: 40px; height: 48px;
   background: rgba(10,20,38,.9); border: 2px solid var(--border);
   border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 700; transition: all .22s;
+  font-size: 20px; font-weight: 700; transition: all .22s; text-transform: uppercase;
 }
 .ab.f  { background: rgba(79,195,247,.1);   border-color: var(--blue);  color: var(--blue);  }
 .ab.ok { background: rgba(105,240,174,.12); border-color: var(--green); color: var(--green); animation: pop .4s ease; }
@@ -218,27 +220,34 @@ html, body {
 .pool {
   background: rgba(10,20,38,.6); border: 1px solid var(--border);
   border-radius: 20px; padding: 14px;
-  display: flex; flex-wrap: wrap; gap: 9px; justify-content: center;
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; direction: ltr;
 }
 .pb {
-  width: 50px; height: 50px;
+  width: 45px; height: 45px;
   background: linear-gradient(135deg, var(--card), rgba(79,195,247,.07));
   border: 2px solid var(--border); border-radius: 12px;
-  font-family: 'Cairo', sans-serif; font-size: 20px; font-weight: 700;
+  font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700;
   color: var(--text); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: transform .14s, background .14s;
+  transition: transform .14s, background .14s; text-transform: uppercase;
 }
 .pb:active { transform: scale(.87); background: rgba(79,195,247,.24); }
 .pb.used   { opacity: .15; pointer-events: none; }
 .del {
-  width: 50px; height: 50px;
+  width: 45px; height: 45px;
   background: rgba(239,83,80,.07); border: 2px solid rgba(239,83,80,.2);
-  border-radius: 12px; font-size: 20px; color: var(--red); cursor: pointer;
+  border-radius: 12px; font-size: 18px; color: var(--red); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .14s, transform .14s;
 }
 .del:active { background: rgba(239,83,80,.25); transform: scale(.9); }
+
+/* أزرار الزمر الدموية */
+.blood-grid {
+  display: grid; gap: 10px; width: 100%; max-width: 250px; margin: 0 auto;
+}
+.blood-row1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.blood-row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; justify-content: center; }
 
 /* اللوحات */
 .ov {
@@ -254,7 +263,7 @@ html, body {
 .ov-em { font-size: 72px; animation: ob 1s ease-in-out infinite alternate; }
 @keyframes ob { to { transform: translateY(-14px); } }
 .ov-ti { font-size: 25px; font-weight: 900; color: var(--gold); }
-.ov-wd { font-size: 28px; font-weight: 900; color: var(--green); letter-spacing: 5px; direction: rtl; }
+.ov-wd { font-size: 22px; font-weight: 900; color: var(--green); letter-spacing: 3px; text-transform: uppercase; }
 .ov-st { font-size: 34px; letter-spacing: 6px; }
 .ov-sb { font-size: 14px; color: var(--muted); }
 .btn-ov {
@@ -278,7 +287,6 @@ html, body {
 </head>
 <body>
 
-<!-- الشاشة الأولى: الترحيب -->
 <div id="sw" class="sc on">
   <div class="bgc">
     <span style="width:270px;height:270px;top:-70px;right:-55px;background:#ef5350;animation-delay:0s"></span>
@@ -299,32 +307,35 @@ html, body {
       <span class="bdg">📖 اختبر معلوماتك</span>
     </div>
     <button class="btn-main" id="btn-start">
-      🔤&ensp;اختبار الكلمات المتقاطعة لملحق الدمويات
+      🔤&ensp;بدء الألغاز والاختبارات
     </button>
   </div>
 </div>
 
-<!-- الشاشة الثانية: اختيار اللغز -->
 <div id="sc" class="sc hr">
   <div class="hdr">
     <div class="bk" id="bk1">&#8594;</div>
-    <div class="hdr-t">اختر اللغز</div>
+    <div class="hdr-t">اختر التحدي</div>
   </div>
-  <div class="cl" id="catlist"></div>
+  <div class="cl">
+    <div id="catlist"></div>
+    
+    <button class="btn-main red" id="btn-blood" style="margin-top: 10px;">
+      🩸 اختبار زمر الدم
+    </button>
+  </div>
 </div>
 
-<!-- الشاشة الثالثة: الشبكة -->
 <div id="sg" class="sc hr">
   <div class="hdr">
     <div class="bk" id="bk2">&#8594;</div>
     <div class="hdr-t" id="gtitle">اللغز</div>
   </div>
   <div class="pbar"><div class="pfill" id="gprog" style="width:0%"></div></div>
-  <div class="g-hint">اضغط على رقم السؤال لبدء الحل</div>
+  <div class="g-hint">اضغط على أي مربع داخل الكلمة لفتح السؤال</div>
   <div class="gw"><div class="cg" id="cgrid"></div></div>
 </div>
 
-<!-- الشاشة الرابعة: السؤال -->
 <div id="sq" class="sc hr">
   <div class="hdr">
     <div class="bk" id="bk3">&#8594;</div>
@@ -345,7 +356,40 @@ html, body {
   </div>
 </div>
 
-<!-- لوحة النجاح -->
+<div id="sbl" class="sc hr">
+  <div class="hdr">
+    <div class="bk" id="bk4">&#8594;</div>
+    <div class="hdr-t">اختبار الزمر الدموية</div>
+  </div>
+  <div class="qc">
+    <div class="qbox">
+      <img id="bl-img" class="qimg" alt="صورة الزمرة">
+      <div class="qtxt">ما هي الزمرة الدموية؟</div>
+    </div>
+    
+    <div class="abwrap" style="margin: 10px 0;">
+      <div class="ab" id="bl-abo"></div>
+      <div class="ab" id="bl-rh"></div>
+    </div>
+
+    <div class="blood-grid">
+      <div class="blood-row1">
+        <button class="pb bl-btn" data-type="abo" data-val="A">A</button>
+        <button class="pb bl-btn" data-type="abo" data-val="B">B</button>
+        <button class="pb bl-btn" data-type="abo" data-val="AB">AB</button>
+        <button class="pb bl-btn" data-type="abo" data-val="O">O</button>
+      </div>
+      <div class="blood-row2">
+        <button class="pb bl-btn" data-type="rh" data-val="+">+</button>
+        <button class="pb bl-btn" data-type="rh" data-val="-">-</button>
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:5px;">
+        <button class="del" id="bl-del">⌫</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="ovs">
   <div class="ov-em">🎉</div>
   <div class="ov-ti">أحسنت!</div>
@@ -353,176 +397,60 @@ html, body {
   <button class="btn-ov bgr" id="btn-cont">التالي &larr;</button>
 </div>
 
-<!-- لوحة الاكتمال -->
 <div class="ov" id="ovc">
   <div class="ov-em">🏆</div>
   <div class="ov-ti">أنجزت اللغز!</div>
   <div class="ov-st">⭐⭐⭐</div>
-  <div class="ov-sb">حللت جميع الكلمات بنجاح 🎓</div>
-  <button class="btn-ov bbl" id="btn-tocats">العودة للألغاز</button>
+  <div class="ov-sb" id="ovc-sub">حللت جميع الكلمات بنجاح 🎓</div>
+  <button class="btn-ov bbl" id="btn-tocats">العودة</button>
 </div>
 
 
 <script>
 /* ================================================================
-   📚 بيانات اللعبة — عدّل هنا فقط
-   
-   لإضافة سؤال: انسخ هذا الشكل وعدّل القيم:
-   {
-     id: رقم_فريد,
-     answer: "الكلمة",
-     question: "نص السؤال",
-     image: null,          أو: "images/صورة.jpg"
-     row: 0,
-     col: 0,
-     direction: "H"        H = أفقي ، V = عمودي
-   }
+   📚 بيانات اللعبة
 ================================================================ */
 const GAME = {
   puzzles: [
-
-    /* اللغز الأول: لغز عام
-       شبكة 8 أعمدة × 8 صفوف
-       
-       خريطة الشبكة:
-          0   1   2   3   4   5   6   7
-       0: ①د  ②م   .   .   .   .   .   .
-       1:  .   ص   .   .   .   .   .   .
-       2:  .  ③ل   م  ④ف   ا   و   ي   .
-       3:  .   .   .   ص   .   .   .   .
-       4:  .   .  ⑤ج   ل  ⑥ط   ة   .   .
-       5:  .   .   .   .   ح   .   .   .
-       6:  .   .   .   .   ا   .   .   .
-       7:  .   .   .   .   ل   .   .   .
-    */
-    {
-      id: 1,
-      title: "لغز عام",
-      icon: "🔬",
-      description: "مفاهيم أساسية في علم الدمويات",
-      cols: 8, rows: 8,
-      words: [
-        {
-          id: 1,
-          answer: "دم",
-          question: "السائل الأحمر الذي يجري في أوعية الجسم وينقل الأكسجين والمواد الغذائية",
-          image: null,
-          row: 0, col: 0, direction: "H"
-        },
-        {
-          id: 2,
-          answer: "مصل",
-          question: "الجزء السائل من الدم الذي يبقى بعد إزالة الخثرة وخلايا الدم",
-          image: null,
-          row: 0, col: 1, direction: "V"
-        },
-        {
-          id: 3,
-          answer: "لمفاوي",
-          question: "صفة تصف ما يتعلق بجهاز اللمف ووظائف المناعة الخلوية في الجسم",
-          image: null,
-          row: 2, col: 1, direction: "H"
-        },
-        {
-          id: 4,
-          answer: "فصل",
-          question: "عملية تفريق مكونات الدم باستخدام الطرد المركزي",
-          image: null,
-          row: 2, col: 3, direction: "V"
-        },
-        {
-          id: 5,
-          answer: "جلطة",
-          question: "تجمع الدم المتخثر الذي يمكن أن يسد الأوعية الدموية ويعيق تدفق الدم",
-          image: null,
-          row: 4, col: 2, direction: "H"
-        },
-        {
-          id: 6,
-          answer: "طحال",
-          question: "العضو الذي يدمّر كريات الدم الحمراء المتهالكة ويُنتج خلايا المناعة",
-          image: null,
-          row: 4, col: 4, direction: "V"
-        }
-        /* أضف كلمات جديدة للغز الأول هنا */
-      ]
-    },
-
-    /* اللغز الثاني: لغز المصطلحات
-       شبكة 9 أعمدة × 7 صفوف
-       
-       خريطة الشبكة:
-          0   1   2   3   4   5   6   7   8
-       0: ①ه  ②ي   م   .   .   .   .   .   .
-       1: ③و   ر  ④م   .   .   .   .   .   .
-       2:  .   ق   ض   .   .   .   .   .   .
-       3:  .   ا  ⑤ا   ن   س  ⑥د   ا   د   .
-       4:  .   ن   د   .   .   ه   .   .   .
-       5:  .   .   ا   .   .   و   .   .   .
-       6:  .   .   ت   .   .   ن   .   .   .
-    */
     {
       id: 2,
       title: "لغز المصطلحات",
-      icon: "📚",
-      description: "مصطلحات طبية متخصصة في علم الدمويات",
-      cols: 9, rows: 7,
+      icon: "🔬",
+      description: "المصطلحات العلمية في الدمويات",
+      cols: 25, rows: 35,
       words: [
-        {
-          id: 1,
-          answer: "هيم",
-          question: "المجموعة الصباغية المحتوية على الحديد الموجودة في جزيء الهيموغلوبين",
-          image: null,
-          row: 0, col: 0, direction: "H"
-        },
-        {
-          id: 2,
-          answer: "يرقان",
-          question: "اصفرار الجلد والصلبة الناجم عن تراكم البيليروبين في الدم",
-          image: null,
-          row: 0, col: 1, direction: "V"
-        },
-        {
-          id: 3,
-          answer: "ورم",
-          question: "نمو خلوي غير طبيعي يمكن أن يكون حميداً أو خبيثاً",
-          image: null,
-          row: 1, col: 0, direction: "H"
-        },
-        {
-          id: 4,
-          answer: "مضادات",
-          question: "جزيئات بروتينية ينتجها الجهاز المناعي لمقاومة المستضدات والأجسام الغريبة",
-          image: null,
-          row: 1, col: 2, direction: "V"
-        },
-        {
-          id: 5,
-          answer: "انسداد",
-          question: "انغلاق أو احتقان في وعاء دموي قد ينجم عن جلطة أو رواسب دهنية",
-          image: null,
-          row: 3, col: 2, direction: "H"
-        },
-        {
-          id: 6,
-          answer: "دهون",
-          question: "مجموعة مركبات عضوية كحيوية تشمل الدهون الثلاثية والفسفوليبيدات والكوليسترول",
-          image: null,
-          row: 3, col: 5, direction: "V"
-        }
-        /* أضف كلمات جديدة للغز الثاني هنا */
+        { id: 1,  answer: "NEUTROPHILS", question: "إلام تشير الأسهم الزرقاء؟", image: null, row: 17, col: 6, direction: "H" },
+        { id: 2,  answer: "EOSINOPHIL",  question: "إلام يشير السهم الأحمر؟", image: null, row: 17, col: 7, direction: "V" },
+        { id: 3,  answer: "LYMPHOCYTES", question: "إلام تشير الأسهم الصفراء؟", image: null, row: 26, col: 7, direction: "H" },
+        { id: 4,  answer: "SMALLLYMPHOCYTE", question: "ما نوع الكرية البيضاء؟", image: null, row: 12, col: 16, direction: "V" },
+        { id: 5,  answer: "MONOCYTE",    question: "إلام يشير السهم الأسود؟", image: null, row: 13, col: 16, direction: "H" },
+        { id: 6,  answer: "TARGETCELL",  question: "إلام تشير الأسهم السوداء؟", image: null, row: 9, col: 23, direction: "V" },
+        { id: 7,  answer: "ECHINOCYTES", question: "ماذا يوجد ضمن الحلقات السوداء؟", image: null, row: 9, col: 15, direction: "H" },
+        { id: 8,  answer: "PLATELETS",   question: "ماذا يوجد ضمن الحلقة الصفراء؟", image: null, row: 5, col: 15, direction: "V" },
+        { id: 9,  answer: "TEARDROPCELL",question: "ماذا يوجد ضمن الحلقات السوداء؟", image: null, row: 5, col: 8, direction: "H" },
+        { id: 10, answer: "LARGELYMPHOCYTE", question: "ما نوع الكرية البيضاء؟", image: null, row: 1, col: 8, direction: "V" },
+        { id: 11, answer: "BASOPHIL",    question: "ما نوع الكرية البيضاء؟", image: null, row: 1, col: 1, direction: "H" },
+        // الكلمات المكررة أو المنفصلة
+        { id: 12, answer: "EOSINOPHIL",  question: "ما نوع الكرية البيضاء؟", image: null, row: 29, col: 1, direction: "H" },
+        { id: 13, answer: "MONOCYTE",    question: "ما نوع الكريات البيضاء؟", image: null, row: 31, col: 1, direction: "H" },
+        // الكلمات العربية
+        { id: 14, answer: "الشبكيات",    question: "ما الذي يظهر هنا بعد التلوين فوق الحيوي؟", image: null, row: 34, col: 1, direction: "H" },
+        { id: 15, answer: "منجلية",      question: "ما نوع الكرية الموجودة داخل الحلقات السوداء؟", image: null, row: 30, col: 6, direction: "V" }
       ]
     }
-
-    /* أضف لغزاً جديداً هنا بنفس الشكل */
   ]
 };
-/* ================================================================
-   (نهاية منطقة البيانات)
-================================================================ */
 
+// اختبارات زمر الدم
+const BLOOD_TESTS = [
+  { image: null, abo: 'A', rh: '+' },
+  { image: null, abo: 'B', rh: '+' },
+  { image: null, abo: 'AB', rh: '+' },
+  { image: null, abo: 'O', rh: '+' }
+];
 
-/* الحالة الداخلية */
+/* ================================================================ */
+
 let CUR  = 'sw';
 let PZI  = 0;
 let WI   = 0;
@@ -577,22 +505,23 @@ function buildCats() {
 function buildGrid(pz) {
   $('gtitle').textContent = pz.title;
   const el = $('cgrid');
-  el.style.gridTemplateColumns = `repeat(${pz.cols},36px)`;
-  el.style.gridTemplateRows    = `repeat(${pz.rows},36px)`;
+  el.style.gridTemplateColumns = `repeat(${pz.cols},34px)`;
+  el.style.gridTemplateRows    = `repeat(${pz.rows},34px)`;
   el.innerHTML = '';
 
   const G = Array.from({length: pz.rows}, () =>
-    Array.from({length: pz.cols}, () => ({ l: null, wids: [], num: null, wi: null }))
+    Array.from({length: pz.cols}, () => ({ l: null, wids: [], num: null }))
   );
 
   pz.words.forEach((w, wi) => {
-    [...w.answer].forEach((ltr, i) => {
+    const ans = [...w.answer];
+    ans.forEach((ltr, i) => {
       const r = w.direction === 'H' ? w.row     : w.row + i;
       const c = w.direction === 'H' ? w.col + i : w.col;
-      if (r < pz.rows && c < pz.cols) {
+      if (r >= 0 && r < pz.rows && c >= 0 && c < pz.cols) {
         G[r][c].l = ltr;
-        G[r][c].wids.push(w.id);
-        if (i === 0) { G[r][c].num = w.id; G[r][c].wi = wi; }
+        G[r][c].wids.push(wi);
+        if (i === 0) { G[r][c].num = w.id; }
       }
     });
   });
@@ -604,16 +533,28 @@ function buildGrid(pz) {
       if (!cell.l) {
         div.className = 'cell emp';
       } else {
-        const slv = cell.wids.some(wid => SOL[`${pz.id}-${wid}`]);
-        div.className = 'cell ltr' + (slv ? ' slv' : '');
-        if (slv) div.textContent = cell.l;
+        // التحقق إن كانت كل الكلمات المتقاطعة هنا محلولة
+        const allSlv = cell.wids.every(wi => SOL[`${pz.id}-${pz.words[wi].id}`]);
+        div.className = 'cell ltr' + (allSlv ? ' slv' : '');
+        if (allSlv) div.textContent = cell.l;
+        
+        // ميزة سلاسة الدخول: أي مربع في الكلمة يفتح السؤال الخاص بها
+        div.dataset.wis = JSON.stringify(cell.wids);
+        div.addEventListener('click', function() {
+            const wids = JSON.parse(this.dataset.wis);
+            // إذا كان المربع يتقاطع فيه كلمتان، ابحث عن الغير محلولة أولاً
+            let targetWi = wids[0];
+            if (wids.length > 1) {
+                const unslv = wids.find(idx => !SOL[`${pz.id}-${pz.words[idx].id}`]);
+                if (unslv !== undefined) targetWi = unslv;
+            }
+            openQ(targetWi);
+        });
+
         if (cell.num !== null) {
-          div.classList.add('clk');
           const s = document.createElement('span');
           s.className = 'cnum'; s.textContent = cell.num;
           div.appendChild(s);
-          const wi = cell.wi;
-          div.addEventListener('click', () => openQ(wi));
         }
       }
       el.appendChild(div);
@@ -623,6 +564,13 @@ function buildGrid(pz) {
   const total = pz.words.length;
   const done  = pz.words.filter(w => SOL[`${pz.id}-${w.id}`]).length;
   $('gprog').style.width = (done / total * 100) + '%';
+  
+  // تمرير الشاشة للوسط لضمان ظهور الشبكة
+  setTimeout(() => {
+    const gw = document.querySelector('.gw');
+    gw.scrollLeft = (gw.scrollWidth - gw.clientWidth) / 2;
+    gw.scrollTop = (gw.scrollHeight - gw.clientHeight) / 2;
+  }, 100);
 }
 
 /* فتح السؤال */
@@ -658,12 +606,16 @@ function buildBoxes(n) {
   }
 }
 
-/* مجموعة الحروف */
+/* مجموعة الحروف (تدعم إنجليزي وعربي) */
 function buildPool(answer) {
-  const ARABIC = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويأإآةى'.split('');
-  const ans    = [...answer];
+  const isEn = /[a-zA-Z]/.test(answer);
+  const ALPHABET = isEn 
+    ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('') 
+    : 'ابتثجحخدذرزسشصضطظعغفقكلمنهويأإآةى'.split('');
+    
+  const ans    = [...answer.toUpperCase()];
   const usedSet = new Set(ans);
-  const avail  = shuffle(ARABIC.filter(l => !usedSet.has(l)));
+  const avail  = shuffle(ALPHABET.filter(l => !usedSet.has(l)));
   const extra  = Math.min(8, Math.max(4, ans.length));
   POOL = shuffle([...ans, ...avail.slice(0, extra)]);
 
@@ -703,7 +655,7 @@ function rmLast() {
 function checkAnswer() {
   const pz    = GAME.puzzles[PZI], w = pz.words[WI];
   const typed = INP.map(x => x.l).join('');
-  const ok    = typed === w.answer;
+  const ok    = typed.toUpperCase() === w.answer.toUpperCase();
 
   [...w.answer].forEach((_, i) => $(`ab${i}`).classList.add(ok ? 'ok' : 'no'));
 
@@ -725,12 +677,94 @@ function checkAnswer() {
   }
 }
 
-/* أحداث اللوحات */
+/* ================================================================
+   🩸 منطق اختبار زمر الدم
+================================================================ */
+let bl_idx = 0;
+let bl_ans = { abo: '', rh: '' };
+let inBloodMode = false;
+
+$('btn-blood').addEventListener('click', () => {
+  bl_idx = 0;
+  inBloodMode = true;
+  loadBloodTest();
+  forward('sbl');
+});
+
+function loadBloodTest() {
+  const t = BLOOD_TESTS[bl_idx];
+  const img = $('bl-img');
+  if (t.image) {
+    img.src = t.image; img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+  bl_ans = { abo: '', rh: '' };
+  updateBlUI();
+}
+
+function updateBlUI() {
+  $('bl-abo').textContent = bl_ans.abo;
+  $('bl-rh').textContent = bl_ans.rh;
+  
+  if (bl_ans.abo && bl_ans.rh) {
+    checkBlood();
+  }
+}
+
+document.querySelectorAll('.bl-btn').forEach(b => {
+  b.addEventListener('click', (e) => {
+    const type = e.target.dataset.type;
+    const val = e.target.dataset.val;
+    bl_ans[type] = val;
+    updateBlUI();
+  });
+});
+
+$('bl-del').addEventListener('click', () => {
+  if (bl_ans.rh) bl_ans.rh = '';
+  else if (bl_ans.abo) bl_ans.abo = '';
+  updateBlUI();
+});
+
+function checkBlood() {
+  const t = BLOOD_TESTS[bl_idx];
+  const isOk = (bl_ans.abo === t.abo && bl_ans.rh === t.rh);
+  
+  if (isOk) {
+    $('bl-abo').classList.add('ok'); $('bl-rh').classList.add('ok');
+    launchConfetti();
+    setTimeout(() => {
+      $('bl-abo').classList.remove('ok'); $('bl-rh').classList.remove('ok');
+      bl_idx++;
+      if (bl_idx >= BLOOD_TESTS.length) {
+        $('ov-wd').textContent = "زمر الدم";
+        $('ovc-sub').textContent = "نجحت في تشخيص جميع الزمر 🩸";
+        $('ovc').classList.add('vis');
+      } else {
+        loadBloodTest();
+      }
+    }, 1000);
+  } else {
+    $('bl-abo').classList.add('no'); $('bl-rh').classList.add('no');
+    setTimeout(() => {
+      $('bl-abo').classList.remove('no'); $('bl-rh').classList.remove('no');
+      bl_ans = { abo: '', rh: '' };
+      updateBlUI();
+    }, 600);
+  }
+}
+
+
+/* ================================================================
+   أحداث اللوحات
+================================================================ */
 $('btn-cont').addEventListener('click', () => {
   $('ovs').classList.remove('vis');
   const pz    = GAME.puzzles[PZI];
   const allOk = pz.words.every(w => SOL[`${pz.id}-${w.id}`]);
   if (allOk) {
+    $('ovc-sub').textContent = "حللت جميع الكلمات بنجاح 🎓";
     setTimeout(() => $('ovc').classList.add('vis'), 200);
   } else {
     backward('sg');
@@ -741,7 +775,9 @@ $('btn-tocats').addEventListener('click', () => {
   $('ovc').classList.remove('vis');
   $(CUR).classList.replace('on', 'hr');
   const el = $('sc'); el.classList.remove('hl', 'hr'); el.classList.add('on');
-  CUR = 'sc'; buildCats();
+  CUR = 'sc'; 
+  inBloodMode = false;
+  buildCats();
 });
 
 /* كونفيتي */
@@ -772,11 +808,12 @@ function shuffle(a) {
   return a;
 }
 
-/* الأزرار */
+/* الأزرار الأساسية */
 $('btn-start').addEventListener('click', () => forward('sc'));
 $('bk1').addEventListener('click', () => backward('sw'));
 $('bk2').addEventListener('click', () => backward('sc'));
 $('bk3').addEventListener('click', () => backward('sg'));
+$('bk4').addEventListener('click', () => { inBloodMode = false; backward('sc'); });
 
 /* التهيئة */
 (function init() {
