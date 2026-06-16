@@ -1,240 +1,794 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الكلمات المتقاطعة - الدمويات</title>
-    <style>
-        /* =========================================
-           التصميم والرسوميات (CSS)
-           ========================================= */
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>كلمات متقاطعة | الدمويات</title>
 
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            overflow: hidden;
-        }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 
-        /* إدارة الواجهات وانتقالاتها */
-        .screen {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            position: absolute;
-        }
-        .hidden {
-            opacity: 0;
-            transform: scale(0.9);
-            pointer-events: none;
-            z-index: -1;
-        }
-        .active {
-            opacity: 1;
-            transform: scale(1);
-            z-index: 1;
-        }
+<style>
+:root {
+  --bg:     #07101f;
+  --bg2:    #0c1a2e;
+  --card:   #0f2137;
+  --blue:   #4fc3f7;
+  --red:    #ef5350;
+  --gold:   #ffd54f;
+  --green:  #69f0ae;
+  --text:   #eceff1;
+  --muted:  #78909c;
+  --border: rgba(79,195,247,.2);
+}
 
-        /* الأزرار */
-        button {
-            font-family: 'Tajawal', sans-serif;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px 20px;
-            margin: 10px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: transform 0.2s, background 0.2s;
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        .main-btn { background-color: #ff9800; color: white; width: 90%; }
-        .cat-btn { background-color: #4CAF50; color: white; width: 80%; }
-        .back-btn { background-color: #f44336; color: white; font-size: 14px; padding: 10px; margin-top: 20px; width: 50%;}
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg); color: var(--text);
+  touch-action: manipulation;
+}
 
-        /* واجهة السؤال */
-        .question-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-        .question-box img {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
+.sc {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  transition: transform .38s cubic-bezier(.25,.46,.45,.94), opacity .3s ease;
+  will-change: transform; overflow: hidden;
+}
+.sc.hr { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.sc.hl { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+.sc.on { transform: translateX(0); opacity: 1; }
 
-        /* خانات الأحرف */
-        .slots-container {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            flex-direction: row-reverse; /* لترتيب الأحرف من اليمين لليسار */
-        }
-        .letter-slot {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            background: white;
-            color: #1e3c72;
-            margin: 5px;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-        }
+.hdr {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  background: rgba(7,16,31,.9);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; z-index: 10;
+}
+.hdr-t { font-size: 18px; font-weight: 700; flex: 1; }
+.bk {
+  width: 38px; height: 38px;
+  background: rgba(79,195,247,.1); border: 1px solid var(--border);
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--blue); font-size: 20px;
+  transition: background .15s; flex-shrink: 0;
+}
+.bk:active { background: rgba(79,195,247,.3); }
 
-        /* الحروف العشوائية */
-        .letters-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .pool-letter {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            background: #ff9800;
-            color: white;
-            margin: 5px;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-        }
-    </style>
+.pbar { height: 3px; background: rgba(79,195,247,.08); flex-shrink: 0; }
+.pfill { height: 100%; background: var(--blue); transition: width .45s ease; }
+
+/* شاشة الترحيب */
+#sw {
+  background: radial-gradient(ellipse at 20% 10%, #0d253f 0%, var(--bg) 70%);
+  align-items: center; justify-content: center;
+  padding: 28px; position: relative; overflow: hidden;
+}
+.bgc { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.bgc span {
+  position: absolute; border-radius: 50%; opacity: .06;
+  animation: drift 9s infinite ease-in-out alternate;
+}
+@keyframes drift { to { transform: translate(15px,-12px) scale(1.07); } }
+
+.wi {
+  z-index: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 22px; text-align: center;
+  max-width: 340px; width: 100%;
+}
+.lg-wrap { position: relative; }
+.lg {
+  width: 94px; height: 94px;
+  background: linear-gradient(135deg, #b71c1c, #ef5350);
+  border-radius: 50%; font-size: 48px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 40px rgba(239,83,80,.45);
+  animation: glow 3s ease-in-out infinite;
+}
+@keyframes glow { 50% { box-shadow: 0 0 70px rgba(239,83,80,.75), 0 0 18px rgba(239,83,80,.3); } }
+.ring {
+  position: absolute; inset: -10px; border-radius: 50%;
+  border: 2px dashed rgba(239,83,80,.3);
+  animation: spin 14s linear infinite;
+}
+.ring::before {
+  content: '💊'; position: absolute;
+  top: -10px; left: 50%; transform: translateX(-50%);
+  font-size: 13px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.wt {
+  font-size: 26px; font-weight: 900; line-height: 1.3;
+  background: linear-gradient(120deg, #e3f2fd, var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.ws { font-size: 13px; color: var(--muted); margin-top: -14px; }
+
+.badges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.bdg {
+  padding: 6px 14px;
+  background: rgba(79,195,247,.07); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 12px; color: var(--blue);
+}
+.btn-main {
+  background: linear-gradient(135deg, var(--blue), #0288d1);
+  border: none; border-radius: 18px; padding: 17px 32px;
+  font-family: 'Cairo', sans-serif; font-size: 17px; font-weight: 700;
+  color: #041526; cursor: pointer; width: 100%; max-width: 320px;
+  box-shadow: 0 6px 24px rgba(79,195,247,.38);
+  transition: transform .12s, box-shadow .12s;
+}
+.btn-main:active { transform: scale(.96); box-shadow: 0 3px 10px rgba(79,195,247,.2); }
+
+/* شاشة الألغاز */
+#sc { background: var(--bg); }
+.cl { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.cc {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 18px 18px 18px 20px;
+  cursor: pointer; display: flex; align-items: center; gap: 16px;
+  position: relative; overflow: hidden;
+  transition: transform .18s, background .18s;
+}
+.cc::before {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--blue), var(--red));
+}
+.cc.done::before { background: linear-gradient(180deg, var(--green), #00695c); }
+.cc:active { transform: scale(.97); background: rgba(79,195,247,.05); }
+.c-ic { font-size: 44px; flex-shrink: 0; }
+.c-inf { flex: 1; min-width: 0; }
+.c-t { font-size: 19px; font-weight: 700; }
+.c-d { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.c-s { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.cs { font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.cs-b { background: rgba(79,195,247,.09); border: 1px solid rgba(79,195,247,.2); color: var(--blue); }
+.cs-g { background: rgba(105,240,174,.09); border: 1px solid rgba(105,240,174,.2); color: var(--green); }
+.cs-y { background: rgba(255,213,79,.09); border: 1px solid rgba(255,213,79,.2); color: var(--gold); }
+
+/* شاشة الشبكة */
+#sg { background: var(--bg); }
+.g-hint { text-align: center; padding: 9px 16px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+.gw { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 12px; }
+.cg {
+  display: grid; gap: 2px; padding: 10px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border); border-radius: 14px;
+}
+.cell {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 7px; font-size: 15px; font-weight: 700;
+  position: relative; transition: background .18s;
+}
+.cell.emp { background: transparent; }
+.cell.ltr { background: rgba(12,26,46,.9); border: 1px solid rgba(79,195,247,.12); }
+.cell.clk { cursor: pointer; }
+.cell.clk:active { background: rgba(79,195,247,.28) !important; }
+.cell.slv { background: rgba(105,240,174,.13); border-color: rgba(105,240,174,.3); color: var(--green); }
+.cnum { position: absolute; top: 1px; left: 2px; font-size: 8px; color: var(--blue); font-weight: 700; line-height: 1; }
+.cell.slv .cnum { color: var(--green); }
+
+/* شاشة السؤال */
+#sq { background: var(--bg); }
+.qc { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.qmeta {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--muted);
+  padding: 8px 14px;
+  background: rgba(79,195,247,.04);
+  border: 1px solid var(--border); border-radius: 12px;
+}
+.qdir {
+  padding: 4px 12px;
+  background: rgba(79,195,247,.12); border-radius: 20px;
+  color: var(--blue); font-size: 12px; font-weight: 600;
+}
+.qbox {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 20px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; min-height: 130px; justify-content: center;
+}
+.qimg { width: 100%; max-height: 160px; object-fit: contain; border-radius: 12px; display: none; }
+.qtxt { font-size: 17px; font-weight: 600; text-align: center; line-height: 1.75; }
+
+.abwrap { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; }
+.ab {
+  width: 44px; height: 52px;
+  background: rgba(10,20,38,.9); border: 2px solid var(--border);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; transition: all .22s;
+}
+.ab.f  { background: rgba(79,195,247,.1);   border-color: var(--blue);  color: var(--blue);  }
+.ab.ok { background: rgba(105,240,174,.12); border-color: var(--green); color: var(--green); animation: pop .4s ease; }
+.ab.no { animation: shk .4s ease; border-color: var(--red); }
+@keyframes pop { 0%{transform:scale(.65)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+@keyframes shk { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+.pool {
+  background: rgba(10,20,38,.6); border: 1px solid var(--border);
+  border-radius: 20px; padding: 14px;
+  display: flex; flex-wrap: wrap; gap: 9px; justify-content: center;
+}
+.pb {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--card), rgba(79,195,247,.07));
+  border: 2px solid var(--border); border-radius: 12px;
+  font-family: 'Cairo', sans-serif; font-size: 20px; font-weight: 700;
+  color: var(--text); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .14s, background .14s;
+}
+.pb:active { transform: scale(.87); background: rgba(79,195,247,.24); }
+.pb.used   { opacity: .15; pointer-events: none; }
+.del {
+  width: 50px; height: 50px;
+  background: rgba(239,83,80,.07); border: 2px solid rgba(239,83,80,.2);
+  border-radius: 12px; font-size: 20px; color: var(--red); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .14s, transform .14s;
+}
+.del:active { background: rgba(239,83,80,.25); transform: scale(.9); }
+
+/* اللوحات */
+.ov {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; z-index: 500; padding: 28px; text-align: center;
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.ov.vis { opacity: 1; pointer-events: all; }
+#ovs { background: rgba(0,0,0,.93); backdrop-filter: blur(10px); }
+#ovc { background: linear-gradient(155deg, #060f1c 0%, #061506 100%); }
+.ov-em { font-size: 72px; animation: ob 1s ease-in-out infinite alternate; }
+@keyframes ob { to { transform: translateY(-14px); } }
+.ov-ti { font-size: 25px; font-weight: 900; color: var(--gold); }
+.ov-wd { font-size: 28px; font-weight: 900; color: var(--green); letter-spacing: 5px; direction: rtl; }
+.ov-st { font-size: 34px; letter-spacing: 6px; }
+.ov-sb { font-size: 14px; color: var(--muted); }
+.btn-ov {
+  border: none; border-radius: 16px; padding: 14px 38px;
+  font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: transform .12s;
+}
+.btn-ov:active { transform: scale(.95); }
+.bgr { background: linear-gradient(135deg, var(--green), #00695c); color: #040f06; }
+.bbl { background: linear-gradient(135deg, var(--blue), #0288d1); color: #04152a; }
+
+.cf {
+  position: fixed; pointer-events: none; z-index: 600;
+  border-radius: 2px; animation: cf-fall 2s ease-out forwards;
+}
+@keyframes cf-fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(79,195,247,.18); border-radius: 4px; }
+</style>
 </head>
 <body>
 
-    <div id="screen-start" class="screen active">
-        <h1>مرحباً بك في المختبر</h1>
-        <button onclick="goToScreen('screen-categories')" class="main-btn">
-            اختبار الكلمات المتقاطعة لملحق الدمويات
-        </button>
+<!-- الشاشة الأولى: الترحيب -->
+<div id="sw" class="sc on">
+  <div class="bgc">
+    <span style="width:270px;height:270px;top:-70px;right:-55px;background:#ef5350;animation-delay:0s"></span>
+    <span style="width:210px;height:210px;bottom:-55px;left:-45px;background:#4fc3f7;animation-delay:3.5s;animation-duration:12s"></span>
+    <span style="width:155px;height:155px;top:38%;right:30%;background:#ffc107;animation-delay:7s;animation-duration:10s"></span>
+  </div>
+  <div class="wi">
+    <div class="lg-wrap">
+      <div class="lg">🩸</div>
+      <div class="ring"></div>
     </div>
-
-    <div id="screen-categories" class="screen hidden">
-        <h2>اختر نوع اللغز</h2>
-        <button onclick="startPuzzle('لغز عام')" class="cat-btn">1- لغز عام</button>
-        <button onclick="startPuzzle('لغز المصطلحات')" class="cat-btn">2- لغز المصطلحات</button>
-        <button onclick="goToScreen('screen-start')" class="back-btn">عودة للبداية</button>
+    <div>
+      <div class="wt">ملحق الدمويات</div>
+      <div class="ws">كلية الصيدلة&nbsp;·&nbsp;السنة الثالثة&nbsp;·&nbsp;الفصل الثاني</div>
     </div>
+    <div class="badges">
+      <span class="bdg">🏥 Hematology</span>
+      <span class="bdg">📖 اختبر معلوماتك</span>
+    </div>
+    <button class="btn-main" id="btn-start">
+      🔤&ensp;اختبار الكلمات المتقاطعة لملحق الدمويات
+    </button>
+  </div>
+</div>
 
-    <div id="screen-question" class="screen hidden">
-        <div class="question-box">
-            <img id="q-image" src="" alt="صورة توضيحية" style="display:none;">
-            <p id="q-text">نص السؤال سيظهر هنا</p>
+<!-- الشاشة الثانية: اختيار اللغز -->
+<div id="sc" class="sc hr">
+  <div class="hdr">
+    <div class="bk" id="bk1">&#8594;</div>
+    <div class="hdr-t">اختر اللغز</div>
+  </div>
+  <div class="cl" id="catlist"></div>
+</div>
+
+<!-- الشاشة الثالثة: الشبكة -->
+<div id="sg" class="sc hr">
+  <div class="hdr">
+    <div class="bk" id="bk2">&#8594;</div>
+    <div class="hdr-t" id="gtitle">اللغز</div>
+  </div>
+  <div class="pbar"><div class="pfill" id="gprog" style="width:0%"></div></div>
+  <div class="g-hint">اضغط على رقم السؤال لبدء الحل</div>
+  <div class="gw"><div class="cg" id="cgrid"></div></div>
+</div>
+
+<!-- الشاشة الرابعة: السؤال -->
+<div id="sq" class="sc hr">
+  <div class="hdr">
+    <div class="bk" id="bk3">&#8594;</div>
+    <div class="hdr-t" id="qtitle">السؤال</div>
+  </div>
+  <div class="qc">
+    <div class="qmeta">
+      <span class="qdir" id="qdir">أفقي</span>
+      <span>•</span>
+      <span id="qnum">سؤال 1</span>
+    </div>
+    <div class="qbox">
+      <img id="qimg" class="qimg" alt="صورة السؤال">
+      <div id="qtext" class="qtxt"></div>
+    </div>
+    <div id="abwrap" class="abwrap"></div>
+    <div id="pool" class="pool"></div>
+  </div>
+</div>
+
+<!-- لوحة النجاح -->
+<div class="ov" id="ovs">
+  <div class="ov-em">🎉</div>
+  <div class="ov-ti">أحسنت!</div>
+  <div class="ov-wd" id="ov-wd"></div>
+  <button class="btn-ov bgr" id="btn-cont">التالي &larr;</button>
+</div>
+
+<!-- لوحة الاكتمال -->
+<div class="ov" id="ovc">
+  <div class="ov-em">🏆</div>
+  <div class="ov-ti">أنجزت اللغز!</div>
+  <div class="ov-st">⭐⭐⭐</div>
+  <div class="ov-sb">حللت جميع الكلمات بنجاح 🎓</div>
+  <button class="btn-ov bbl" id="btn-tocats">العودة للألغاز</button>
+</div>
+
+
+<script>
+/* ================================================================
+   📚 بيانات اللعبة — عدّل هنا فقط
+   
+   لإضافة سؤال: انسخ هذا الشكل وعدّل القيم:
+   {
+     id: رقم_فريد,
+     answer: "الكلمة",
+     question: "نص السؤال",
+     image: null,          أو: "images/صورة.jpg"
+     row: 0,
+     col: 0,
+     direction: "H"        H = أفقي ، V = عمودي
+   }
+================================================================ */
+const GAME = {
+  puzzles: [
+
+    /* اللغز الأول: لغز عام
+       شبكة 8 أعمدة × 8 صفوف
+       
+       خريطة الشبكة:
+          0   1   2   3   4   5   6   7
+       0: ①د  ②م   .   .   .   .   .   .
+       1:  .   ص   .   .   .   .   .   .
+       2:  .  ③ل   م  ④ف   ا   و   ي   .
+       3:  .   .   .   ص   .   .   .   .
+       4:  .   .  ⑤ج   ل  ⑥ط   ة   .   .
+       5:  .   .   .   .   ح   .   .   .
+       6:  .   .   .   .   ا   .   .   .
+       7:  .   .   .   .   ل   .   .   .
+    */
+    {
+      id: 1,
+      title: "لغز عام",
+      icon: "🔬",
+      description: "مفاهيم أساسية في علم الدمويات",
+      cols: 8, rows: 8,
+      words: [
+        {
+          id: 1,
+          answer: "دم",
+          question: "السائل الأحمر الذي يجري في أوعية الجسم وينقل الأكسجين والمواد الغذائية",
+          image: null,
+          row: 0, col: 0, direction: "H"
+        },
+        {
+          id: 2,
+          answer: "مصل",
+          question: "الجزء السائل من الدم الذي يبقى بعد إزالة الخثرة وخلايا الدم",
+          image: null,
+          row: 0, col: 1, direction: "V"
+        },
+        {
+          id: 3,
+          answer: "لمفاوي",
+          question: "صفة تصف ما يتعلق بجهاز اللمف ووظائف المناعة الخلوية في الجسم",
+          image: null,
+          row: 2, col: 1, direction: "H"
+        },
+        {
+          id: 4,
+          answer: "فصل",
+          question: "عملية تفريق مكونات الدم باستخدام الطرد المركزي",
+          image: null,
+          row: 2, col: 3, direction: "V"
+        },
+        {
+          id: 5,
+          answer: "جلطة",
+          question: "تجمع الدم المتخثر الذي يمكن أن يسد الأوعية الدموية ويعيق تدفق الدم",
+          image: null,
+          row: 4, col: 2, direction: "H"
+        },
+        {
+          id: 6,
+          answer: "طحال",
+          question: "العضو الذي يدمّر كريات الدم الحمراء المتهالكة ويُنتج خلايا المناعة",
+          image: null,
+          row: 4, col: 4, direction: "V"
+        }
+        /* أضف كلمات جديدة للغز الأول هنا */
+      ]
+    },
+
+    /* اللغز الثاني: لغز المصطلحات
+       شبكة 9 أعمدة × 7 صفوف
+       
+       خريطة الشبكة:
+          0   1   2   3   4   5   6   7   8
+       0: ①ه  ②ي   م   .   .   .   .   .   .
+       1: ③و   ر  ④م   .   .   .   .   .   .
+       2:  .   ق   ض   .   .   .   .   .   .
+       3:  .   ا  ⑤ا   ن   س  ⑥د   ا   د   .
+       4:  .   ن   د   .   .   ه   .   .   .
+       5:  .   .   ا   .   .   و   .   .   .
+       6:  .   .   ت   .   .   ن   .   .   .
+    */
+    {
+      id: 2,
+      title: "لغز المصطلحات",
+      icon: "📚",
+      description: "مصطلحات طبية متخصصة في علم الدمويات",
+      cols: 9, rows: 7,
+      words: [
+        {
+          id: 1,
+          answer: "هيم",
+          question: "المجموعة الصباغية المحتوية على الحديد الموجودة في جزيء الهيموغلوبين",
+          image: null,
+          row: 0, col: 0, direction: "H"
+        },
+        {
+          id: 2,
+          answer: "يرقان",
+          question: "اصفرار الجلد والصلبة الناجم عن تراكم البيليروبين في الدم",
+          image: null,
+          row: 0, col: 1, direction: "V"
+        },
+        {
+          id: 3,
+          answer: "ورم",
+          question: "نمو خلوي غير طبيعي يمكن أن يكون حميداً أو خبيثاً",
+          image: null,
+          row: 1, col: 0, direction: "H"
+        },
+        {
+          id: 4,
+          answer: "مضادات",
+          question: "جزيئات بروتينية ينتجها الجهاز المناعي لمقاومة المستضدات والأجسام الغريبة",
+          image: null,
+          row: 1, col: 2, direction: "V"
+        },
+        {
+          id: 5,
+          answer: "انسداد",
+          question: "انغلاق أو احتقان في وعاء دموي قد ينجم عن جلطة أو رواسب دهنية",
+          image: null,
+          row: 3, col: 2, direction: "H"
+        },
+        {
+          id: 6,
+          answer: "دهون",
+          question: "مجموعة مركبات عضوية كحيوية تشمل الدهون الثلاثية والفسفوليبيدات والكوليسترول",
+          image: null,
+          row: 3, col: 5, direction: "V"
+        }
+        /* أضف كلمات جديدة للغز الثاني هنا */
+      ]
+    }
+
+    /* أضف لغزاً جديداً هنا بنفس الشكل */
+  ]
+};
+/* ================================================================
+   (نهاية منطقة البيانات)
+================================================================ */
+
+
+/* الحالة الداخلية */
+let CUR  = 'sw';
+let PZI  = 0;
+let WI   = 0;
+let INP  = [];
+let POOL = [];
+const SOL = {};
+
+/* التنقل */
+function $ (id) { return document.getElementById(id); }
+
+function forward(id) {
+  $(CUR).classList.replace('on','hl');
+  const nx = $(id); nx.classList.remove('hr','hl'); nx.classList.add('on');
+  CUR = id; onEnter(id);
+}
+function backward(id) {
+  $(CUR).classList.replace('on','hr');
+  const pv = $(id); pv.classList.remove('hl','hr'); pv.classList.add('on');
+  CUR = id; onEnter(id);
+}
+function onEnter(id) {
+  if (id === 'sc') buildCats();
+  if (id === 'sg') buildGrid(GAME.puzzles[PZI]);
+}
+
+/* شاشة الألغاز */
+function buildCats() {
+  const el = $('catlist'); el.innerHTML = '';
+  GAME.puzzles.forEach((pz, idx) => {
+    const total = pz.words.length;
+    const done  = pz.words.filter(w => SOL[`${pz.id}-${w.id}`]).length;
+    const all   = done === total;
+    const d = document.createElement('div');
+    d.className = 'cc' + (all ? ' done' : '');
+    d.innerHTML = `
+      <div class="c-ic">${pz.icon}</div>
+      <div class="c-inf">
+        <div class="c-t">${pz.title}</div>
+        <div class="c-d">${pz.description}</div>
+        <div class="c-s">
+          <span class="cs cs-b">📝 ${total} كلمة</span>
+          <span class="cs cs-g">✅ ${done} محلولة</span>
+          ${all ? '<span class="cs cs-y">🏆 مكتمل</span>' : ''}
         </div>
-        
-        <div id="answer-slots" class="slots-container"></div>
-        
-        <div id="letters-pool" class="letters-container"></div>
+      </div>`;
+    d.addEventListener('click', () => { PZI = idx; forward('sg'); });
+    el.appendChild(d);
+  });
+}
 
-        <button onclick="goToScreen('screen-categories')" class="back-btn">عودة للألغاز</button>
-    </div>
+/* بناء الشبكة */
+function buildGrid(pz) {
+  $('gtitle').textContent = pz.title;
+  const el = $('cgrid');
+  el.style.gridTemplateColumns = `repeat(${pz.cols},36px)`;
+  el.style.gridTemplateRows    = `repeat(${pz.rows},36px)`;
+  el.innerHTML = '';
 
-    <script>
-        // 1. البيانات (الأسئلة): يمكنك إضافة الأسئلة هنا بسهولة مستقبلاً
-        const questionsData = {
-            "لغز المصطلحات": [
-                {
-                    question: "بروتين غني بالحديد يتواجد في كريات الدم الحمراء ومسؤول عن نقل الأكسجين",
-                    answer: "هيموغلوبين",
-                    image: "" // ضع مسار الصورة هنا مثل "images/blood.png" إذا أردت
-                }
-            ],
-            "لغز عام": [
-                {
-                    question: "ما هو السائل الذي يسبح فيه الدم؟",
-                    answer: "بلازما",
-                    image: ""
-                }
-            ]
-        };
+  const G = Array.from({length: pz.rows}, () =>
+    Array.from({length: pz.cols}, () => ({ l: null, wids: [], num: null, wi: null }))
+  );
 
-        // 2. دالة الانتقال بين الشاشات
-        function goToScreen(screenId) {
-            // إخفاء كل الشاشات
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-                screen.classList.add('hidden');
-            });
-            // إظهار الشاشة المطلوبة
-            const targetScreen = document.getElementById(screenId);
-            targetScreen.classList.remove('hidden');
-            targetScreen.classList.add('active');
+  pz.words.forEach((w, wi) => {
+    [...w.answer].forEach((ltr, i) => {
+      const r = w.direction === 'H' ? w.row     : w.row + i;
+      const c = w.direction === 'H' ? w.col + i : w.col;
+      if (r < pz.rows && c < pz.cols) {
+        G[r][c].l = ltr;
+        G[r][c].wids.push(w.id);
+        if (i === 0) { G[r][c].num = w.id; G[r][c].wi = wi; }
+      }
+    });
+  });
+
+  for (let r = 0; r < pz.rows; r++) {
+    for (let c = 0; c < pz.cols; c++) {
+      const cell = G[r][c];
+      const div  = document.createElement('div');
+      if (!cell.l) {
+        div.className = 'cell emp';
+      } else {
+        const slv = cell.wids.some(wid => SOL[`${pz.id}-${wid}`]);
+        div.className = 'cell ltr' + (slv ? ' slv' : '');
+        if (slv) div.textContent = cell.l;
+        if (cell.num !== null) {
+          div.classList.add('clk');
+          const s = document.createElement('span');
+          s.className = 'cnum'; s.textContent = cell.num;
+          div.appendChild(s);
+          const wi = cell.wi;
+          div.addEventListener('click', () => openQ(wi));
         }
+      }
+      el.appendChild(div);
+    }
+  }
 
-        // 3. دالة بدء اللغز (تأخذنا مباشرة للسؤال للتجربة المبدئية)
-        function startPuzzle(categoryName) {
-            goToScreen('screen-question');
-            
-            // جلب السؤال الأول من القسم المختار كعينة
-            const currentQuestion = questionsData[categoryName][0];
-            setupQuestionView(currentQuestion);
-        }
+  const total = pz.words.length;
+  const done  = pz.words.filter(w => SOL[`${pz.id}-${w.id}`]).length;
+  $('gprog').style.width = (done / total * 100) + '%';
+}
 
-        let currentSlotIndex = 0; // متغیر لتتبع الخانة الحالية المفتوحة
+/* فتح السؤال */
+function openQ(wi) {
+  WI = wi; INP = [];
+  const pz = GAME.puzzles[PZI], w = pz.words[wi];
 
-        // 4. دالة تجهيز واجهة السؤال
-        function setupQuestionView(data) {
-            currentSlotIndex = 0; // تصفير المؤشر عند بدء سؤال جديد
+  $('qdir').textContent   = w.direction === 'H' ? '← أفقي →' : '↕ عمودي';
+  $('qnum').textContent   = `سؤال ${w.id}`;
+  $('qtitle').textContent = `سؤال ${w.id}`;
 
-            // إعداد النص والصورة
-            document.getElementById('q-text').innerText = data.question;
-            const imgEl = document.getElementById('q-image');
-            if(data.image && data.image !== "") {
-                imgEl.src = data.image;
-                imgEl.style.display = "block";
-            } else {
-                imgEl.style.display = "none";
-            }
+  const img = $('qimg');
+  if (w.image) {
+    img.src = w.image; img.style.display = 'block';
+    img.onerror = () => { img.style.display = 'none'; };
+  } else {
+    img.style.display = 'none';
+  }
 
-            // إعداد خانات الإجابة
-            const slotsContainer = document.getElementById('answer-slots');
-            slotsContainer.innerHTML = '';
-            for(let i = 0; i < data.answer.length; i++) {
-                slotsContainer.innerHTML += `<div class="letter-slot" id="slot-${i}"></div>`;
-            }
+  $('qtext').textContent = w.question;
+  buildBoxes(w.answer.length);
+  buildPool(w.answer);
+  forward('sq');
+}
 
-            // إعداد الحروف العشوائية للحل
-            const poolContainer = document.getElementById('letters-pool');
-            poolContainer.innerHTML = '';
-            
-            // خربطة حروف الكلمة كبداية
-            let letters = data.answer.split('').sort(() => Math.random() - 0.5);
-            
-            letters.forEach(letter => {
-                poolContainer.innerHTML += `<div class="pool-letter" onclick="selectLetter(this)">${letter}</div>`;
-            });
-        }
+/* خانات الإجابة */
+function buildBoxes(n) {
+  const el = $('abwrap'); el.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('div');
+    d.className = 'ab'; d.id = `ab${i}`;
+    el.appendChild(d);
+  }
+}
 
-        // 5. دالة عند الضغط على أحد الحروف المبعثرة
-        function selectLetter(element) {
-            const letter = element.innerText;
-            const slot = document.getElementById(`slot-${currentSlotIndex}`);
-            
-            // إذا كان هناك خانة فارغة متبقية
-            if(slot) {
-                slot.innerText = letter; // نقل الحرف للخانة
-                element.style.visibility = 'hidden'; // إخفاء الحرف من السلة السفلية
-                currentSlotIndex++; // الانتقال للخانة التالية
-            }
-        }
-    </script>
+/* مجموعة الحروف */
+function buildPool(answer) {
+  const ARABIC = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويأإآةى'.split('');
+  const ans    = [...answer];
+  const usedSet = new Set(ans);
+  const avail  = shuffle(ARABIC.filter(l => !usedSet.has(l)));
+  const extra  = Math.min(8, Math.max(4, ans.length));
+  POOL = shuffle([...ans, ...avail.slice(0, extra)]);
+
+  const el = $('pool'); el.innerHTML = '';
+  POOL.forEach((l, i) => {
+    const b = document.createElement('button');
+    b.className = 'pb'; b.id = `pb${i}`; b.textContent = l;
+    b.addEventListener('click', () => pick(l, i));
+    el.appendChild(b);
+  });
+
+  const del = document.createElement('button');
+  del.className = 'del'; del.textContent = '⌫';
+  del.addEventListener('click', rmLast);
+  el.appendChild(del);
+}
+
+/* اختيار حرف */
+function pick(l, pi) {
+  const w = GAME.puzzles[PZI].words[WI];
+  if (INP.length >= w.answer.length) return;
+  const pos = INP.length; INP.push({ l, pi });
+  $(`pb${pi}`).classList.add('used');
+  const b = $(`ab${pos}`); b.textContent = l; b.classList.add('f');
+  if (INP.length === w.answer.length) checkAnswer();
+}
+
+/* حذف آخر حرف */
+function rmLast() {
+  if (!INP.length) return;
+  const last = INP.pop(), pos = INP.length;
+  $(`pb${last.pi}`).classList.remove('used');
+  const b = $(`ab${pos}`); b.textContent = ''; b.className = 'ab';
+}
+
+/* التحقق من الإجابة */
+function checkAnswer() {
+  const pz    = GAME.puzzles[PZI], w = pz.words[WI];
+  const typed = INP.map(x => x.l).join('');
+  const ok    = typed === w.answer;
+
+  [...w.answer].forEach((_, i) => $(`ab${i}`).classList.add(ok ? 'ok' : 'no'));
+
+  if (ok) {
+    SOL[`${pz.id}-${w.id}`] = true;
+    launchConfetti();
+    setTimeout(() => {
+      $('ov-wd').textContent = w.answer;
+      $('ovs').classList.add('vis');
+    }, 500);
+  } else {
+    setTimeout(() => {
+      INP = [];
+      [...w.answer].forEach((_, i) => {
+        const b = $(`ab${i}`); b.textContent = ''; b.className = 'ab';
+      });
+      POOL.forEach((_, i) => $(`pb${i}`)?.classList.remove('used'));
+    }, 950);
+  }
+}
+
+/* أحداث اللوحات */
+$('btn-cont').addEventListener('click', () => {
+  $('ovs').classList.remove('vis');
+  const pz    = GAME.puzzles[PZI];
+  const allOk = pz.words.every(w => SOL[`${pz.id}-${w.id}`]);
+  if (allOk) {
+    setTimeout(() => $('ovc').classList.add('vis'), 200);
+  } else {
+    backward('sg');
+  }
+});
+
+$('btn-tocats').addEventListener('click', () => {
+  $('ovc').classList.remove('vis');
+  $(CUR).classList.replace('on', 'hr');
+  const el = $('sc'); el.classList.remove('hl', 'hr'); el.classList.add('on');
+  CUR = 'sc'; buildCats();
+});
+
+/* كونفيتي */
+function launchConfetti() {
+  const C = ['#ffd54f','#4fc3f7','#69f0ae','#ef5350','#ce93d8','#ff8a65','#fff176'];
+  for (let i = 0; i < 55; i++) {
+    const d = document.createElement('div');
+    d.className = 'cf';
+    const s = 5 + Math.random() * 7;
+    d.style.cssText = `
+      left: ${Math.random() * 100}vw; top: 0;
+      background: ${C[i % C.length]};
+      width: ${s}px; height: ${s}px;
+      animation-delay: ${Math.random() * .8}s;
+      animation-duration: ${1.4 + Math.random() * .9}s;
+    `;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 3500);
+  }
+}
+
+/* مساعدات */
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* الأزرار */
+$('btn-start').addEventListener('click', () => forward('sc'));
+$('bk1').addEventListener('click', () => backward('sw'));
+$('bk2').addEventListener('click', () => backward('sc'));
+$('bk3').addEventListener('click', () => backward('sg'));
+
+/* التهيئة */
+(function init() {
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+  }
+  document.querySelectorAll('.sc').forEach(s => {
+    if (s.id !== 'sw') { s.classList.add('hr'); s.classList.remove('on'); }
+  });
+})();
+</script>
+
 </body>
 </html>
